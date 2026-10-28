@@ -17,27 +17,74 @@ function notifyPro(unlocked) {
   }
 }
 
-export async function isProUnlocked() {
+/** Parse the persisted Pro record. Legacy value is `'1'`. */
+export function parseProRecord(raw) {
+  if (raw == null || raw === '') {
+    return { unlocked: false, pendingVerification: false };
+  }
+  if (raw === '1') {
+    return { unlocked: true, pendingVerification: false, source: 'store' };
+  }
   try {
-    const v = await AsyncStorage.getItem(PRO_KEY);
-    return v === '1';
+    const obj = JSON.parse(raw);
+    if (obj && (obj.unlocked === true || obj.unlocked === '1')) {
+      const pending = obj.pendingVerification === true || obj.source === 'event';
+      return {
+        unlocked: true,
+        pendingVerification: pending,
+        source: obj.source || (pending ? 'event' : 'store'),
+        ts: obj.ts,
+      };
+    }
+  } catch {}
+  return { unlocked: false, pendingVerification: false };
+}
+
+export async function getProRecord() {
+  try {
+    return parseProRecord(await AsyncStorage.getItem(PRO_KEY));
   } catch {
-    return false;
+    return { unlocked: false, pendingVerification: false };
   }
 }
 
-export async function setProUnlocked(unlocked) {
-  try {
-    if (unlocked) {
-      await AsyncStorage.setItem(PRO_KEY, '1');
-      await AsyncStorage.removeItem(EMPTY_PURCHASE_STREAK_KEY);
-    } else {
+export async function isProPersisted() {
+  return (await getProRecord()).unlocked === true;
+}
+
+export async function isPendingVerification() {
+  return (await getProRecord()).pendingVerification === true;
+}
+
+export async function isProUnlocked() {
+  return isProPersisted();
+}
+
+export async function setProUnlocked(unlocked, { pendingVerification = false } = {}) {
+  if (!unlocked) {
+    try {
       await AsyncStorage.removeItem(PRO_KEY);
+    } catch {
+      // ignore
     }
+    notifyPro(false);
+    return;
+  }
+  try {
+    if (pendingVerification) {
+      await AsyncStorage.setItem(PRO_KEY, JSON.stringify({
+        unlocked: true,
+        source: 'event',
+        ts: Date.now(),
+      }));
+    } else {
+      await AsyncStorage.setItem(PRO_KEY, '1');
+    }
+    await AsyncStorage.removeItem(EMPTY_PURCHASE_STREAK_KEY);
   } catch {
     // ignore
   }
-  notifyPro(unlocked);
+  notifyPro(true);
 }
 
 export async function clearProUnlocked() {

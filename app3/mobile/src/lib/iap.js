@@ -7,10 +7,42 @@ import {
 } from './entitlements';
 import { t } from '../i18n';
 
-export const PRO_PRODUCT_ID =
-  process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.beenages.app.fullpack';
+export const CANONICAL_PRO_PRODUCT_ID = 'com.beenages.app.fullpack';
 
 export const EMPTY_LIST_REVOKE_AFTER = 3;
+
+/** Backoff before re-reading entitlements after a purchase-updated event. */
+export const entitlementGrantConfig = {
+  retryDelaysMs: [1000, 3000],
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  },
+};
+
+function easBuildProfile() {
+  return String(
+    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE || '',
+  );
+}
+
+/**
+ * Env override is for local / __DEV__ / non-production profiles only.
+ * Production builds always use the App Store Full Pack id.
+ */
+export function resolveProProductId({
+  override = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID,
+  dev = typeof __DEV__ !== 'undefined' && __DEV__ === true,
+  profile = easBuildProfile(),
+} = {}) {
+  const raw = typeof override === 'string' ? override.trim() : '';
+  if (!raw) return CANONICAL_PRO_PRODUCT_ID;
+  if (profile === 'production') return CANONICAL_PRO_PRODUCT_ID;
+  if (dev === true) return raw;
+  if (profile !== '') return raw;
+  return CANONICAL_PRO_PRODUCT_ID;
+}
+
+export const PRO_PRODUCT_ID = resolveProProductId();
 
 function runningInExpoGo() {
   try {
@@ -22,12 +54,6 @@ function runningInExpoGo() {
   } catch {
     return false;
   }
-}
-
-function easBuildProfile() {
-  return String(
-    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE || '',
-  );
 }
 
 /** Never true for the EAS production profile, even if the simulate flag leaks in. */
@@ -67,8 +93,16 @@ export function purchaseMatches(p, productId = PRO_PRODUCT_ID) {
 }
 
 export function isRevoked(purchase) {
-  const d = purchase?.revocationDate ?? purchase?.revocationDateIOS;
-  return d != null && d !== '' && d !== 0;
+  if (!purchase || typeof purchase !== 'object') return false;
+  const d = purchase.revocationDate ?? purchase.revocationDateIOS;
+  if (d != null && d !== '' && d !== 0) return true;
+  if (purchase.revoked === true) return true;
+  const reason = purchase.revocationReason ?? purchase.revocationReasonIOS;
+  if (reason != null && reason !== '' && reason !== 0) return true;
+  const state = String(
+    purchase.purchaseState ?? purchase.transactionState ?? purchase.transactionReason ?? '',
+  ).toLowerCase();
+  return state === 'revoked' || state === 'refunded';
 }
 
 export function isPendingPurchase(p) {
@@ -99,6 +133,9 @@ export function decideUnlockFromPurchases(
   if ((purchases || []).some((p) => isEntitledPurchase(p))) {
     return { unlocked: true, emptyStreak: 0, revoke: false, entitled: true };
   }
+  if ((purchases || []).some((p) => purchaseMatches(p) && isRevoked(p))) {
+    return { unlocked: false, emptyStreak: 0, revoke: true, entitled: false };
+  }
   const nextStreak = emptyStreak + 1;
   if (currentlyUnlocked && nextStreak < revokeAfter) {
     return { unlocked: true, emptyStreak: nextStreak, revoke: false, entitled: false };
@@ -127,6 +164,33 @@ function productSku(purchase) {
 
 let keepIapConnection = false;
 let purchaseSub = null;
+const grantInFlight = new Map();
+
+export function purchaseTransactionId(purchase) {
+  if (!purchase || typeof purchase !== 'object') return null;
+  for (const key of [
+    'transactionId',
+    'transactionIdIOS',
+    'originalTransactionIdentifierIOS',
+    'purchaseToken',
+    'purchaseTokenAndroid',
+  ]) {
+    const v = purchase[key];
+    if (v != null && String(v).trim() !== '') return String(v);
+  }
+  return null;
+}
+
+export function grantDedupeKey(purchase) {
+  const tx = purchaseTransactionId(purchase);
+  if (tx) return `tx:${tx}`;
+  const date = purchase?.transactionDate ?? purchase?.transactionDateIOS ?? purchase?.purchaseTime ?? '';
+  return `sku:${PRO_PRODUCT_ID}:${date}`;
+}
+
+export function resetGrantInFlight() {
+  grantInFlight.clear();
+}
 
 export function canPresentRedeemCode(os = Platform.OS) {
   return os === 'ios';
@@ -191,22 +255,48 @@ async function finishIfPossible(iap, purchase) {
   } catch {}
 }
 
+async function grantFullpackPurchaseBody(purchase) {
+  const iap = require('expo-iap');
+  const verified = await verifyTransactionBestEffort(iap, purchase);
+  await finishIfPossible(iap, purchase);
+
+  if (await unlockFromEntitlements(iap)) return true;
+
+  // Entitlements can lag the purchase-updated event; retry a couple of times
+  // before deciding whether to persist the unlock.
+  for (const ms of entitlementGrantConfig.retryDelaysMs) {
+    await entitlementGrantConfig.sleep(ms);
+    if (await unlockFromEntitlements(iap)) return true;
+  }
+
+  if (verified === true) {
+    await setProUnlocked(true);
+    await setEmptyPurchaseStreak(0);
+    return true;
+  }
+
+  // Persist so a force-quit + relaunch (App Review) stays unlocked.
+  // Launch rebuild clears this pending flag once entitlements catch up,
+  // or revokes after N successful empty queries / explicit revocation.
+  await setProUnlocked(true, { pendingVerification: true });
+  await setEmptyPurchaseStreak(0);
+  return true;
+}
+
 export async function grantFullpackPurchase(purchase) {
   try {
     if (isPendingPurchase(purchase)) return false;
     if (!purchaseMatches(purchase) || isRevoked(purchase)) return false;
 
-    const iap = require('expo-iap');
-    await verifyTransactionBestEffort(iap, purchase);
-    await finishIfPossible(iap, purchase);
+    const key = grantDedupeKey(purchase);
+    const existing = grantInFlight.get(key);
+    if (existing) return existing;
 
-    if (await unlockFromEntitlements(iap)) return true;
-
-    // Entitlements can lag the purchase-updated event; a matching
-    // non-revoked StoreKit purchase is itself an entitlement.
-    await setProUnlocked(true);
-    await setEmptyPurchaseStreak(0);
-    return true;
+    const run = grantFullpackPurchaseBody(purchase).finally(() => {
+      if (grantInFlight.get(key) === run) grantInFlight.delete(key);
+    });
+    grantInFlight.set(key, run);
+    return run;
   } catch {
     return false;
   }
@@ -235,6 +325,7 @@ export async function stopPurchaseUpdates() {
   } catch {}
   purchaseSub = null;
   keepIapConnection = false;
+  resetGrantInFlight();
   try {
     const iap = require('expo-iap');
     await iap.endConnection?.();

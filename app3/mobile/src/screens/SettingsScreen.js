@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors, useTheme } from '../theme/useTheme';
@@ -29,6 +29,8 @@ export default function SettingsScreen() {
     reminderTime, setReminderTime,
   } = useTheme();
   const [pro, setPro] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
+  const busyLock = React.useRef(false);
   const [trash, setTrash] = React.useState(() => getRecentlyDeleted().length);
   React.useEffect(() => {
     isProUnlocked().then(setPro);
@@ -37,17 +39,25 @@ export default function SettingsScreen() {
   React.useEffect(() => subscribe(() => setTrash(getRecentlyDeleted().length)), []);
 
   async function restore() {
-    const r = await restoreProUnlock();
-    if (r.ok && r.restored !== false) {
-      setPro(true);
-      Alert.alert(t('settings.restore'), t('iap.restored'));
-      return;
+    if (busy || busyLock.current) return;
+    busyLock.current = true;
+    setBusy(true);
+    try {
+      const r = await restoreProUnlock();
+      if (r.ok && r.restored !== false) {
+        setPro(true);
+        Alert.alert(t('settings.restore'), t('iap.restored'));
+        return;
+      }
+      if (r.error) {
+        Alert.alert(t('common.fail'), r.error);
+        return;
+      }
+      Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
+    } finally {
+      busyLock.current = false;
+      setBusy(false);
     }
-    if (r.error) {
-      Alert.alert(t('common.fail'), r.error);
-      return;
-    }
-    Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
   }
 
   function cycleAppearance() {
@@ -79,13 +89,24 @@ export default function SettingsScreen() {
             chev
           />
           <View style={styles.restoreRow}>
-            <TouchableOpacity onPress={restore} style={styles.restoreMain} activeOpacity={0.6} accessibilityLabel={t('settings.restore')}>
+            <TouchableOpacity
+              onPress={restore}
+              disabled={busy}
+              style={styles.restoreMain}
+              activeOpacity={0.6}
+              accessibilityState={{ disabled: busy, busy }}
+              accessibilityLabel={busy ? t('iap.processing') : t('settings.restore')}
+            >
               <Sq bg="#8E8E93"><RestoreIcon color="#fff" size={15} /></Sq>
-              <Text style={[styles.restoreTitle, { color: c.label }]}>{t('settings.restore')}</Text>
+              <Text style={[styles.restoreTitle, { color: c.label }]}>
+                {busy ? t('iap.processing') : t('settings.restore')}
+              </Text>
+              {busy ? <ActivityIndicator color={c.brand} size="small" /> : null}
             </TouchableOpacity>
             {canPresentRedeemCode() ? (
               <TouchableOpacity
                 onPress={() => { presentRedeemCodeSheet().catch(() => {}); }}
+                disabled={busy}
                 hitSlop={8}
                 accessibilityLabel={t('settings.redeem')}
               >

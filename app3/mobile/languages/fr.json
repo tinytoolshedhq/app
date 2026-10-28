@@ -25,6 +25,7 @@
   },
   "iap": {
     "buyFail": "Achat échoué",
+    "processing": "Traitement…",
     "unavailable": "Achats indisponibles",
     "timeout": "Achat trop long",
     "cancel": "Annuler",

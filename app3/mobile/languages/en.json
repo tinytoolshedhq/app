@@ -21,6 +21,7 @@
   },
   "iap": {
     "buyFail": "Purchase failed",
+    "processing": "Processing…",
     "unavailable": "Purchases unavailable",
     "timeout": "Timed out waiting for purchase",
     "cancel": "Cancel",
