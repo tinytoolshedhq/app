@@ -40,15 +40,14 @@ export default function SettingsScreen() {
     const r = await restoreProUnlock();
     if (r.ok && r.restored !== false) {
       setPro(true);
+      Alert.alert(t('settings.restore'), t('iap.restored'));
       return;
     }
     if (r.error) {
       Alert.alert(t('common.fail'), r.error);
       return;
     }
-    if (r.ok && r.restored === false) {
-      Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
-    }
+    Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
   }
 
   function cycleAppearance() {

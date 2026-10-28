@@ -7,8 +7,10 @@ import {
 } from './entitlements';
 import { t } from '../i18n';
 
-const PRO_PRODUCT_ID =
+export const PRO_PRODUCT_ID =
   process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.beenages.app.fullpack';
+
+export const EMPTY_LIST_REVOKE_AFTER = 3;
 
 function runningInExpoGo() {
   try {
@@ -39,13 +41,88 @@ export function allowSimulate() {
     && process.env.EXPO_PUBLIC_IAP_SIMULATE === '1';
 }
 
-function purchaseMatches(p) {
+function errorBlob(error) {
+  return `${error?.code || ''} ${error?.message || error || ''}`;
+}
+
+export function isUserCancelledError(error) {
+  return /cancel|E_USER_CANCELLED|user-cancelled/i.test(errorBlob(error));
+}
+
+export function isAlreadyOwnedError(error) {
+  return /already.?owned|E_ALREADY_OWNED|already-owned|already (been )?bought|already purchased/i.test(errorBlob(error));
+}
+
+export function isDeferredError(error) {
+  return /E_DEFERRED|deferred-payment|(^|[^a-z])deferred([^a-z]|$)/i.test(errorBlob(error));
+}
+
+export function purchaseMatches(p, productId = PRO_PRODUCT_ID) {
   return (
-    p?.productId === PRO_PRODUCT_ID ||
-    p?.id === PRO_PRODUCT_ID ||
-    p?.sku === PRO_PRODUCT_ID ||
-    (Array.isArray(p?.ids) && p.ids.includes(PRO_PRODUCT_ID))
+    p?.productId === productId ||
+    p?.id === productId ||
+    p?.sku === productId ||
+    (Array.isArray(p?.ids) && p.ids.includes(productId))
   );
+}
+
+export function isRevoked(purchase) {
+  const d = purchase?.revocationDate ?? purchase?.revocationDateIOS;
+  return d != null && d !== '' && d !== 0;
+}
+
+export function isPendingPurchase(p) {
+  if (!p || typeof p !== 'object') return false;
+  if (p.purchaseState === 'pending') return true;
+  if (p.purchaseStateAndroid === 2) return true;
+  if (p.transactionStateIOS === 4) return true;
+  return false;
+}
+
+/** Matching Full Pack that is not pending and not refunded. */
+export function isEntitledPurchase(p, productId = PRO_PRODUCT_ID) {
+  return purchaseMatches(p, productId) && !isRevoked(p) && !isPendingPurchase(p);
+}
+
+/**
+ * Pure unlock decision from a StoreKit currentEntitlements-style list.
+ * Empty/offline-looking lists do not immediately revoke a valid local unlock.
+ */
+export function decideUnlockFromPurchases(
+  purchases,
+  {
+    currentlyUnlocked = false,
+    emptyStreak = 0,
+    revokeAfter = EMPTY_LIST_REVOKE_AFTER,
+  } = {},
+) {
+  if ((purchases || []).some((p) => isEntitledPurchase(p))) {
+    return { unlocked: true, emptyStreak: 0, revoke: false, entitled: true };
+  }
+  const nextStreak = emptyStreak + 1;
+  if (currentlyUnlocked && nextStreak < revokeAfter) {
+    return { unlocked: true, emptyStreak: nextStreak, revoke: false, entitled: false };
+  }
+  return {
+    unlocked: false,
+    emptyStreak: nextStreak,
+    revoke: currentlyUnlocked && nextStreak >= revokeAfter,
+    entitled: false,
+  };
+}
+
+function looksLikePurchase(p) {
+  return !!(p && typeof p === 'object' && (p.productId || p.id || p.sku || p.ids));
+}
+
+function productSku(purchase) {
+  if (purchaseMatches(purchase)) {
+    if (purchase?.productId === PRO_PRODUCT_ID) return purchase.productId;
+    if (purchase?.sku === PRO_PRODUCT_ID) return purchase.sku;
+    if (purchase?.id === PRO_PRODUCT_ID) return purchase.id;
+    return PRO_PRODUCT_ID;
+  }
+  return purchase?.productId || purchase?.sku || PRO_PRODUCT_ID;
 }
 
 let keepIapConnection = false;
@@ -62,42 +139,73 @@ async function endIapIfEphemeral(iap) {
   } catch {}
 }
 
-function isRevoked(purchase) {
-  const d = purchase?.revocationDate ?? purchase?.revocationDateIOS;
-  return d != null && d !== '';
-}
-
-/** StoreKit 2 / expo-iap transaction check. Fail closed. */
-async function transactionVerified(iap, purchase) {
-  if (!purchaseMatches(purchase)) return false;
-  if (isRevoked(purchase)) return false;
-  if (typeof iap?.isTransactionVerifiedIOS !== 'function') return false;
+/**
+ * Best-effort StoreKit 2 JWS check. Must not fail closed: expo-iap's
+ * isTransactionVerifiedIOS often returns false/throws in sandbox (and
+ * immediately after purchaseUpdated) even for a valid Full Pack buy.
+ */
+async function verifyTransactionBestEffort(iap, purchase) {
+  if (typeof iap?.isTransactionVerifiedIOS !== 'function') return null;
   try {
-    const sku = purchase.productId || purchase.id || purchase.sku || PRO_PRODUCT_ID;
-    const ok = await iap.isTransactionVerifiedIOS(sku);
+    const ok = await iap.isTransactionVerifiedIOS(productSku(purchase));
     return ok === true;
   } catch {
     return false;
   }
 }
 
-async function hasVerifiedFullpack(iap, purchases) {
-  for (const p of purchases || []) {
-    if (await transactionVerified(iap, p)) return true;
+async function readCurrentEntitlements(iap) {
+  if (typeof iap?.getAvailablePurchases !== 'function') {
+    return { ok: false, purchases: [] };
+  }
+  try {
+    const purchases = await iap.getAvailablePurchases();
+    if (!Array.isArray(purchases)) return { ok: false, purchases: [] };
+    const list = [...purchases];
+    if (!list.some((p) => isEntitledPurchase(p)) && typeof iap?.currentEntitlementIOS === 'function') {
+      try {
+        const one = await iap.currentEntitlementIOS(PRO_PRODUCT_ID);
+        if (one) list.push(one);
+      } catch {}
+    }
+    return { ok: true, purchases: list };
+  } catch {
+    return { ok: false, purchases: [] };
+  }
+}
+
+async function unlockFromEntitlements(iap) {
+  const { purchases } = await readCurrentEntitlements(iap);
+  if (purchases.some((p) => isEntitledPurchase(p))) {
+    await setProUnlocked(true);
+    await setEmptyPurchaseStreak(0);
+    return true;
   }
   return false;
 }
 
+async function finishIfPossible(iap, purchase) {
+  if (typeof iap?.finishTransaction !== 'function') return;
+  try {
+    await iap.finishTransaction({ purchase, isConsumable: false });
+  } catch {}
+}
+
 export async function grantFullpackPurchase(purchase) {
   try {
+    if (isPendingPurchase(purchase)) return false;
+    if (!purchaseMatches(purchase) || isRevoked(purchase)) return false;
+
     const iap = require('expo-iap');
-    if (!(await transactionVerified(iap, purchase))) return false;
-    if (typeof iap.finishTransaction === 'function') {
-      try {
-        await iap.finishTransaction({ purchase, isConsumable: false });
-      } catch {}
-    }
+    await verifyTransactionBestEffort(iap, purchase);
+    await finishIfPossible(iap, purchase);
+
+    if (await unlockFromEntitlements(iap)) return true;
+
+    // Entitlements can lag the purchase-updated event; a matching
+    // non-revoked StoreKit purchase is itself an entitlement.
     await setProUnlocked(true);
+    await setEmptyPurchaseStreak(0);
     return true;
   } catch {
     return false;
@@ -149,69 +257,63 @@ export async function presentRedeemCodeSheet() {
 }
 
 function waitForPurchaseEvent(iap, timeoutMs = 120000) {
-  return new Promise((resolve) => {
-    let settled = false;
-    const finish = (result) => {
-      if (settled) return;
-      settled = true;
-      try {
-        subUpdate?.remove?.();
-      } catch {}
-      try {
-        subError?.remove?.();
-      } catch {}
-      clearTimeout(timer);
-      resolve(result);
-    };
-
-    const subUpdate = iap.purchaseUpdatedListener((purchase) => {
-      if (!purchaseMatches(purchase)) return;
-      finish({ ok: true, purchase });
-    });
-    const subError = iap.purchaseErrorListener?.((error) => {
-      const msg = String(error?.message || error?.code || error || t('iap.buyFail'));
-      if (/cancel|Cancel|E_USER_CANCELLED/i.test(msg)) {
-        finish({ ok: false, cancelled: true });
-        return;
-      }
-      finish({ ok: false, error: msg });
-    });
-
-    const timer = setTimeout(() => {
-      finish({ ok: false, error: t('iap.timeout') });
-    }, timeoutMs);
+  let settled = false;
+  let subUpdate;
+  let subError;
+  let timer;
+  let resolvePromise;
+  const promise = new Promise((resolve) => {
+    resolvePromise = resolve;
   });
-}
 
-async function tryNativePurchase() {
-  const iap = require('expo-iap');
-  if (!iap?.initConnection || !iap?.requestPurchase) {
-    throw new Error('IAP unavailable');
-  }
+  const cleanup = () => {
+    try { subUpdate?.remove?.(); } catch {}
+    try { subError?.remove?.(); } catch {}
+    clearTimeout(timer);
+  };
 
-  await iap.initConnection();
-  try {
-    if (typeof iap.fetchProducts === 'function') {
-      await iap.fetchProducts({ skus: [PRO_PRODUCT_ID], type: 'in-app' });
+  const finish = (result) => {
+    if (settled) return;
+    settled = true;
+    cleanup();
+    resolvePromise(result);
+  };
+
+  subUpdate = iap.purchaseUpdatedListener((purchase) => {
+    if (isPendingPurchase(purchase)) {
+      finish({ ok: false, pending: true, purchase });
+      return;
     }
+    if (!purchaseMatches(purchase)) return;
+    if (isRevoked(purchase)) return;
+    finish({ ok: true, purchase });
+  });
+  subError = iap.purchaseErrorListener?.((error) => {
+    if (isUserCancelledError(error)) {
+      finish({ ok: false, cancelled: true });
+      return;
+    }
+    if (isAlreadyOwnedError(error)) {
+      finish({ ok: false, alreadyOwned: true });
+      return;
+    }
+    if (isDeferredError(error)) {
+      finish({ ok: false, pending: true });
+      return;
+    }
+    const msg = String(error?.message || error?.code || error || t('iap.buyFail'));
+    finish({ ok: false, error: msg });
+  });
+  timer = setTimeout(() => {
+    finish({ ok: false, error: t('iap.timeout') });
+  }, timeoutMs);
 
-    const pending = waitForPurchaseEvent(iap);
-    await iap.requestPurchase({
-      request: {
-        apple: { sku: PRO_PRODUCT_ID },
-        google: { skus: [PRO_PRODUCT_ID] }
-      },
-      type: 'in-app'
-    });
-
-    const result = await pending;
-    if (!result.ok) return result;
-    const granted = await grantFullpackPurchase(result.purchase);
-    if (!granted) return { ok: false };
-    return { ok: true };
-  } finally {
-    await endIapIfEphemeral(iap);
-  }
+  return {
+    promise,
+    cancel() {
+      finish({ ok: false, skipped: true });
+    },
+  };
 }
 
 async function tryNativeRestore() {
@@ -229,13 +331,73 @@ async function tryNativeRestore() {
         // continue to query
       }
     }
-    const purchases = await iap.getAvailablePurchases();
-    if (await hasVerifiedFullpack(iap, purchases)) {
-      await setProUnlocked(true);
+    if (await unlockFromEntitlements(iap)) {
       return { ok: true, restored: true };
     }
     return { ok: true, restored: false };
   } finally {
+    await endIapIfEphemeral(iap);
+  }
+}
+
+async function tryNativePurchase() {
+  const iap = require('expo-iap');
+  if (!iap?.initConnection || !iap?.requestPurchase) {
+    throw new Error('IAP unavailable');
+  }
+
+  await iap.initConnection();
+  const waiter = waitForPurchaseEvent(iap);
+  try {
+    if (typeof iap.fetchProducts === 'function') {
+      await iap.fetchProducts({ skus: [PRO_PRODUCT_ID], type: 'in-app' });
+    }
+
+    let returned;
+    try {
+      returned = await iap.requestPurchase({
+        request: {
+          apple: { sku: PRO_PRODUCT_ID },
+          google: { skus: [PRO_PRODUCT_ID] }
+        },
+        type: 'in-app'
+      });
+    } catch (e) {
+      waiter.cancel();
+      if (isUserCancelledError(e)) return { ok: false, cancelled: true };
+      if (isDeferredError(e)) return { ok: false, pending: true };
+      if (isAlreadyOwnedError(e)) return await tryNativeRestore();
+      throw e;
+    }
+
+    if (isPendingPurchase(returned)) {
+      waiter.cancel();
+      return { ok: false, pending: true };
+    }
+
+    let result;
+    if (looksLikePurchase(returned) && purchaseMatches(returned) && !isRevoked(returned)) {
+      waiter.cancel();
+      result = { ok: true, purchase: returned };
+    } else {
+      result = await waiter.promise;
+    }
+
+    if (result.cancelled) return result;
+    if (result.pending) return { ok: false, pending: true };
+    if (result.alreadyOwned) return await tryNativeRestore();
+
+    if (result.ok && result.purchase) {
+      const granted = await grantFullpackPurchase(result.purchase);
+      if (granted) return { ok: true };
+    }
+
+    const restored = await tryNativeRestore();
+    if (restored.ok && restored.restored) return { ok: true };
+    if (!result.ok && !result.skipped) return result;
+    return { ok: false };
+  } finally {
+    waiter.cancel();
     await endIapIfEphemeral(iap);
   }
 }
@@ -249,8 +411,13 @@ export async function purchaseProUnlock() {
     return await tryNativePurchase();
   } catch (e) {
     const msg = String(e?.message || e || '');
-    if (/cancel|Cancel|E_USER_CANCELLED/i.test(msg)) {
+    if (isUserCancelledError(e) || isUserCancelledError(msg)) {
       return { ok: false, cancelled: true };
+    }
+    if (isAlreadyOwnedError(e) || isAlreadyOwnedError(msg)) {
+      try {
+        return await tryNativeRestore();
+      } catch {}
     }
     if (!allowSimulate()) {
       return { ok: false, error: msg || t('iap.buyFail') };
@@ -281,13 +448,17 @@ export async function purchaseProUnlock() {
 }
 
 export async function restoreProUnlock() {
-  if (await isProUnlocked()) {
-    return { ok: true, restored: true };
-  }
-
   try {
-    return await tryNativeRestore();
+    const native = await tryNativeRestore();
+    if (native.ok && native.restored) return native;
+    if (await isProUnlocked()) {
+      return { ok: true, restored: true };
+    }
+    if (native.ok) return native;
   } catch (e) {
+    if (await isProUnlocked()) {
+      return { ok: true, restored: true };
+    }
     if (!allowSimulate()) {
       return { ok: false, restored: false, error: String(e?.message || e) };
     }
@@ -351,13 +522,11 @@ export async function getProDisplayPrice() {
   }
 }
 
-const EMPTY_LIST_REVOKE_AFTER = 3;
-
 /**
- * On launch, re-verify entitlement via getAvailablePurchases() only
- * (not restorePurchases). Grants locally when a matching purchase exists.
- * Does not revoke in IAP_SIMULATE / preview / Expo Go. An empty list can
- * mean offline or a StoreKit cache miss, so revocation requires N consecutive
+ * On launch, rebuild Pro from StoreKit currentEntitlements
+ * (`getAvailablePurchases`). A matching Full Pack unlocks immediately.
+ * Failed/offline queries do not increment the empty streak or revoke.
+ * An empty list can be a cache miss, so revocation needs N consecutive
  * successful empty queries.
  */
 export async function verifyProOnLaunch() {
@@ -369,15 +538,20 @@ export async function verifyProOnLaunch() {
     if (!iap?.initConnection || !iap?.getAvailablePurchases) return;
     await iap.initConnection();
     try {
-      const purchases = await iap.getAvailablePurchases();
-      if (await hasVerifiedFullpack(iap, purchases)) {
+      const { ok, purchases } = await readCurrentEntitlements(iap);
+      if (!ok) return;
+      const currentlyUnlocked = await isProUnlocked();
+      const emptyStreak = await getEmptyPurchaseStreak();
+      const decision = decideUnlockFromPurchases(purchases, {
+        currentlyUnlocked,
+        emptyStreak,
+      });
+      await setEmptyPurchaseStreak(decision.emptyStreak);
+      if (decision.entitled) {
         await setProUnlocked(true);
-        await setEmptyPurchaseStreak(0);
         return;
       }
-      const streak = (await getEmptyPurchaseStreak()) + 1;
-      await setEmptyPurchaseStreak(streak);
-      if (streak >= EMPTY_LIST_REVOKE_AFTER) {
+      if (decision.revoke) {
         await setProUnlocked(false);
       }
     } finally {

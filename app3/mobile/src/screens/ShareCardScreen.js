@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useActivities } from '../data/repository';
 import { useThemeColors } from '../theme/useTheme';
 import { ChevronLeftIcon } from '../components/Icons';
-import { isProUnlocked } from '../lib/entitlements';
+import { isProUnlocked, subscribePro } from '../lib/entitlements';
 import { elapsedMs, formatSpanParts, isDetailHeroToday } from '../lib/time';
 import ShareCardView from '../share/ShareCardView';
 import { SHARE_SIZES, SHARE_STYLES, canUseStyle, styleById } from '../share/config';
@@ -28,7 +28,10 @@ export default function ShareCardScreen() {
   const [pro, setPro] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  React.useEffect(() => { isProUnlocked().then(setPro); }, []);
+  React.useEffect(() => {
+    isProUnlocked().then(setPro);
+    return subscribePro(setPro);
+  }, []);
 
   if (!item) {
     return (

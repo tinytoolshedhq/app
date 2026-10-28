@@ -34,6 +34,7 @@
     "devTitle": "Simuler la restauration",
     "devRestoreBody": "Accorder l’achat ?",
     "restore": "Restaurer",
+    "restored": "Achats restaurés",
     "nothingToRestore": "Aucun achat trouvé",
     "cannotRestore": "Impossible ici"
   },

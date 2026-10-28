@@ -30,6 +30,7 @@
     "devTitle": "模擬恢復",
     "devRestoreBody": "要授予權限嗎？",
     "restore": "恢復",
+    "restored": "已恢復購買",
     "nothingToRestore": "找不到已購買紀錄",
     "cannotRestore": "此平台無法恢復"
   },
