@@ -4,6 +4,9 @@ const PRO_KEY = 'beenages/proUnlocked/v1';
 const EMPTY_PURCHASE_STREAK_KEY = 'beenages/emptyPurchaseStreak/v1';
 const proListeners = new Set();
 
+/** In-memory grant for the current process only (not written to storage). */
+let sessionProUnlocked = false;
+
 export function subscribePro(listener) {
   proListeners.add(listener);
   return () => proListeners.delete(listener);
@@ -17,7 +20,7 @@ function notifyPro(unlocked) {
   }
 }
 
-export async function isProUnlocked() {
+export async function isProPersisted() {
   try {
     const v = await AsyncStorage.getItem(PRO_KEY);
     return v === '1';
@@ -26,21 +29,39 @@ export async function isProUnlocked() {
   }
 }
 
-export async function setProUnlocked(unlocked) {
-  try {
-    if (unlocked) {
-      await AsyncStorage.setItem(PRO_KEY, '1');
-      await AsyncStorage.removeItem(EMPTY_PURCHASE_STREAK_KEY);
-    } else {
+export async function isProUnlocked() {
+  if (sessionProUnlocked) return true;
+  return isProPersisted();
+}
+
+export async function setProUnlocked(unlocked, { persist = true } = {}) {
+  if (!unlocked) {
+    sessionProUnlocked = false;
+    try {
       await AsyncStorage.removeItem(PRO_KEY);
+    } catch {
+      // ignore
     }
+    notifyPro(false);
+    return;
+  }
+  if (!persist) {
+    sessionProUnlocked = true;
+    notifyPro(true);
+    return;
+  }
+  sessionProUnlocked = false;
+  try {
+    await AsyncStorage.setItem(PRO_KEY, '1');
+    await AsyncStorage.removeItem(EMPTY_PURCHASE_STREAK_KEY);
   } catch {
     // ignore
   }
-  notifyPro(unlocked);
+  notifyPro(true);
 }
 
 export async function clearProUnlocked() {
+  sessionProUnlocked = false;
   try {
     await AsyncStorage.removeItem(PRO_KEY);
     await AsyncStorage.removeItem(EMPTY_PURCHASE_STREAK_KEY);

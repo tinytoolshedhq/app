@@ -7,10 +7,42 @@ import {
 } from './entitlements';
 import { t } from '../i18n';
 
-export const PRO_PRODUCT_ID =
-  process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.beenages.app.fullpack';
+export const CANONICAL_PRO_PRODUCT_ID = 'com.beenages.app.fullpack';
 
 export const EMPTY_LIST_REVOKE_AFTER = 3;
+
+/** Backoff before re-reading entitlements after a purchase-updated event. */
+export const entitlementGrantConfig = {
+  retryDelaysMs: [1000, 3000],
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  },
+};
+
+function easBuildProfile() {
+  return String(
+    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE || '',
+  );
+}
+
+/**
+ * Env override is for local / __DEV__ / non-production profiles only.
+ * Production builds always use the App Store Full Pack id.
+ */
+export function resolveProProductId({
+  override = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID,
+  dev = typeof __DEV__ !== 'undefined' && __DEV__ === true,
+  profile = easBuildProfile(),
+} = {}) {
+  const raw = typeof override === 'string' ? override.trim() : '';
+  if (!raw) return CANONICAL_PRO_PRODUCT_ID;
+  if (profile === 'production') return CANONICAL_PRO_PRODUCT_ID;
+  if (dev === true) return raw;
+  if (profile !== '') return raw;
+  return CANONICAL_PRO_PRODUCT_ID;
+}
+
+export const PRO_PRODUCT_ID = resolveProProductId();
 
 function runningInExpoGo() {
   try {
@@ -22,12 +54,6 @@ function runningInExpoGo() {
   } catch {
     return false;
   }
-}
-
-function easBuildProfile() {
-  return String(
-    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE || '',
-  );
 }
 
 /** Never true for the EAS production profile, even if the simulate flag leaks in. */
@@ -67,8 +93,16 @@ export function purchaseMatches(p, productId = PRO_PRODUCT_ID) {
 }
 
 export function isRevoked(purchase) {
-  const d = purchase?.revocationDate ?? purchase?.revocationDateIOS;
-  return d != null && d !== '' && d !== 0;
+  if (!purchase || typeof purchase !== 'object') return false;
+  const d = purchase.revocationDate ?? purchase.revocationDateIOS;
+  if (d != null && d !== '' && d !== 0) return true;
+  if (purchase.revoked === true) return true;
+  const reason = purchase.revocationReason ?? purchase.revocationReasonIOS;
+  if (reason != null && reason !== '' && reason !== 0) return true;
+  const state = String(
+    purchase.purchaseState ?? purchase.transactionState ?? purchase.transactionReason ?? '',
+  ).toLowerCase();
+  return state === 'revoked' || state === 'refunded';
 }
 
 export function isPendingPurchase(p) {
@@ -98,6 +132,9 @@ export function decideUnlockFromPurchases(
 ) {
   if ((purchases || []).some((p) => isEntitledPurchase(p))) {
     return { unlocked: true, emptyStreak: 0, revoke: false, entitled: true };
+  }
+  if ((purchases || []).some((p) => purchaseMatches(p) && isRevoked(p))) {
+    return { unlocked: false, emptyStreak: 0, revoke: true, entitled: false };
   }
   const nextStreak = emptyStreak + 1;
   if (currentlyUnlocked && nextStreak < revokeAfter) {
@@ -197,15 +234,27 @@ export async function grantFullpackPurchase(purchase) {
     if (!purchaseMatches(purchase) || isRevoked(purchase)) return false;
 
     const iap = require('expo-iap');
-    await verifyTransactionBestEffort(iap, purchase);
+    const verified = await verifyTransactionBestEffort(iap, purchase);
     await finishIfPossible(iap, purchase);
 
     if (await unlockFromEntitlements(iap)) return true;
 
-    // Entitlements can lag the purchase-updated event; a matching
-    // non-revoked StoreKit purchase is itself an entitlement.
-    await setProUnlocked(true);
-    await setEmptyPurchaseStreak(0);
+    // Entitlements can lag the purchase-updated event; retry a couple of times
+    // before deciding whether to persist the unlock.
+    for (const ms of entitlementGrantConfig.retryDelaysMs) {
+      await entitlementGrantConfig.sleep(ms);
+      if (await unlockFromEntitlements(iap)) return true;
+    }
+
+    if (verified === true) {
+      await setProUnlocked(true);
+      await setEmptyPurchaseStreak(0);
+      return true;
+    }
+
+    // Visible unlock for this session (sandbox review); next launch rebuilds
+    // from StoreKit entitlements instead of a persisted flag.
+    await setProUnlocked(true, { persist: false });
     return true;
   } catch {
     return false;

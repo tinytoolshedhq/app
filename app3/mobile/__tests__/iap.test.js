@@ -20,14 +20,20 @@ import {
   decideUnlockFromPurchases,
   EMPTY_LIST_REVOKE_AFTER,
   PRO_PRODUCT_ID,
+  CANONICAL_PRO_PRODUCT_ID,
+  resolveProProductId,
+  entitlementGrantConfig,
 } from '../src/lib/iap';
-import { isProUnlocked, clearProUnlocked, setProUnlocked, subscribePro, getEmptyPurchaseStreak } from '../src/lib/entitlements';
+import { isProUnlocked, isProPersisted, clearProUnlocked, setProUnlocked, subscribePro, getEmptyPurchaseStreak } from '../src/lib/entitlements';
+
+const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
 
 const FULLPACK = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.beenages.app.fullpack';
 
 describe('iap entitlement helpers', () => {
   it('uses the App Store Full Pack product id', () => {
     expect(FULLPACK).toBe('com.beenages.app.fullpack');
+    expect(CANONICAL_PRO_PRODUCT_ID).toBe('com.beenages.app.fullpack');
     expect(PRO_PRODUCT_ID).toBe('com.beenages.app.fullpack');
     expect(purchaseMatches({ productId: FULLPACK })).toBe(true);
     expect(purchaseMatches({ id: FULLPACK })).toBe(true);
@@ -37,6 +43,44 @@ describe('iap entitlement helpers', () => {
     expect(purchaseMatches({ id: '100000012345' })).toBe(false);
   });
 
+  it('ignores EXPO_PUBLIC_IAP_PRODUCT_ID override in production builds', () => {
+    expect(resolveProProductId({
+      override: 'com.other.app.sku',
+      dev: false,
+      profile: 'production',
+    })).toBe(CANONICAL_PRO_PRODUCT_ID);
+    expect(resolveProProductId({
+      override: 'com.other.app.sku',
+      dev: true,
+      profile: 'production',
+    })).toBe(CANONICAL_PRO_PRODUCT_ID);
+    expect(resolveProProductId({
+      override: 'com.dev.app.sku',
+      dev: true,
+      profile: '',
+    })).toBe('com.dev.app.sku');
+    expect(resolveProProductId({
+      override: 'com.preview.app.sku',
+      dev: false,
+      profile: 'preview',
+    })).toBe('com.preview.app.sku');
+    expect(resolveProProductId({
+      override: 'com.other.app.sku',
+      dev: false,
+      profile: '',
+    })).toBe(CANONICAL_PRO_PRODUCT_ID);
+    expect(resolveProProductId({
+      override: '   ',
+      dev: true,
+      profile: 'preview',
+    })).toBe(CANONICAL_PRO_PRODUCT_ID);
+
+    const src = require('fs').readFileSync(require('path').join(__dirname, '../src/lib/iap.js'), 'utf8');
+    expect(src).toMatch(/export const PRO_PRODUCT_ID = resolveProProductId\(\)/);
+    expect(src).toMatch(/profile === 'production'/);
+    expect(src).toMatch(/dev === true/);
+  });
+
   it('treats pending and revoked rows as not entitled', () => {
     expect(isPendingPurchase({ productId: FULLPACK, purchaseState: 'pending' })).toBe(true);
     expect(isPendingPurchase({ productId: FULLPACK, purchaseStateAndroid: 2 })).toBe(true);
@@ -44,10 +88,16 @@ describe('iap entitlement helpers', () => {
     expect(isPendingPurchase({ productId: FULLPACK, purchaseState: 'purchased' })).toBe(false);
     expect(isRevoked({ productId: FULLPACK, revocationDate: '2026-01-01' })).toBe(true);
     expect(isRevoked({ productId: FULLPACK, revocationDateIOS: 1 })).toBe(true);
+    expect(isRevoked({ productId: FULLPACK, revoked: true })).toBe(true);
+    expect(isRevoked({ productId: FULLPACK, purchaseState: 'revoked' })).toBe(true);
+    expect(isRevoked({ productId: FULLPACK, transactionReason: 'REVOKED' })).toBe(true);
+    expect(isRevoked({ productId: FULLPACK, revocationReasonIOS: 1 })).toBe(true);
+    expect(isRevoked({ productId: FULLPACK })).toBe(false);
     expect(isEntitledPurchase({ productId: FULLPACK })).toBe(true);
     expect(isEntitledPurchase({ productId: FULLPACK, purchaseState: 'purchased' })).toBe(true);
     expect(isEntitledPurchase({ productId: FULLPACK, purchaseState: 'pending' })).toBe(false);
     expect(isEntitledPurchase({ productId: FULLPACK, revocationDateIOS: 99 })).toBe(false);
+    expect(isEntitledPurchase({ productId: FULLPACK, purchaseState: 'revoked' })).toBe(false);
     expect(isEntitledPurchase({ productId: 'com.other.app.sku' })).toBe(false);
   });
 
@@ -74,12 +124,24 @@ describe('iap entitlement helpers', () => {
       entitled: false,
     });
 
-    const stillKeep = decideUnlockFromPurchases(
+    const explicitRevoke = decideUnlockFromPurchases(
       [{ productId: FULLPACK, revocationDate: '2026-01-01' }],
+      { currentlyUnlocked: true, emptyStreak: 0 },
+    );
+    expect(explicitRevoke).toEqual({
+      unlocked: false,
+      emptyStreak: 0,
+      revoke: true,
+      entitled: false,
+    });
+
+    const revokedState = decideUnlockFromPurchases(
+      [{ productId: FULLPACK, purchaseState: 'revoked' }],
       { currentlyUnlocked: true, emptyStreak: EMPTY_LIST_REVOKE_AFTER - 2 },
     );
-    expect(stillKeep.unlocked).toBe(true);
-    expect(stillKeep.revoke).toBe(false);
+    expect(revokedState.unlocked).toBe(false);
+    expect(revokedState.revoke).toBe(true);
+    expect(revokedState.emptyStreak).toBe(0);
 
     const drop = decideUnlockFromPurchases([], {
       currentlyUnlocked: true,
@@ -107,6 +169,8 @@ describe('iap', () => {
     process.env.EXPO_PUBLIC_IAP_SIMULATE = '1';
     delete process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE;
     delete process.env.EAS_BUILD_PROFILE;
+    entitlementGrantConfig.retryDelaysMs = [1000, 3000];
+    entitlementGrantConfig.sleep = jest.fn(async () => {});
     const iap = require('expo-iap');
     iap.__resetIapMock?.();
     iap.finishTransaction.mockClear();
@@ -124,6 +188,8 @@ describe('iap', () => {
 
   afterEach(async () => {
     await stopPurchaseUpdates();
+    entitlementGrantConfig.sleep = realEntitlementSleep;
+    entitlementGrantConfig.retryDelaysMs = [1000, 3000];
   });
 
   it('simulates purchase in test env', async () => {
@@ -187,6 +253,8 @@ describe('iap', () => {
     });
     expect(iap.isTransactionVerifiedIOS).toHaveBeenCalledWith(FULLPACK);
     expect(iap.getAvailablePurchases).toHaveBeenCalled();
+    expect(entitlementGrantConfig.sleep).not.toHaveBeenCalled();
+    expect(await isProPersisted()).toBe(true);
   });
 
   it('ignores purchase-updated events for other products', async () => {
@@ -201,20 +269,24 @@ describe('iap', () => {
 
   it('still unlocks when isTransactionVerifiedIOS fails, throws, or is missing', async () => {
     const iap = require('expo-iap');
+    iap.getAvailablePurchases.mockResolvedValue([{ productId: FULLPACK }]);
     iap.isTransactionVerifiedIOS.mockResolvedValue(false);
     expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
     expect(await isProUnlocked()).toBe(true);
+    expect(await isProPersisted()).toBe(true);
     expect(iap.finishTransaction).toHaveBeenCalledWith({
       purchase: { productId: FULLPACK },
       isConsumable: false,
     });
     expect(iap.getAvailablePurchases).toHaveBeenCalled();
+    expect(entitlementGrantConfig.sleep).not.toHaveBeenCalled();
 
     await clearProUnlocked();
     iap.finishTransaction.mockClear();
     iap.isTransactionVerifiedIOS.mockRejectedValue(new Error('storekit'));
     expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
     expect(await isProUnlocked()).toBe(true);
+    expect(await isProPersisted()).toBe(true);
 
     await clearProUnlocked();
     iap.finishTransaction.mockClear();
@@ -227,7 +299,73 @@ describe('iap', () => {
     try {
       expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
       expect(await isProUnlocked()).toBe(true);
+      expect(await isProPersisted()).toBe(true);
       expect(iap.finishTransaction).toHaveBeenCalled();
+    } finally {
+      iap.isTransactionVerifiedIOS = orig;
+    }
+  });
+
+  it('retries entitlement reads after purchase then persists when Full Pack appears', async () => {
+    const iap = require('expo-iap');
+    iap.isTransactionVerifiedIOS.mockResolvedValue(false);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.getAvailablePurchases
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ productId: FULLPACK }]);
+
+    expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
+    expect(entitlementGrantConfig.sleep.mock.calls.map((c) => c[0])).toEqual([1000, 3000]);
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isProPersisted()).toBe(true);
+  });
+
+  it('persists unlock after empty entitlement retries only if verification returned true', async () => {
+    const iap = require('expo-iap');
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.isTransactionVerifiedIOS.mockResolvedValue(true);
+
+    expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
+    expect(entitlementGrantConfig.sleep).toHaveBeenCalledTimes(2);
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isProPersisted()).toBe(true);
+  });
+
+  it('unlocks the current session only when entitlements stay empty and verification is not true', async () => {
+    const iap = require('expo-iap');
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.isTransactionVerifiedIOS.mockResolvedValue(false);
+
+    const unlocked = new Promise((resolve) => {
+      const unsub = subscribePro((v) => {
+        if (v) {
+          unsub();
+          resolve();
+        }
+      });
+    });
+    expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
+    await unlocked;
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isProPersisted()).toBe(false);
+    expect(entitlementGrantConfig.sleep.mock.calls.map((c) => c[0])).toEqual([1000, 3000]);
+
+    await clearProUnlocked();
+    iap.isTransactionVerifiedIOS.mockRejectedValue(new Error('storekit'));
+    expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isProPersisted()).toBe(false);
+
+    await clearProUnlocked();
+    const orig = iap.isTransactionVerifiedIOS;
+    iap.isTransactionVerifiedIOS = undefined;
+    try {
+      expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
+      expect(await isProUnlocked()).toBe(true);
+      expect(await isProPersisted()).toBe(false);
     } finally {
       iap.isTransactionVerifiedIOS = orig;
     }
@@ -361,9 +499,8 @@ describe('iap', () => {
     process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
 
     await setProUnlocked(true);
-    iap.getAvailablePurchases.mockResolvedValue([
-      { productId: FULLPACK, revocationDate: '2026-01-01T00:00:00.000Z' },
-    ]);
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
     await verifyProOnLaunch();
     expect(await getEmptyPurchaseStreak()).toBe(1);
     expect(await isProUnlocked()).toBe(true);
@@ -379,6 +516,35 @@ describe('iap', () => {
     iap.getAvailablePurchases.mockRejectedValue(new Error('offline'));
     await verifyProOnLaunch();
     expect(await isProUnlocked()).toBe(true);
+    expect(await getEmptyPurchaseStreak()).toBe(0);
+  });
+
+  it('verifyProOnLaunch revokes Pro immediately when Full Pack has a revocationDate', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    await setProUnlocked(true);
+    iap.getAvailablePurchases.mockResolvedValue([
+      { productId: FULLPACK, revocationDate: '2026-01-01T00:00:00.000Z' },
+    ]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(false);
+    expect(await isProPersisted()).toBe(false);
+    expect(await getEmptyPurchaseStreak()).toBe(0);
+    expect(iap.finishTransaction).not.toHaveBeenCalled();
+  });
+
+  it('verifyProOnLaunch revokes Pro immediately on revoked state without waiting for empty-list streak', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    await setProUnlocked(true);
+    iap.getAvailablePurchases.mockResolvedValue([
+      { productId: FULLPACK, purchaseState: 'revoked' },
+    ]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(false);
+    expect(await isProPersisted()).toBe(false);
     expect(await getEmptyPurchaseStreak()).toBe(0);
   });
 
