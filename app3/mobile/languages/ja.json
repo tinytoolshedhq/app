@@ -33,6 +33,7 @@
     "devTitle": "復元をシミュレート",
     "devRestoreBody": "権限を付与しますか？",
     "restore": "復元",
+    "restored": "購入を復元しました",
     "nothingToRestore": "購入履歴がありません",
     "cannotRestore": "この環境では復元できません"
   },

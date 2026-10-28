@@ -30,6 +30,7 @@
     "devTitle": "Simulate restore",
     "devRestoreBody": "Grant entitlement?",
     "restore": "Restore",
+    "restored": "Purchases restored",
     "nothingToRestore": "No previous purchase found",
     "cannotRestore": "Cannot restore on this platform"
   },

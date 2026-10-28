@@ -2,11 +2,17 @@
 jest.mock('expo-iap', () => {
   let purchased = false;
   const listeners = new Set();
+  const errorListeners = new Set();
   const sku = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.beenages.app.fullpack';
   const emitUpdate = (purchase) => {
     purchased = true;
     for (const cb of [...listeners]) {
       try { cb(purchase); } catch {}
+    }
+  };
+  const emitError = (error) => {
+    for (const cb of [...errorListeners]) {
+      try { cb(error); } catch {}
     }
   };
   return {
@@ -28,8 +34,12 @@ jest.mock('expo-iap', () => {
       listeners.add(cb);
       return { remove: () => { listeners.delete(cb); } };
     }),
-    purchaseErrorListener: jest.fn(() => ({ remove: () => {} })),
+    purchaseErrorListener: jest.fn((cb) => {
+      errorListeners.add(cb);
+      return { remove: () => { errorListeners.delete(cb); } };
+    }),
     getAvailablePurchases: jest.fn(async () => (purchased ? [{ productId: sku }] : [])),
+    currentEntitlementIOS: jest.fn(async () => (purchased ? { productId: sku } : null)),
     restorePurchases: jest.fn(async () => {
       setTimeout(() => {
         emitUpdate({ productId: sku });
@@ -39,9 +49,11 @@ jest.mock('expo-iap', () => {
     presentCodeRedemptionSheetIOS: jest.fn(async () => null),
     isTransactionVerifiedIOS: jest.fn(async () => true),
     __emitPurchaseUpdated: emitUpdate,
+    __emitPurchaseError: emitError,
     __resetIapMock: () => {
       purchased = false;
       listeners.clear();
+      errorListeners.clear();
     },
   };
 });

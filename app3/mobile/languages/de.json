@@ -34,6 +34,7 @@
     "devTitle": "Wiederherstellen simulieren",
     "devRestoreBody": "Berechtigung geben?",
     "restore": "Wiederherstellen",
+    "restored": "Käufe wiederhergestellt",
     "nothingToRestore": "Kein früherer Kauf gefunden",
     "cannotRestore": "Hier nicht wiederherstellbar"
   },

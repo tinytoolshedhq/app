@@ -51,9 +51,8 @@ export default function PaywallScreen() {
         setPro(true);
         return;
       }
-      if (!r.cancelled && r.error) {
-        Alert.alert(t('common.fail'), r.error);
-      }
+      if (r.pending || r.cancelled) return;
+      Alert.alert(t('common.fail'), r.error || t('iap.buyFail'));
     } finally {
       setBusy(false);
     }
@@ -66,15 +65,14 @@ export default function PaywallScreen() {
       const r = await restoreProUnlock();
       if (r.ok && r.restored !== false) {
         setPro(true);
+        Alert.alert(t('settings.restore'), t('iap.restored'));
         return;
       }
       if (r.error) {
         Alert.alert(t('common.fail'), r.error);
         return;
       }
-      if (r.ok && r.restored === false) {
-        Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
-      }
+      Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
     } finally {
       setBusy(false);
     }
