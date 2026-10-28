@@ -24,6 +24,7 @@
   },
   "iap": {
     "buyFail": "購入に失敗",
+    "processing": "待機中…",
     "unavailable": "購入できません",
     "timeout": "購入の待ち時間が切れました",
     "cancel": "キャンセル",

@@ -164,6 +164,33 @@ function productSku(purchase) {
 
 let keepIapConnection = false;
 let purchaseSub = null;
+const grantInFlight = new Map();
+
+export function purchaseTransactionId(purchase) {
+  if (!purchase || typeof purchase !== 'object') return null;
+  for (const key of [
+    'transactionId',
+    'transactionIdIOS',
+    'originalTransactionIdentifierIOS',
+    'purchaseToken',
+    'purchaseTokenAndroid',
+  ]) {
+    const v = purchase[key];
+    if (v != null && String(v).trim() !== '') return String(v);
+  }
+  return null;
+}
+
+export function grantDedupeKey(purchase) {
+  const tx = purchaseTransactionId(purchase);
+  if (tx) return `tx:${tx}`;
+  const date = purchase?.transactionDate ?? purchase?.transactionDateIOS ?? purchase?.purchaseTime ?? '';
+  return `sku:${PRO_PRODUCT_ID}:${date}`;
+}
+
+export function resetGrantInFlight() {
+  grantInFlight.clear();
+}
 
 export function canPresentRedeemCode(os = Platform.OS) {
   return os === 'ios';
@@ -228,34 +255,48 @@ async function finishIfPossible(iap, purchase) {
   } catch {}
 }
 
+async function grantFullpackPurchaseBody(purchase) {
+  const iap = require('expo-iap');
+  const verified = await verifyTransactionBestEffort(iap, purchase);
+  await finishIfPossible(iap, purchase);
+
+  if (await unlockFromEntitlements(iap)) return true;
+
+  // Entitlements can lag the purchase-updated event; retry a couple of times
+  // before deciding whether to persist the unlock.
+  for (const ms of entitlementGrantConfig.retryDelaysMs) {
+    await entitlementGrantConfig.sleep(ms);
+    if (await unlockFromEntitlements(iap)) return true;
+  }
+
+  if (verified === true) {
+    await setProUnlocked(true);
+    await setEmptyPurchaseStreak(0);
+    return true;
+  }
+
+  // Persist so a force-quit + relaunch (App Review) stays unlocked.
+  // Launch rebuild clears this pending flag once entitlements catch up,
+  // or revokes after N successful empty queries / explicit revocation.
+  await setProUnlocked(true, { pendingVerification: true });
+  await setEmptyPurchaseStreak(0);
+  return true;
+}
+
 export async function grantFullpackPurchase(purchase) {
   try {
     if (isPendingPurchase(purchase)) return false;
     if (!purchaseMatches(purchase) || isRevoked(purchase)) return false;
 
-    const iap = require('expo-iap');
-    const verified = await verifyTransactionBestEffort(iap, purchase);
-    await finishIfPossible(iap, purchase);
+    const key = grantDedupeKey(purchase);
+    const existing = grantInFlight.get(key);
+    if (existing) return existing;
 
-    if (await unlockFromEntitlements(iap)) return true;
-
-    // Entitlements can lag the purchase-updated event; retry a couple of times
-    // before deciding whether to persist the unlock.
-    for (const ms of entitlementGrantConfig.retryDelaysMs) {
-      await entitlementGrantConfig.sleep(ms);
-      if (await unlockFromEntitlements(iap)) return true;
-    }
-
-    if (verified === true) {
-      await setProUnlocked(true);
-      await setEmptyPurchaseStreak(0);
-      return true;
-    }
-
-    // Visible unlock for this session (sandbox review); next launch rebuilds
-    // from StoreKit entitlements instead of a persisted flag.
-    await setProUnlocked(true, { persist: false });
-    return true;
+    const run = grantFullpackPurchaseBody(purchase).finally(() => {
+      if (grantInFlight.get(key) === run) grantInFlight.delete(key);
+    });
+    grantInFlight.set(key, run);
+    return run;
   } catch {
     return false;
   }
@@ -284,6 +325,7 @@ export async function stopPurchaseUpdates() {
   } catch {}
   purchaseSub = null;
   keepIapConnection = false;
+  resetGrantInFlight();
   try {
     const iap = require('expo-iap');
     await iap.endConnection?.();

@@ -23,8 +23,19 @@ import {
   CANONICAL_PRO_PRODUCT_ID,
   resolveProProductId,
   entitlementGrantConfig,
+  purchaseTransactionId,
+  grantDedupeKey,
 } from '../src/lib/iap';
-import { isProUnlocked, isProPersisted, clearProUnlocked, setProUnlocked, subscribePro, getEmptyPurchaseStreak } from '../src/lib/entitlements';
+import {
+  isProUnlocked,
+  isProPersisted,
+  isPendingVerification,
+  parseProRecord,
+  clearProUnlocked,
+  setProUnlocked,
+  subscribePro,
+  getEmptyPurchaseStreak,
+} from '../src/lib/entitlements';
 
 const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
 
@@ -161,6 +172,35 @@ describe('iap entitlement helpers', () => {
     expect(unverifiedStillEntitled.entitled).toBe(true);
     expect(unverifiedStillEntitled.revoke).toBe(false);
   });
+
+  it('parses legacy and pendingVerification Pro records', () => {
+    expect(parseProRecord(null)).toEqual({ unlocked: false, pendingVerification: false });
+    expect(parseProRecord('1')).toEqual({
+      unlocked: true,
+      pendingVerification: false,
+      source: 'store',
+    });
+    expect(parseProRecord(JSON.stringify({ unlocked: true, source: 'event', ts: 42 }))).toEqual({
+      unlocked: true,
+      pendingVerification: true,
+      source: 'event',
+      ts: 42,
+    });
+    expect(parseProRecord(JSON.stringify({ unlocked: true, pendingVerification: true }))).toMatchObject({
+      unlocked: true,
+      pendingVerification: true,
+    });
+  });
+
+  it('dedupes purchase grants by transactionId', () => {
+    const a = { productId: FULLPACK, transactionId: '100000012345' };
+    const b = { productId: FULLPACK, transactionId: '100000012345', purchaseToken: 'jws' };
+    const c = { productId: FULLPACK, transactionId: 'other' };
+    expect(purchaseTransactionId(a)).toBe('100000012345');
+    expect(grantDedupeKey(a)).toBe(grantDedupeKey(b));
+    expect(grantDedupeKey(a)).not.toBe(grantDedupeKey(c));
+    expect(grantDedupeKey({ productId: FULLPACK })).toBe(`sku:${FULLPACK}:`);
+  });
 });
 
 describe('iap', () => {
@@ -274,6 +314,7 @@ describe('iap', () => {
     expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
     expect(await isProUnlocked()).toBe(true);
     expect(await isProPersisted()).toBe(true);
+    expect(await isPendingVerification()).toBe(false);
     expect(iap.finishTransaction).toHaveBeenCalledWith({
       purchase: { productId: FULLPACK },
       isConsumable: false,
@@ -319,6 +360,7 @@ describe('iap', () => {
     expect(entitlementGrantConfig.sleep.mock.calls.map((c) => c[0])).toEqual([1000, 3000]);
     expect(await isProUnlocked()).toBe(true);
     expect(await isProPersisted()).toBe(true);
+    expect(await isPendingVerification()).toBe(false);
   });
 
   it('persists unlock after empty entitlement retries only if verification returned true', async () => {
@@ -331,10 +373,12 @@ describe('iap', () => {
     expect(entitlementGrantConfig.sleep).toHaveBeenCalledTimes(2);
     expect(await isProUnlocked()).toBe(true);
     expect(await isProPersisted()).toBe(true);
+    expect(await isPendingVerification()).toBe(false);
   });
 
-  it('unlocks the current session only when entitlements stay empty and verification is not true', async () => {
+  it('persists pendingVerification when entitlements lag and verification is not true', async () => {
     const iap = require('expo-iap');
+    const AsyncStorage = require('@react-native-async-storage/async-storage');
     iap.getAvailablePurchases.mockResolvedValue([]);
     iap.currentEntitlementIOS.mockResolvedValue(null);
     iap.isTransactionVerifiedIOS.mockResolvedValue(false);
@@ -350,14 +394,18 @@ describe('iap', () => {
     expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
     await unlocked;
     expect(await isProUnlocked()).toBe(true);
-    expect(await isProPersisted()).toBe(false);
+    expect(await isProPersisted()).toBe(true);
+    expect(await isPendingVerification()).toBe(true);
     expect(entitlementGrantConfig.sleep.mock.calls.map((c) => c[0])).toEqual([1000, 3000]);
+    const stored = JSON.parse(await AsyncStorage.getItem('beenages/proUnlocked/v1'));
+    expect(stored).toEqual(expect.objectContaining({ unlocked: true, source: 'event' }));
+    expect(typeof stored.ts).toBe('number');
 
     await clearProUnlocked();
     iap.isTransactionVerifiedIOS.mockRejectedValue(new Error('storekit'));
     expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
     expect(await isProUnlocked()).toBe(true);
-    expect(await isProPersisted()).toBe(false);
+    expect(await isPendingVerification()).toBe(true);
 
     await clearProUnlocked();
     const orig = iap.isTransactionVerifiedIOS;
@@ -365,10 +413,43 @@ describe('iap', () => {
     try {
       expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
       expect(await isProUnlocked()).toBe(true);
-      expect(await isProPersisted()).toBe(false);
+      expect(await isPendingVerification()).toBe(true);
     } finally {
       iap.isTransactionVerifiedIOS = orig;
     }
+  });
+
+  it('runs unlock and finishTransaction once for the same transactionId', async () => {
+    const iap = require('expo-iap');
+    const purchase = { productId: FULLPACK, transactionId: '100000012345' };
+    iap.getAvailablePurchases.mockResolvedValue([{ productId: FULLPACK }]);
+    const [a, b] = await Promise.all([
+      grantFullpackPurchase(purchase),
+      grantFullpackPurchase(purchase),
+    ]);
+    expect(a).toBe(true);
+    expect(b).toBe(true);
+    expect(iap.finishTransaction).toHaveBeenCalledTimes(1);
+    expect(iap.isTransactionVerifiedIOS).toHaveBeenCalledTimes(1);
+    expect(await isProUnlocked()).toBe(true);
+  });
+
+  it('dedupes the global purchase listener with the purchase flow for one transaction', async () => {
+    const iap = require('expo-iap');
+    const purchase = { productId: FULLPACK, transactionId: 'tx-shared' };
+    iap.getAvailablePurchases.mockResolvedValue([{ productId: FULLPACK }]);
+    iap.requestPurchase.mockImplementation(async () => {
+      iap.__emitPurchaseUpdated(purchase);
+      return purchase;
+    });
+    await startPurchaseUpdates();
+    const result = await purchaseProUnlock();
+    expect(result.ok).toBe(true);
+    expect(iap.finishTransaction).toHaveBeenCalledTimes(1);
+    expect(iap.finishTransaction).toHaveBeenCalledWith({
+      purchase,
+      isConsumable: false,
+    });
   });
 
   it('rejects a transaction with revocationDate and does not finish it', async () => {
@@ -492,6 +573,37 @@ describe('iap', () => {
     await verifyProOnLaunch();
     expect(await isProUnlocked()).toBe(true);
     expect(await getEmptyPurchaseStreak()).toBe(0);
+    expect(await isPendingVerification()).toBe(false);
+  });
+
+  it('verifyProOnLaunch clears pendingVerification when entitlements contain Full Pack', async () => {
+    const iap = require('expo-iap');
+    const AsyncStorage = require('@react-native-async-storage/async-storage');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    await setProUnlocked(true, { pendingVerification: true });
+    expect(await isPendingVerification()).toBe(true);
+    iap.getAvailablePurchases.mockResolvedValue([{ productId: FULLPACK }]);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isPendingVerification()).toBe(false);
+    expect(await AsyncStorage.getItem('beenages/proUnlocked/v1')).toBe('1');
+  });
+
+  it('verifyProOnLaunch keeps pendingVerification Pro across empty lists until the streak', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    await setProUnlocked(true, { pendingVerification: true });
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    await verifyProOnLaunch();
+    expect(await getEmptyPurchaseStreak()).toBe(1);
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isPendingVerification()).toBe(true);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(true);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(false);
+    expect(await isPendingVerification()).toBe(false);
   });
 
   it('verifyProOnLaunch keeps Pro across empty lists until the streak, and does not revoke on throw', async () => {
@@ -563,5 +675,32 @@ describe('iap', () => {
     expect(src).toMatch(/easBuildProfile\(\) === 'production'/);
     expect(src).toMatch(/__DEV__/);
     expect(src).not.toMatch(/EXPO_PUBLIC_IAP_SIMULATE === '1'\) return true/);
+  });
+
+  it('shows a disabled processing state on paywall and settings while purchase or restore runs', () => {
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/PaywallScreen.js'), 'utf8');
+    const settings = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/SettingsScreen.js'), 'utf8');
+    expect(paywall).toMatch(/iap\.processing/);
+    expect(paywall).toMatch(/ActivityIndicator/);
+    expect(paywall).toMatch(/disabled=\{busy \|\| pro\}/);
+    expect(paywall).toMatch(/busyLock/);
+    expect(paywall).toMatch(/if \(busy \|\| pro \|\| !beginBusy\(\)\) return/);
+    expect(paywall).toMatch(/if \(busy \|\| !beginBusy\(\)\) return/);
+    expect(settings).toMatch(/iap\.processing/);
+    expect(settings).toMatch(/ActivityIndicator/);
+    expect(settings).toMatch(/disabled=\{busy\}/);
+    expect(settings).toMatch(/busyLock/);
+    expect(settings).toMatch(/if \(busy \|\| busyLock\.current\) return/);
+
+    const en = require('../languages/en.json');
+    const zh = require('../languages/zh-Hant.json');
+    const ja = require('../languages/ja.json');
+    const de = require('../languages/de.json');
+    const fr = require('../languages/fr.json');
+    expect(en.iap.processing).toBe('Processing…');
+    expect(zh.iap.processing).toBe('等待中…');
+    expect(ja.iap.processing).toBe('待機中…');
+    expect(de.iap.processing).toBe('Wird verarbeitet…');
+    expect(fr.iap.processing).toBe('Traitement…');
   });
 });

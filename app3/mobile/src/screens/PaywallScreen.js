@@ -20,6 +20,7 @@ export default function PaywallScreen() {
   const [price, setPrice] = React.useState(null);
   const [priceReady, setPriceReady] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
+  const busyLock = React.useRef(false);
 
   const loadPrice = React.useCallback(async () => {
     setPriceReady(false);
@@ -42,9 +43,20 @@ export default function PaywallScreen() {
     loadPrice();
   }, [loadPrice]);
 
-  async function buy() {
-    if (busy || pro) return;
+  function beginBusy() {
+    if (busyLock.current) return false;
+    busyLock.current = true;
     setBusy(true);
+    return true;
+  }
+
+  function endBusy() {
+    busyLock.current = false;
+    setBusy(false);
+  }
+
+  async function buy() {
+    if (busy || pro || !beginBusy()) return;
     try {
       const r = await purchaseProUnlock();
       if (r.ok) {
@@ -54,13 +66,12 @@ export default function PaywallScreen() {
       if (r.pending || r.cancelled) return;
       Alert.alert(t('common.fail'), r.error || t('iap.buyFail'));
     } finally {
-      setBusy(false);
+      endBusy();
     }
   }
 
   async function restore() {
-    if (busy) return;
-    setBusy(true);
+    if (busy || !beginBusy()) return;
     try {
       const r = await restoreProUnlock();
       if (r.ok && r.restored !== false) {
@@ -74,7 +85,7 @@ export default function PaywallScreen() {
       }
       Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));
     } finally {
-      setBusy(false);
+      endBusy();
     }
   }
 
@@ -132,13 +143,35 @@ export default function PaywallScreen() {
         <TouchableOpacity
           onPress={buy}
           disabled={busy || pro}
+          accessibilityState={{ disabled: busy || pro, busy }}
+          accessibilityLabel={busy ? t('iap.processing') : (pro ? t('common.unlocked') : t('paywall.buy'))}
           style={[styles.cta, { backgroundColor: c.brand, opacity: busy ? 0.7 : 1 }]}
         >
-          <Text style={[styles.ctaText, { color: c.onbrand }]}>{pro ? t('common.unlocked') : t('paywall.buy')}</Text>
+          {busy ? (
+            <View style={styles.ctaBusy}>
+              <ActivityIndicator color={c.onbrand} />
+              <Text style={[styles.ctaText, { color: c.onbrand }]}>{t('iap.processing')}</Text>
+            </View>
+          ) : (
+            <Text style={[styles.ctaText, { color: c.onbrand }]}>{pro ? t('common.unlocked') : t('paywall.buy')}</Text>
+          )}
         </TouchableOpacity>
         <View style={styles.links}>
-          <TouchableOpacity onPress={restore} disabled={busy} style={styles.linkBtn} accessibilityLabel={t('settings.restore')}>
-            <Text style={{ color: c.brand, fontSize: 15, fontFamily: 'BeenAgesRounded-Regular' }}>{t('settings.restore')}</Text>
+          <TouchableOpacity
+            onPress={restore}
+            disabled={busy}
+            style={styles.linkBtn}
+            accessibilityState={{ disabled: busy, busy }}
+            accessibilityLabel={busy ? t('iap.processing') : t('settings.restore')}
+          >
+            {busy ? (
+              <View style={styles.linkBusy}>
+                <ActivityIndicator color={c.brand} size="small" />
+                <Text style={{ color: c.brand, fontSize: 15, fontFamily: 'BeenAgesRounded-Regular' }}>{t('iap.processing')}</Text>
+              </View>
+            ) : (
+              <Text style={{ color: c.brand, fontSize: 15, fontFamily: 'BeenAgesRounded-Regular' }}>{t('settings.restore')}</Text>
+            )}
           </TouchableOpacity>
           {canPresentRedeemCode() ? (
             <TouchableOpacity
@@ -191,6 +224,8 @@ const styles = StyleSheet.create({
   once: { textAlign: 'center', fontSize: 13, marginTop: 2, fontFamily: 'BeenAgesRounded-Regular' },
   cta: { marginTop: 18, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
   ctaText: { fontSize: 18, fontFamily: 'BeenAgesRounded-SemiBold' },
+  ctaBusy: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   links: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 20, paddingVertical: 16 },
   linkBtn: { paddingVertical: 4, paddingHorizontal: 4 },
+  linkBusy: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 });
