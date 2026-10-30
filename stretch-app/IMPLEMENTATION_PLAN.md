@@ -1,6 +1,7 @@
+
 # 伸展 app（暫定名）實作計畫 — app5/
 
-更新：2026-10-30。依據：`README.md`、`exercises.zh-Hant.json`，以及 Chun 2026-10-30 的四項決定。
+更新：2026-10-30（第二版：全免費方案起步、TTS 只比較 Google 與 OpenAI）。依據：`README.md`、`exercises.zh-Hant.json`，以及 Chun 2026-10-30 的四項決定。
 本文件只是計畫，不含程式。價格都標了查證日期，**所有成本都是估算**，正式定價前要用實測校正。
 
 ## 0. 已定決策
@@ -80,57 +81,152 @@ interface AudioService {
 | M7 | 動畫：previewer 在 Figma 先做 3 個代表動作 → 確認後做全部 30 個；輸出無聲 MP4 加靜態封面 | Figma（Starter 先試） | 由 previewer 負責 |
 | M8 | 整合、飛航模式驗收、README §10 清單、TestFlight | EAS build、TestFlight（都要 Chun 同意，由蘋果大師執行） | ⏳ |
 
-## 3. 後端候選（2026-10-30 查官方頁）
-| 候選 | 免費額度 | 付費起點 | 適合度 |
-|---|---|---|---|
-| **Cloudflare Workers + D1 + R2 + Queues**（推薦） | Workers 每天 10 萬 requests；D1 每天 500 萬 rows read、10 萬 rows written、5 GB；R2 10 GB-month、egress 免費；Queues 每天 1 萬 ops | Workers Paid 每月 US$5（含 1,000 萬 requests、D1 250 億 reads、5,000 萬 writes）；R2 US$0.015/GB-month | D1 可用 SQL 交易做原子預留；R2 egress 免費，適合音檔下載；Queues 跑生成工作。缺點：要自己寫 auth（Apple JWKS 驗證） |
-| Supabase | Free：50,000 MAU、500 MB DB、1 GB 檔案、5 GB egress；1 週沒活動會暫停 | Pro 每月 US$25 起（100 GB 檔案、250 GB egress） | Postgres 交易最穩，內建 Sign in with Apple。Free 會暫停，不適合正式上線 |
-| Firebase（Cloud Functions + Firestore + Storage） | Functions 每月 200 萬次（需 Blaze）；Firestore 每天 2 萬 writes、5 萬 reads；Storage 5 GB、每月 100 GB 下載（限美國區） | Blaze 按量計費 | Auth 成熟；Firestore transaction 可做帳本。Functions 一定要綁卡（Blaze） |
+## 3. 後端：Cloudflare Workers Free + D1 + R2（2026-10-30 查官方文件）
+Chun 2026-10-30 決定：全部從免費方案開始。程式要設計成升級到 Workers Paid 時不必改程式。
 
-來源：<https://developers.cloudflare.com/workers/platform/pricing/>、<https://supabase.com/pricing>、<https://firebase.google.com/pricing>（皆 2026-10-30 查）。
+### Free 方案限制（官方數字）
+| 項目 | Free | Paid（對照） |
+|---|---|---|
+| Workers requests | 每天 100,000（UTC 0 點重置；超過回 Error 1027） | 無上限 |
+| CPU time | 每次 HTTP 請求 10 ms；Cron 也是 10 ms | 預設 30 秒，最多 5 分鐘 |
+| 等待時間（wall-clock） | HTTP 沒有上限（client 保持連線即可）；`ctx.waitUntil()` 回應後最多再撐 30 秒 | 同左 |
+| Subrequests | 每次呼叫 50 個（Cloudflare 內部服務 1,000 個） | 10,000 個 |
+| 同時等待回應標頭的連線 | 6 | 6 |
+| Memory | 每個 isolate 128 MB | 128 MB |
+| Worker 大小 | 64 MiB（未壓縮） | 64 MiB |
+| 啟動時間 | 1 秒 | 1 秒 |
+| Cron Triggers | 每帳號 5 個 | 250 個 |
+| 環境變數＋secrets | 每個 Worker 64 個，每個 5 KB | 128 個 |
+| Queues | **Free 可用**：每天 10,000 ops；保留 24 小時；consumer 每次最多 15 分鐘 | 每月 100 萬 ops |
+| Durable Objects | **Free 可用**（只限 SQLite backend）：每天 10 萬 requests、13,000 GB-s | — |
+| D1 rows read | 每天 500 萬 | 每月 250 億 |
+| D1 rows written | **每天 100,000** | 每月 5,000 萬 |
+| D1 容量 | 單一 DB 500 MB；帳號合計 5 GB；最多 10 個 DB | 單一 10 GB |
+| D1 每次 Worker 呼叫可查詢次數 | 50 次（一個 `batch()` 算 1 次） | 1,000 次 |
+| R2（只限 Standard class） | 每月 10 GB-month 儲存、Class A 100 萬次、Class B 1,000 萬次；egress 免費 | 超出後按量計費 |
 
-## 4. TTS 供應商候選（2026-10-30 查官方頁）
-字數是用腳本從 JSON 實際統計的 `voice_cues.text`：30 動作、120 段、**共 1,500 字**，每動作 42–56 字（平均 50）。最長的 10 個動作合計 531 字。所有 `max_duration_seconds` 合計 780 秒。
+來源（皆 2026-10-30 查）：
+- <https://developers.cloudflare.com/workers/platform/limits/>（頁面更新 2026-10-29）
+- <https://developers.cloudflare.com/workers/platform/pricing/>（Queues、DO、D1 免費額度；頁面更新 2026-10-02）
+- <https://developers.cloudflare.com/d1/platform/limits/>（頁面更新 2026-10-24）
+- <https://developers.cloudflare.com/r2/pricing/>（頁面更新 2026-10-26）
 
-| 供應商／模型 | 官方價格 | zh-TW 品質 | 語氣指令 |
-|---|---|---|---|
-| OpenAI gpt-4o-mini-tts | 文字輸入 US$0.60/1M tokens；音訊輸出 US$12/1M tokens | 支援中文；台灣口音和用詞要實測 | ✅ 有 `instructions` 參數，最符合「可愛、溫柔、慢一點」這類需求 |
-| OpenAI tts-1 / tts-1-hd | US$15 / US$30 每 1M 字元 | 同上，偏中性 | ❌ 只能調語速 |
-| Google Chirp 3 HD | 每月前 100 萬字元免費，之後 US$30/1M | 有 cmn-TW 聲音（要試聽） | 有限（SSML、語速） |
-| Google Gemini 2.5 Flash TTS | 輸入 US$0.50/1M tokens；輸出 US$10/1M audio tokens（25 tokens/秒） | 要實測 | ✅ 用 prompt 控制風格 |
-| ElevenLabs v4 / Flash | v4 US$0.08/1K 字元；Flash/Turbo US$0.04/1K | 多語；中文口音要實測 | ✅ v4 有 audio tags |
-| Azure Speech zh-TW Neural | **官方頁的數字沒有載出來，今天無法查證**。只確認 F0 免費層每月 50 萬字元 | zh-TW 聲音最成熟，例如 HsiaoChen | SSML style（部分聲音） |
+### 一次轉換塞得進 Free 嗎？
+假設一次轉換：最多 10 個動作，約 40 段提示（每動作 4 段），每段 1 次 TTS 呼叫和 1 次 R2 put，再加 D1。
 
-來源：<https://developers.openai.com/api/docs/pricing>、<https://cloud.google.com/text-to-speech/pricing>、<https://elevenlabs.io/pricing/api>、<https://azure.microsoft.com/en-us/pricing/details/cognitive-services/speech-services/>（皆 2026-10-30 查）。
+- **單一請求做完：不行**。40 次 TTS＋40 次 R2 put＋D1 查詢 ≈ 85 個 subrequests，超過 Free 的 50。`waitUntil` 只有 30 秒，也撐不住 40 次 TTS 的等待時間。
+- **CPU 不是瓶頸**。等 TTS 回應不算 CPU。主要的 CPU 成本是 JWS 驗證（ECDSA，用 WebCrypto，應該只要幾 ms）、sha256、解析音長。
+  - 做法是把 TTS 回應直接用 stream 轉存到 R2，不在記憶體裡轉碼。
+  - 音長從 WAV/PCM 的位元組數，或 MP3 frame header 算出來。
+  - 10 ms 仍然偏緊，M5 要用 Workers Logs 實測 CPU time。
+- **採用的設計：分段處理，由 client 輪詢推進**，不依賴 Queues。
+  1. `POST /jobs`：預留額度，在 D1 寫入 job 和 cue 列，回傳 jobId。
+  2. App 每 2–3 秒呼叫一次 `POST /jobs/{id}/step`。每次最多處理 **5 段**：約 5 次 TTS＋5 次 R2 put＋1 次 D1 batch ≈ 12 個 subrequests，連線上限 6 剛好可以並行。
+  3. 處理前先用 D1 條件更新把 cue 從 `pending` 改成 `running`，加 lease 時間，避免重複處理。
+  4. 全部段落 `done` 且長度檢查通過後，commit 額度。
+  5. 一次轉換約 8 次 step，加上建立和輪詢，總計約 20 個 requests。
+  6. App 進背景時暫停；回前景後從 D1 狀態續跑，續跑不會重複扣額度。
+- **升級選項**：之後若要不靠 App 輪詢，可改用 Queues（Free 每天 10,000 ops，每則訊息約 3 ops，約 3,300 則／天），或用 Durable Object alarm。程式用同一個 `processCueBatch(jobId, n)` 函式，只是換觸發方式。
+
+### D1 每日寫入上限能撐幾次轉換
+每次轉換估計寫入的 rows（含索引會多算一列）：
+
+| 項目 | 估計 rows |
+|---|---|
+| ledger：reserve＋commit | 2 筆 ×2 = 4 |
+| job：建立加約 8 次狀態更新 | ≈ 10 |
+| cue：40 筆，每筆建立、running、done 共 3 次更新，加索引 | ≈ 40 × 3 × 2 = 240 |
+| cache：40 筆加索引 | ≈ 80 |
+| **合計** | **≈ 330 rows** |
+
+- 每天 100,000 ÷ 330 ≈ **300 次轉換／天**。這還沒算試聽、登入和 entitlement 的寫入，那些每次大約 2–4 rows。
+- 優化做法：cue 狀態改存在 job 的一個 JSON 欄位，每次 step 寫 1 列，可降到每次轉換約 60 rows，也就是約 **1,600 次／天**。
+- requests 上限 100,000／天 ÷ 每次轉換約 20 ≈ 5,000 次，所以 D1 寫入才是先碰到的上限。
+
+### 帳號與卡片
+- **R2**：官方 Get started 寫要先「Complete the checkout flow to add an R2 subscription」，同時說 R2 免費開始使用。是否一定要填卡片，文件沒有明說，**未能確認**，由黑嘛嘛開通時確認。來源：<https://developers.cloudflare.com/r2/get-started/>（2026-10-30 查）。
+- **Workers Free**：官方限制頁和價格頁都沒有寫需要卡片，Free 是預設方案。是否完全免卡，**未能在官方頁確認**。
+
+### 升級到 Paid 的條件與步驟（不改程式）
+**升級條件**（任一成立就提出，經 Chun 同意後升級）：
+- D1 每日寫入連續 3 天超過 70,000 rows。
+- requests 每天超過 70,000。
+- Workers Logs 出現 `exceededCpu`。
+- R2 用量超過 8 GB-month。
+- 正式上線前，想要更穩定的 CPU 上限。
+
+**程式設計約束**：
+- 每次 step 處理段數是 `STEP_CUES` 環境變數（Free 設 5，Paid 可設 40，一次做完）。
+- Step 迴圈不假設 CPU 足夠。
+- 觸發方式抽象成 `JobRunner` 介面（client 輪詢、Queues、DO alarm 三選一），用 `wrangler.toml` 的 vars 切換。
+- 所有上限值都放在設定裡，不寫死在程式。
+
+**升級步驟**：
+1. 黑嘛嘛在 Dashboard 把 Workers 升級成 Paid（US$5/月），並設定 billing 通知。
+2. 在 `wrangler.toml` 加 `[limits] cpu_ms = 30000`（這是設定檔，不是程式），把 `STEP_CUES` 改成 40。
+3. 重新 deploy。D1 和 R2 的資料不用搬移，綁定名稱也不變。
+
+## 4. TTS：Google Cloud TTS Chirp 3 HD vs OpenAI（2026-10-30 查官方頁）
+ElevenLabs 依 Chun 的選擇排除，不列入推薦。
+
+字數是用腳本從 JSON 實際統計的 `voice_cues.text`：30 動作、120 段、**共 1,500 字**。最長的 10 個動作合計 531 字。所有 `max_duration_seconds` 合計 780 秒。
+
+### ⚠️ 兩個重大發現
+1. **Chirp 3 HD 沒有台灣華語（cmn-TW）**。官方語言表只有 `cmn-CN`（Mandarin Chinese (China)）和 `yue-HK`（粵語，Preview），用的會是中國大陸口音。
+   - 聲音名稱格式是 `cmn-CN-Chirp3-HD-<名稱>`，可選 Achernar、Aoede、Kore、Leda、Puck、Charon、Zephyr 等 30 個。
+   - 要台灣口音，只能改用 Google 舊的 cmn-TW 聲音（Standard、WaveNet），這要另外確認有哪些可用。
+2. **OpenAI 的 `tts-1`、`tts-1-hd`、`gpt-4o-mini-tts` 已宣告 deprecated，2027-01-06 停止服務**。官方建議改用 Realtime API 的 `gpt-realtime-2.1-mini`，而 `/v1/audio/speech` 不支援這個模型，要改用 WebSocket 流程。
+   - v1 若在 2027-01 之後上線，**應直接用 gpt-realtime-2.1-mini 實作**，或至少把 TTS provider 介面抽象化，方便切換。
+
+### 比較
+| 項目 | Chirp 3 HD | OpenAI gpt-4o-mini-tts（2027-01-06 停用） | OpenAI tts-1 / tts-1-hd（同日停用） | OpenAI gpt-realtime-2.1-mini（替代） |
+|---|---|---|---|---|
+| 價格 | 每月前 100 萬字元免費，之後 US$30/1M 字元 | 文字輸入 US$0.60/1M tokens；音訊輸出 US$12/1M tokens | US$15 / US$30 每 1M 字元 | 文字輸入 US$0.60/1M；音訊輸出 US$20/1M tokens |
+| zh-TW | ❌ 只有 cmn-CN | 支援中文，但官方說聲音以英文最佳化；台灣口音可以用 instructions 要求（Accent），要實測 | 同左，不能調口音 | 要實測 |
+| 語氣控制 | ❌ 沒有語氣指令。只能調 `speaking_rate`（0.25–2.0）、用 markup 加 `[pause]`、自訂發音，SSML `<prosody>` 是 Preview | ✅ 有 `instructions`，可控制 accent、tone、speed、emotion | ❌ | ✅ 用 prompt 控制 |
+| 試用門檻 | **要有 billing account，並綁信用卡或其他付款方式**；Free Trial 送 US$300、90 天 | **要先預付 credits**，最少 US$5，credits 一年後過期 | 同左 | 同左 |
+
+來源（皆 2026-10-30 查）：
+- <https://cloud.google.com/text-to-speech/pricing>
+- <https://cloud.google.com/text-to-speech/docs/chirp3-hd>
+- <https://docs.cloud.google.com/free/docs/free-cloud-features>
+- <https://developers.openai.com/api/docs/pricing>
+- <https://developers.openai.com/api/docs/guides/text-to-speech>
+- <https://help.openai.com/en/articles/8264644-setting-up-and-managing-prepaid-api-billing>
+
+### 自訂語氣能不能做
+- **Chirp 3 HD**：「可愛、溫柔、稍慢」只能做到「換一個聲音＋調語速＋加停頓」，做不到真正的語氣轉換，而且是大陸口音。
+- **OpenAI 的 instructions 模型**才能符合 README §6 的需求。
+- **建議**：
+  - 自訂語音用 OpenAI。以停用時程來看，優先評估 gpt-realtime-2.1-mini；若 gpt-4o-mini-tts 在停用前仍可用，可以先拿來試聽。
+  - 預設語音包可以用 Chirp 3 HD（落在免費額度內），但前提是 Chun 接受大陸口音，否則也改用 OpenAI。
+  - 要等試聽結果（tts-audition-script）出來再定案。
 
 ### 成本估算
 假設：
-- 一次轉換：最長 10 個動作，531 字，音長上限 300 秒（README 上限 5 分鐘）。
-- 試聽：約 60 字、約 10 秒。
+- 一次轉換：最長 10 個動作，531 字，音長上限 300 秒。
+- 試聽：約 60 字。
 - 重試係數 ×1.5。
 
-| 模型 | 一次轉換 | ×1.5 重試 | 一次試聽 | 預設包（1,500 字／780 秒） |
+| 模型 | 一次轉換 | ×1.5 | 一次試聽 | 預設包（1,500 字） |
 |---|---|---|---|---|
-| gpt-4o-mini-tts | 音訊 token 對秒數的換算**今天官方頁未列，無法查證**，M5 要用 usage 回傳值實測 | — | 實測 | 實測 |
+| Chirp 3 HD | US$0.016（在 100 萬字元／月免費額度內為 0） | US$0.024 | US$0.0018 | US$0.045（在免費額度內為 0） |
 | tts-1 | US$0.008 | US$0.012 | US$0.0009 | US$0.023 |
-| Chirp 3 HD | US$0.016 | US$0.024 | US$0.0018 | US$0.045（在免費額度內是 0） |
-| Gemini 2.5 Flash TTS | ≤US$0.075（300 秒 ×25 tokens） | ≤US$0.11 | ≈US$0.0025 | ≈US$0.20 |
-| ElevenLabs v4 | US$0.042 | US$0.064 | US$0.0048 | US$0.12 |
+| tts-1-hd | US$0.016 | US$0.024 | US$0.0018 | US$0.045 |
+| gpt-4o-mini-tts / realtime-2.1-mini | 音訊 tokens 和秒數的換算**官方價格頁沒有列，無法查證**，M5 要用回應的 usage 欄位實測 | — | — | — |
 
-每位用滿 10 次的付費用戶（含重試）：tts-1 約 US$0.12；Chirp 3 HD 約 US$0.24；ElevenLabs v4 約 US$0.64；Gemini 上限約 US$1.1。
+Chirp 免費額度能撐多少：每月 100 萬字元 ÷ 每次轉換 531 字 ≈ 1,880 次轉換／月（不算試聽和重試）。
 
 ### 每月總成本估算
-假設：當月 N 位付費用戶**全部用滿 10 次**，每人再加 10 次試聽，用 ElevenLabs v4 做保守估計；後端是 Cloudflare Paid。
+假設：當月 N 位付費用戶全部用滿 10 次，每人再加 10 次試聽，並套用 ×1.5 重試。
 
-| 付費用戶 | 轉換次數 | TTS（v4，含重試＋試聽） | 後端 | 音檔儲存 |
+| 付費用戶 | 轉換次數 | Chirp 3 HD | tts-1-hd | 後端 |
 |---|---|---|---|---|
-| 100 | 1,000 | ≈ US$69 | US$5 | 約 0.5 GB，在免費額度內 |
-| 1,000 | 10,000 | ≈ US$690 | US$5（requests 和 rows 都在額度內） | 約 5 GB，免費 |
-| 10,000 | 100,000 | ≈ US$6,900 | ≈ US$5–10 | 約 50 GB ≈ US$0.6/月 |
+| 100 | 1,000 | 約 0.86M 字元，在免費額度內，約 US$0 | 約 US$26 | Free |
+| 1,000 | 10,000 | 約 8.6M 字元，超出部分約 US$228 | 約 US$258 | Free 不夠，D1 寫入會超過，要轉 Paid（US$5） |
+| 10,000 | 100,000 | 約 US$2,550 | 約 US$2,580 | Paid，約 US$5–10 |
 
-音檔大小假設每個動作約 50 KB（AAC 64 kbps、約 26 秒 ≈ 200 KB 為上限）。換成 Chirp 3 HD 時，TTS 費用約為上表的 40%。
-
-對照 README 的假設試算（US$4 售價、10 次預算 US$1）：Apple 抽成 15%（Small Business Program）後約剩 US$3.4。v4 每人約 US$0.69，在預算內。Gemini 的上限情況接近 US$1，偏緊。
+gpt-4o-mini-tts 和 realtime 的數字要等實測後補上。
 
 ## 5. 身分登入候選
 | 方案 | 可恢復性 | 優點 | 缺點 |
@@ -200,19 +296,15 @@ interface AudioService {
 - 標示「AI 合成語音」，加上「非醫療建議」聲明。
 
 ## 10. 需要 Chun 確認的付費服務／帳號／金鑰
-所有憑證只由**黑嘛嘛或蘋果大師**設定。金鑰只存在後端 secret store（例如 Cloudflare Workers Secrets），絕不進 app、JSON、repo 或聊天。
+完整表格見 `accounts-needed.md`，這裡只列重點。
 
-| 項目 | 費用 | 誰設定 |
-|---|---|---|
-| 1. 後端主機帳號（建議 Cloudflare，Workers Paid） | 每月 US$5；Free 可先開發 | 黑嘛嘛 |
-| 2. 資料庫（D1，包含在 1；若選 Supabase 則 Pro 每月 US$25） | 包含在 1 | 黑嘛嘛 |
-| 3. 物件儲存與 CDN（R2，包含在 1，超過 10 GB 後 US$0.015/GB） | 估計很低 | 黑嘛嘛 |
-| 4. TTS 供應商帳號與 API key：二選一，或兩個都開來比較 | 按量計費；先設每月花費上限 | 黑嘛嘛 |
-| 5. App Store Connect：非消耗型商品 ID 與價格、In-App Purchase API key（.p8、Key ID、Issuer ID）、Server Notifications V2 URL | Apple 開發者年費已有 | 蘋果大師 |
-| 6. Sign in with Apple capability 與 App ID 設定 | 無 | 蘋果大師 |
-| 7. EAS dev build 與 TestFlight build | 每次都要 Chun 同意 | 蘋果大師 |
-| 8. Figma：先用 Starter，超出才升級 | 先免費 | previewer／黑嘛嘛 |
-| 9. （選用）網域，用於 API 與 CDN | 每年約十幾美元，未查證 | 黑嘛嘛 |
+- 所有憑證只由黑嘛嘛（Cloudflare、Google、OpenAI）或蘋果大師（Apple）設定。
+- 金鑰只放在 **Wrangler secrets**（後端 secret store），絕不進 app、JSON、repo 或聊天。
+- 全部先用免費方案。
+- **免費也要付款方式的項目**：
+  - Google Cloud：billing account 要綁卡。
+  - OpenAI：要先預付至少 US$5。
+  - Cloudflare R2：要完成 checkout，是否要卡**未能確認**。
 
 ## 資安審查建議（M4／M5 實作時納入）
 1. （中）購買時將使用者 UUID 設為 `appAccountToken`，後端驗證時比對 appAccountToken 與 session 使用者一致，避免外流的 signedTransaction 被別的帳號先 verify 而佔走額度。
@@ -221,4 +313,6 @@ interface AudioService {
 4. （低）toneText 除長度上限外過濾控制字元，伺服器端固定系統指令，避免使用者改寫模型行為。
 5. （低）log 與錯誤訊息不記錄 signedTransaction、identity token、session JWT、簽名 URL、toneText 原文（必要時只記 hash 或前後幾碼）；簽名 URL 有效期短（例如 15 分鐘）。
 6. （低）R2 分開 bucket：預設語音包公開、私人音檔私有，不共用同一 bucket 以路徑區分。
+
+
 
