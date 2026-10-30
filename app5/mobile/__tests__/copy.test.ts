@@ -35,4 +35,27 @@ describe('copy', () => {
     expect(zh.home.safety).toMatch(/不是醫療建議/);
     expect(JSON.stringify(zh)).not.toMatch(/審核通過/);
   });
+
+  it('declares App Store photo usage strings like app4 (ITMS-90683)', () => {
+    const appJson = require('../app.json');
+    const plist = appJson.expo.ios.infoPlist;
+    expect(plist.NSPhotoLibraryUsageDescription).toBe(
+      'This app does not access your photos. This text is required by a system component.',
+    );
+    expect(plist.NSPhotoLibraryAddUsageDescription).toBe(
+      'This app does not add photos to your library. This text is required by a system component.',
+    );
+    expect(appJson.expo.locales).toEqual({
+      en: './languages/ios/en.json',
+      'zh-Hant': './languages/ios/zh-Hant.json',
+      'zh-TW': './languages/ios/zh-Hant.json',
+      'zh-HK': './languages/ios/zh-Hant.json',
+    });
+    const zhIos = require('../languages/ios/zh-Hant.json');
+    const enIos = require('../languages/ios/en.json');
+    expect(zhIos.NSPhotoLibraryUsageDescription).toBe('這個 App 不會使用你的照片。這段文字是系統元件需要的。');
+    expect(zhIos.NSPhotoLibraryAddUsageDescription).toBe('這個 App 不會把照片加進相簿。這段文字是系統元件需要的。');
+    expect(enIos.NSPhotoLibraryUsageDescription).toBe(plist.NSPhotoLibraryUsageDescription);
+    expect(enIos.NSPhotoLibraryAddUsageDescription).toBe(plist.NSPhotoLibraryAddUsageDescription);
+  });
 });

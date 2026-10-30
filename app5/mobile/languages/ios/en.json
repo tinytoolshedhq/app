@@ -1,0 +1,5 @@
+{
+  "CFBundleDisplayName": "Stretch",
+  "NSPhotoLibraryUsageDescription": "This app does not access your photos. This text is required by a system component.",
+  "NSPhotoLibraryAddUsageDescription": "This app does not add photos to your library. This text is required by a system component."
+}

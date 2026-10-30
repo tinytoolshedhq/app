@@ -14,10 +14,13 @@
       "infoPlist": {
         "CFBundleDevelopmentRegion": "zh-Hant",
         "CFBundleLocalizations": [
+          "en",
           "zh-Hant"
         ],
         "CFBundleAllowMixedLocalizations": true,
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "This app does not access your photos. This text is required by a system component.",
+        "NSPhotoLibraryAddUsageDescription": "This app does not add photos to your library. This text is required by a system component."
       },
       "runtimeVersion": {
         "policy": "sdkVersion"
@@ -39,9 +42,11 @@
         {
           "supportedLocales": {
             "ios": [
+              "en",
               "zh-Hant"
             ],
             "android": [
+              "en",
               "zh-Hant",
               "zh-TW",
               "zh-HK"
@@ -60,6 +65,7 @@
       "expo-iap"
     ],
     "locales": {
+      "en": "./languages/ios/en.json",
       "zh-Hant": "./languages/ios/zh-Hant.json",
       "zh-TW": "./languages/ios/zh-Hant.json",
       "zh-HK": "./languages/ios/zh-Hant.json"
