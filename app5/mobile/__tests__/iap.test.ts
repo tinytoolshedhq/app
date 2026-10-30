@@ -34,9 +34,12 @@ import {
   setProUnlocked,
   subscribePro,
   getEmptyPurchaseStreak,
+  getProRecord,
+  PENDING_MAX_AGE_MS,
 } from '../src/iap/entitlements';
 
 const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
+const realNow = entitlementGrantConfig.now.bind(entitlementGrantConfig);
 const FULLPACK = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.tinytoolshed.stretch.fullpack';
 
 describe('iap entitlement helpers', () => {
@@ -102,7 +105,14 @@ describe('iap entitlement helpers', () => {
       pendingVerification: true,
       source: 'event',
       ts: 42,
+      pendingSince: 42,
     });
+    expect(parseProRecord(JSON.stringify({
+      unlocked: true,
+      source: 'event',
+      ts: 99,
+      pendingSince: 10,
+    }))).toMatchObject({ pendingVerification: true, pendingSince: 10, ts: 99 });
   });
 
   it('dedupes purchase grants by transactionId', () => {
@@ -135,6 +145,7 @@ describe('iap', () => {
   afterEach(async () => {
     await stopPurchaseUpdates();
     entitlementGrantConfig.sleep = realEntitlementSleep;
+    entitlementGrantConfig.now = realNow;
     entitlementGrantConfig.retryDelaysMs = [1000, 3000];
   });
 
@@ -192,17 +203,91 @@ describe('iap', () => {
     });
   });
 
-  it('persists pendingVerification when entitlements lag and verification is not true', async () => {
+  it('does not unlock when transaction verification explicitly returns false', async () => {
+    const iap = require('expo-iap');
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.isTransactionVerifiedIOS.mockResolvedValue(false);
+    expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(false);
+    expect(await isProUnlocked()).toBe(false);
+    expect(await isPendingVerification()).toBe(false);
+  });
+
+  it('writes pendingVerification with pendingSince when verification is inconclusive', async () => {
     const iap = require('expo-iap');
     const AsyncStorage = require('@react-native-async-storage/async-storage');
     iap.getAvailablePurchases.mockResolvedValue([]);
     iap.currentEntitlementIOS.mockResolvedValue(null);
-    iap.isTransactionVerifiedIOS.mockResolvedValue(false);
+    iap.isTransactionVerifiedIOS.mockRejectedValue(new Error('offline'));
+    entitlementGrantConfig.now = () => 1_700_000_000_000;
     expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
     expect(await isProUnlocked()).toBe(true);
     expect(await isPendingVerification()).toBe(true);
     const stored = JSON.parse(await AsyncStorage.getItem('stretch/proUnlocked/v1'));
-    expect(stored).toEqual(expect.objectContaining({ unlocked: true, source: 'event' }));
+    expect(stored).toEqual(expect.objectContaining({
+      unlocked: true,
+      source: 'event',
+      pendingSince: 1_700_000_000_000,
+      ts: 1_700_000_000_000,
+    }));
+    expect((await getProRecord()).pendingSince).toBe(1_700_000_000_000);
+  });
+
+  it('does not reset pendingSince on later purchase or restore events', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.isTransactionVerifiedIOS.mockRejectedValue(new Error('offline'));
+    entitlementGrantConfig.now = () => 1_000;
+    expect(await grantFullpackPurchase({ productId: FULLPACK, transactionId: 'tx-a' })).toBe(true);
+    expect((await getProRecord()).pendingSince).toBe(1_000);
+
+    entitlementGrantConfig.now = () => 50_000;
+    expect(await grantFullpackPurchase({ productId: FULLPACK, transactionId: 'tx-b' })).toBe(true);
+    const afterPurchase = await getProRecord();
+    expect(afterPurchase.pendingVerification).toBe(true);
+    expect(afterPurchase.pendingSince).toBe(1_000);
+    expect(afterPurchase.ts).toBe(50_000);
+
+    await restoreProUnlock();
+    const afterRestore = await getProRecord();
+    expect(afterRestore.pendingVerification).toBe(true);
+    expect(afterRestore.pendingSince).toBe(1_000);
+  });
+
+  it('revokes a pending unlock after 14 days without successful verification', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    entitlementGrantConfig.now = () => 1_000;
+    await setProUnlocked(true, { pendingVerification: true, now: 1_000 });
+    expect(await isPendingVerification()).toBe(true);
+
+    entitlementGrantConfig.now = () => 1_000 + PENDING_MAX_AGE_MS;
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(true);
+
+    entitlementGrantConfig.now = () => 1_000 + PENDING_MAX_AGE_MS + 1;
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(false);
+    expect(await isPendingVerification()).toBe(false);
+  });
+
+  it('clears pendingVerification when verification succeeds', async () => {
+    const iap = require('expo-iap');
+    const AsyncStorage = require('@react-native-async-storage/async-storage');
+    await setProUnlocked(true, { pendingVerification: true, now: 1_000 });
+    expect(await isPendingVerification()).toBe(true);
+
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.isTransactionVerifiedIOS.mockResolvedValue(true);
+    expect(await grantFullpackPurchase({ productId: FULLPACK, transactionId: 'tx-ok' })).toBe(true);
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isPendingVerification()).toBe(false);
+    expect(await AsyncStorage.getItem('stretch/proUnlocked/v1')).toBe('1');
   });
 
   it('does not unlock a pending purchase', async () => {

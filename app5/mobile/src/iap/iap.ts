@@ -4,6 +4,8 @@ import {
   isProUnlocked,
   getEmptyPurchaseStreak,
   setEmptyPurchaseStreak,
+  getProRecord,
+  isPendingExpired,
 } from './entitlements';
 import { t } from '../i18n';
 
@@ -65,6 +67,9 @@ export const entitlementGrantConfig = {
   retryDelaysMs: [1000, 3000],
   sleep(ms: number) {
     return new Promise<void>((resolve) => setTimeout(resolve, ms));
+  },
+  now() {
+    return Date.now();
   },
 };
 
@@ -248,13 +253,16 @@ async function endIapIfEphemeral(iap: ExpoIap) {
   } catch { /* ignore */ }
 }
 
-async function verifyTransactionBestEffort(iap: ExpoIap, purchase: PurchaseLike) {
+/** true = verified, false = explicit reject, null = inconclusive (missing API / throw / non-boolean). */
+async function verifyTransactionBestEffort(iap: ExpoIap, purchase: PurchaseLike): Promise<boolean | null> {
   if (typeof iap?.isTransactionVerifiedIOS !== 'function') return null;
   try {
     const ok = await iap.isTransactionVerifiedIOS(productSku(purchase));
-    return ok === true;
+    if (ok === true) return true;
+    if (ok === false) return false;
+    return null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -313,7 +321,11 @@ async function grantFullpackPurchaseBody(purchase: PurchaseLike) {
     return true;
   }
 
-  await setProUnlocked(true, { pendingVerification: true });
+  if (verified === false) {
+    return false;
+  }
+
+  await setProUnlocked(true, { pendingVerification: true, now: entitlementGrantConfig.now() });
   await setEmptyPurchaseStreak(0);
   return true;
 }
@@ -660,13 +672,21 @@ export async function verifyProOnLaunch() {
   if (allowSimulate()) {
     return;
   }
+  const now = entitlementGrantConfig.now();
+  const record = await getProRecord();
   try {
     const iap = loadIap();
-    if (!iap?.initConnection || !iap?.getAvailablePurchases) return;
+    if (!iap?.initConnection || !iap?.getAvailablePurchases) {
+      if (isPendingExpired(record, now)) await setProUnlocked(false);
+      return;
+    }
     await iap.initConnection();
     try {
       const { ok, purchases } = await readCurrentEntitlements(iap);
-      if (!ok) return;
+      if (!ok) {
+        if (isPendingExpired(record, now)) await setProUnlocked(false);
+        return;
+      }
       const currentlyUnlocked = await isProUnlocked();
       const emptyStreak = await getEmptyPurchaseStreak();
       const decision = decideUnlockFromPurchases(purchases, {
@@ -678,6 +698,10 @@ export async function verifyProOnLaunch() {
         await setProUnlocked(true);
         return;
       }
+      if (isPendingExpired(record, now)) {
+        await setProUnlocked(false);
+        return;
+      }
       if (decision.revoke) {
         await setProUnlocked(false);
       }
@@ -685,6 +709,6 @@ export async function verifyProOnLaunch() {
       await endIapIfEphemeral(iap);
     }
   } catch {
-    // Network / StoreKit errors: do not increment streak or revoke.
+    if (isPendingExpired(record, now)) await setProUnlocked(false);
   }
 }
