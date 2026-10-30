@@ -1,0 +1,11 @@
+{
+  "name": "stretch-tts-audition",
+  "private": true,
+  "type": "module",
+  "description": "app5 試聽與成本實測（gpt-realtime-2.1-mini, Realtime API WebSocket）",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "dry-run": "node measure_cost.mjs --dry-run"
+  },
+  "dependencies": { "ws": "^8.18.0" }
+}

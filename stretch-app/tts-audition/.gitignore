@@ -1,0 +1,8 @@
+# 試聽輸出不進 repo
+*.wav
+*.pcm
+audition/
+../audition/
+results.csv
+summary.json
+node_modules/

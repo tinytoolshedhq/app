@@ -1,0 +1,254 @@
+[
+  {
+    "id": "zh-TW.sit_side_reach.01",
+    "lang": "zh-TW",
+    "exerciseId": "sit_side_reach",
+    "text": "左手沿身側往下，身體輕輕向左。"
+  },
+  {
+    "id": "zh-TW.sit_side_reach.02",
+    "lang": "zh-TW",
+    "exerciseId": "sit_side_reach",
+    "text": "慢慢回到中間。"
+  },
+  {
+    "id": "zh-TW.sit_side_reach.03",
+    "lang": "zh-TW",
+    "exerciseId": "sit_side_reach",
+    "text": "換右手往下滑，身體輕輕向右。"
+  },
+  {
+    "id": "zh-TW.sit_side_reach.04",
+    "lang": "zh-TW",
+    "exerciseId": "sit_side_reach",
+    "text": "回到中間，坐穩放鬆。"
+  },
+  {
+    "id": "zh-TW.stand_calf_wall.01",
+    "lang": "zh-TW",
+    "exerciseId": "stand_calf_wall",
+    "text": "左腳退一小步，腳跟留地，前膝微彎。"
+  },
+  {
+    "id": "zh-TW.stand_calf_wall.02",
+    "lang": "zh-TW",
+    "exerciseId": "stand_calf_wall",
+    "text": "慢慢收回，站穩。"
+  },
+  {
+    "id": "zh-TW.stand_calf_wall.03",
+    "lang": "zh-TW",
+    "exerciseId": "stand_calf_wall",
+    "text": "換右腳後退，腳跟留地，輕輕伸展。"
+  },
+  {
+    "id": "zh-TW.stand_calf_wall.04",
+    "lang": "zh-TW",
+    "exerciseId": "stand_calf_wall",
+    "text": "收回右腳，站穩放鬆。"
+  },
+  {
+    "id": "zh-TW.lie_single_knee_hug.01",
+    "lang": "zh-TW",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "雙手托左大腿後側，左膝輕輕靠近身體。"
+  },
+  {
+    "id": "zh-TW.lie_single_knee_hug.02",
+    "lang": "zh-TW",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "左腳慢慢放回地面。"
+  },
+  {
+    "id": "zh-TW.lie_single_knee_hug.03",
+    "lang": "zh-TW",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "換托右大腿，右膝輕靠近，別用力拉。"
+  },
+  {
+    "id": "zh-TW.lie_single_knee_hug.04",
+    "lang": "zh-TW",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "右腳放回，放鬆一下。"
+  },
+  {
+    "id": "zh-TW.pronunciation_test.01",
+    "lang": "zh-TW",
+    "exerciseId": "pronunciation_test",
+    "text": "小腿墊穩，兩隻腳踝各自慢慢畫小圈。"
+  },
+  {
+    "id": "zh-TW.pronunciation_test.02",
+    "lang": "zh-TW",
+    "exerciseId": "pronunciation_test",
+    "text": "骨盆輕輕後傾，腰靠近地面，再放鬆。"
+  },
+  {
+    "id": "ja.sit_side_reach.01",
+    "lang": "ja",
+    "exerciseId": "sit_side_reach",
+    "text": "左手を体の横にそわせて、ゆっくり下へ。上半身を少しだけ左に傾けます。"
+  },
+  {
+    "id": "ja.sit_side_reach.02",
+    "lang": "ja",
+    "exerciseId": "sit_side_reach",
+    "text": "はい、ゆっくり真ん中に戻りましょう。"
+  },
+  {
+    "id": "ja.sit_side_reach.03",
+    "lang": "ja",
+    "exerciseId": "sit_side_reach",
+    "text": "今度は右手を下へすべらせて、からだを軽く右へ。"
+  },
+  {
+    "id": "ja.sit_side_reach.04",
+    "lang": "ja",
+    "exerciseId": "sit_side_reach",
+    "text": "真ん中に戻ったら、座り直して力を抜きましょう。"
+  },
+  {
+    "id": "ja.stand_calf_wall.01",
+    "lang": "ja",
+    "exerciseId": "stand_calf_wall",
+    "text": "左足を小さく一歩うしろへ。かかとは床につけたまま、前のひざは軽く曲げます。"
+  },
+  {
+    "id": "ja.stand_calf_wall.02",
+    "lang": "ja",
+    "exerciseId": "stand_calf_wall",
+    "text": "ゆっくり足を戻して、まっすぐ立ちましょう。"
+  },
+  {
+    "id": "ja.stand_calf_wall.03",
+    "lang": "ja",
+    "exerciseId": "stand_calf_wall",
+    "text": "次は右足をうしろへ。かかとを床につけて、気持ちいいところまで。"
+  },
+  {
+    "id": "ja.stand_calf_wall.04",
+    "lang": "ja",
+    "exerciseId": "stand_calf_wall",
+    "text": "右足を戻して、楽に立ちましょう。"
+  },
+  {
+    "id": "ja.lie_single_knee_hug.01",
+    "lang": "ja",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "両手で左の太ももの裏を支えて、ひざをそっと体に近づけます。"
+  },
+  {
+    "id": "ja.lie_single_knee_hug.02",
+    "lang": "ja",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "左足をゆっくり床に下ろしましょう。"
+  },
+  {
+    "id": "ja.lie_single_knee_hug.03",
+    "lang": "ja",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "今度は右の太ももを支えて、ひざを近づけます。強く引っぱらないでくださいね。"
+  },
+  {
+    "id": "ja.lie_single_knee_hug.04",
+    "lang": "ja",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "右足を下ろして、ひと息つきましょう。"
+  },
+  {
+    "id": "ja.pronunciation_test.01",
+    "lang": "ja",
+    "exerciseId": "pronunciation_test",
+    "text": "背筋をすっと伸ばして、股関節のまわりをゆるめましょう。"
+  },
+  {
+    "id": "ja.pronunciation_test.02",
+    "lang": "ja",
+    "exerciseId": "pronunciation_test",
+    "text": "足首をゆっくり回して、脛とふくらはぎの力を抜きます。"
+  },
+  {
+    "id": "en.sit_side_reach.01",
+    "lang": "en",
+    "exerciseId": "sit_side_reach",
+    "text": "Let your left hand slide down your side, and lean just a little to the left."
+  },
+  {
+    "id": "en.sit_side_reach.02",
+    "lang": "en",
+    "exerciseId": "sit_side_reach",
+    "text": "Nice and slow, come back to the middle."
+  },
+  {
+    "id": "en.sit_side_reach.03",
+    "lang": "en",
+    "exerciseId": "sit_side_reach",
+    "text": "Now slide your right hand down, and ease over to the right."
+  },
+  {
+    "id": "en.sit_side_reach.04",
+    "lang": "en",
+    "exerciseId": "sit_side_reach",
+    "text": "Back to center. Sit tall and relax."
+  },
+  {
+    "id": "en.stand_calf_wall.01",
+    "lang": "en",
+    "exerciseId": "stand_calf_wall",
+    "text": "Take a small step back with your left foot. Keep the heel down and the front knee soft."
+  },
+  {
+    "id": "en.stand_calf_wall.02",
+    "lang": "en",
+    "exerciseId": "stand_calf_wall",
+    "text": "Slowly bring it back in and stand steady."
+  },
+  {
+    "id": "en.stand_calf_wall.03",
+    "lang": "en",
+    "exerciseId": "stand_calf_wall",
+    "text": "Now step your right foot back, heel down, and ease into the stretch."
+  },
+  {
+    "id": "en.stand_calf_wall.04",
+    "lang": "en",
+    "exerciseId": "stand_calf_wall",
+    "text": "Bring your right foot in, and stand nice and easy."
+  },
+  {
+    "id": "en.lie_single_knee_hug.01",
+    "lang": "en",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "Hold behind your left thigh and gently bring that knee toward you."
+  },
+  {
+    "id": "en.lie_single_knee_hug.02",
+    "lang": "en",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "Slowly lower your left foot back to the floor."
+  },
+  {
+    "id": "en.lie_single_knee_hug.03",
+    "lang": "en",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "Switch to your right thigh and bring the knee in. No need to pull hard."
+  },
+  {
+    "id": "en.lie_single_knee_hug.04",
+    "lang": "en",
+    "exerciseId": "lie_single_knee_hug",
+    "text": "Lower your right foot and take a breather."
+  },
+  {
+    "id": "en.pronunciation_test.01",
+    "lang": "en",
+    "exerciseId": "pronunciation_test",
+    "text": "Feel a gentle stretch through your calf and hamstring, never forcing it."
+  },
+  {
+    "id": "en.pronunciation_test.02",
+    "lang": "en",
+    "exerciseId": "pronunciation_test",
+    "text": "Circle your ankles slowly, and let your lower back and quadriceps relax."
+  }
+]

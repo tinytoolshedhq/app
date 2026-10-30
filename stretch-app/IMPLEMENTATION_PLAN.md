@@ -168,6 +168,7 @@ Chun 2026-10-30 決定：全部從免費方案開始。程式要設計成升級�
 
 ## 4. TTS：Google Cloud TTS Chirp 3 HD vs OpenAI（2026-10-30 查官方頁）
 ElevenLabs 依 Chun 的選擇排除，不列入推薦。
+2026-10-30 Chun 決定預設與自訂語音都用 OpenAI（全球多語），暫不接 Google；試聽與成本實測腳本在 `stretch-app/tts-audition/`。
 
 字數是用腳本從 JSON 實際統計的 `voice_cues.text`：30 動作、120 段、**共 1,500 字**。最長的 10 個動作合計 531 字。所有 `max_duration_seconds` 合計 780 秒。
 
