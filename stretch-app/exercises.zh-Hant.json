@@ -1,0 +1,3139 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "0.1.0",
+  "locale": "zh-Hant",
+  "created_at": "2026-10-30",
+  "title": "伸展與活動初始內容包",
+  "status": "draft",
+  "review_status": "pending_professional_review",
+  "media_status": "not_created",
+  "notes": [
+    "本檔為內容草稿，尚不包含實體動畫、圖片與語音。",
+    "30 秒編排為原創產品草案，參考來源不代表其認證或建議此時間安排。",
+    "包含不同姿勢的相似活動版本；動作涵蓋伸展與關節活動。",
+    "所有躺姿均為仰躺，左右側包含在同一筆動作，不獨立分類。",
+    "部分動作為一般活動設計，source_ids 為空，必須由專業人士確認後再發布。"
+  ],
+  "categories": {
+    "positions": [
+      {
+        "id": "sitting",
+        "label": "坐著"
+      },
+      {
+        "id": "standing",
+        "label": "站著"
+      },
+      {
+        "id": "lying",
+        "label": "躺著"
+      }
+    ],
+    "body_regions": [
+      {
+        "id": "shoulders",
+        "label": "肩膀"
+      },
+      {
+        "id": "chest",
+        "label": "胸口"
+      },
+      {
+        "id": "upper_back",
+        "label": "上背"
+      },
+      {
+        "id": "neck",
+        "label": "頸部"
+      },
+      {
+        "id": "hands",
+        "label": "手部"
+      },
+      {
+        "id": "wrists",
+        "label": "手腕"
+      },
+      {
+        "id": "arms",
+        "label": "手臂"
+      },
+      {
+        "id": "waist",
+        "label": "腰部"
+      },
+      {
+        "id": "hips",
+        "label": "髖部"
+      },
+      {
+        "id": "knees",
+        "label": "膝部"
+      },
+      {
+        "id": "ankles",
+        "label": "腳踝"
+      },
+      {
+        "id": "calves",
+        "label": "小腿"
+      }
+    ],
+    "selection_options": [
+      {
+        "id": "whole_body",
+        "label": "全身",
+        "matches_all_body_regions": true
+      }
+    ],
+    "movement_types": [
+      {
+        "id": "stretch",
+        "label": "輕度伸展"
+      },
+      {
+        "id": "mobility",
+        "label": "關節活動"
+      }
+    ],
+    "equipment": [
+      {
+        "id": "chair",
+        "label": "穩固、無輪椅子"
+      },
+      {
+        "id": "wall",
+        "label": "穩固牆面"
+      },
+      {
+        "id": "mat",
+        "label": "穩定平面與舒適地墊"
+      },
+      {
+        "id": "cushion",
+        "label": "小腿支撐薄墊"
+      }
+    ]
+  },
+  "product_rules": {
+    "platforms": [
+      "ios"
+    ],
+    "exercise_duration_seconds": 30,
+    "gap_after_each_exercise_seconds": 3,
+    "include_gap_after_last_exercise": true,
+    "selected_time_means": "active_time_only",
+    "duration_increment_seconds": 30,
+    "suggested_duration_options_seconds": [
+      30,
+      60,
+      120,
+      180,
+      300
+    ],
+    "body_region_selection": "single",
+    "cache_last_selection": true,
+    "allow_explicitly_disclosed_repetition": true,
+    "split_records_by_side": false,
+    "monetization": {
+      "purchase_type": "one_time_unlock",
+      "subscription_enabled": false,
+      "additional_credit_purchase_enabled": false,
+      "custom_voice_conversions_included": 10,
+      "credit_renewal": "never",
+      "restore_purchase_grants_new_credits": false,
+      "on_credits_exhausted": "keep_existing_audio_and_paid_features_disable_new_generation",
+      "proposed_conversion_limit": {
+        "status": "proposal_requires_cost_validation",
+        "max_exercises": 10,
+        "max_generated_audio_seconds": 300,
+        "style_profiles": 1,
+        "cost_in_credits": 1
+      },
+      "preview_limits": {
+        "status": "to_be_decided",
+        "unlimited": false
+      },
+      "price": null
+    }
+  },
+  "playback": {
+    "initial_state": "setup_preview",
+    "start_requires_user_action": true,
+    "timeline_authority": "app_monotonic_clock_with_pause_accounting",
+    "voice_generation_rewrites_script": false,
+    "default_voice_style": "繁體中文講稿，以親切溫柔、清楚自然的語氣朗讀，不加字、不改左右、不省略重點。",
+    "voice_generation_status": "not_generated",
+    "cue_durations_are": "budgets_not_measured_audio_lengths",
+    "pause_on_headphone_disconnect": true,
+    "background_audio_required": true
+  },
+  "global_safety": {
+    "intended_audience": "可自行安全活動的一般成人；不是個人復健處方。",
+    "before_start": "在穩固環境中就位，確認周圍留空，活動以舒服為限並保持自然呼吸。",
+    "stop_if": [
+      "疼痛",
+      "麻木",
+      "暈眩",
+      "其他不適"
+    ],
+    "seek_individual_advice_if": [
+      "有傷勢或醫療活動限制",
+      "手術後",
+      "懷孕",
+      "不確定動作是否適合自己"
+    ],
+    "professional_review_required_before_release": true
+  },
+  "sources": [
+    {
+      "id": "seated",
+      "title": "NHS — Sitting exercises",
+      "url": "https://www.nhs.uk/live-well/exercise/sitting-exercises/",
+      "scope": "部分坐姿活動的方向參考；本檔的時間、講稿與姿勢變體另行編排。"
+    },
+    {
+      "id": "flexibility",
+      "title": "NHS — Flexibility exercises",
+      "url": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/",
+      "scope": "側彎及扶牆小腿活動參考；坐姿變體與 30 秒安排須另行審核。"
+    },
+    {
+      "id": "office",
+      "title": "Newcastle Hospitals — 1 minute body check",
+      "url": "https://www.newcastle-hospitals.nhs.uk/services/newcastle-occupational-health-service/information-for-staff/physiotherapy/self-help-leaflets/1-minute-body-check/",
+      "scope": "肩部、手部與手肘活動參考；仰躺變體屬本產品草稿。"
+    },
+    {
+      "id": "back",
+      "title": "Cambridge University Hospitals — Back mobility exercises",
+      "url": "https://www.cuh.nhs.uk/patient-information/back-mobility-exercises/",
+      "scope": "屈膝移動、骨盆活動與膝部靠近身體的方向參考；不沿用為個人復健處方。"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "sit_shoulder_circles",
+      "name": "肩膀輕繞圈",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "shoulders"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐在穩固無輪椅子上，雙腳踩地，雙手垂在身旁。",
+      "description": "雙手自然垂放，肩膀小幅向前、向後繞圈。",
+      "instructions": [
+        "肩膀向前緩慢繞小圈",
+        "維持小幅度向前繞圈",
+        "改為向後緩慢繞小圈",
+        "停止繞圈，肩膀回到自然位置"
+      ],
+      "cautions": [
+        "不要用力聳肩或讓頭部跟著繞圈。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "肩膀向前緩慢繞小圈"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "維持小幅度向前繞圈"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "改為向後緩慢繞小圈"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "停止繞圈，肩膀回到自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_shoulder_circles_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手放鬆，肩膀慢慢向前繞小圈。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_shoulder_circles_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "輕輕繞就好，保持呼吸。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_shoulder_circles_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "現在換方向，肩膀慢慢向後繞圈。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_shoulder_circles_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "慢慢停下，放鬆肩膀。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面線條人物，雙手垂下；以小箭頭標示肩膀繞圈方向，15 秒時反向。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "sit_chest_open",
+      "name": "胸前輕伸展",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "chest",
+        "shoulders"
+      ],
+      "movement_type": "stretch",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐直，雙腳踩地，雙臂垂在身旁，背部保持自然。",
+      "description": "雙臂低低向兩側打開，胸前輕微伸展後放鬆。",
+      "instructions": [
+        "雙臂低於肩膀打開，肩膀輕向後下方",
+        "放鬆雙臂並回到身側",
+        "再次低低打開雙臂，短暫保持",
+        "收回雙臂，放鬆肩膀"
+      ],
+      "cautions": [
+        "不要挺腰、憋氣，或強行將手臂向後拉。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙臂低於肩膀打開，肩膀輕向後下方"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "放鬆雙臂並回到身側"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "再次低低打開雙臂，短暫保持"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "收回雙臂，放鬆肩膀"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_chest_open_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "坐直，雙手低低打開，肩膀輕輕往後。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_chest_open_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "先慢慢放鬆雙手。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_chest_open_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "再輕輕打開，胸前微微伸展就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_chest_open_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙手放回來，做得很好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "斜前方視角，雙臂在身體低處打開；軀幹不後仰，兩次開合各有停留。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "seated"
+      ]
+    },
+    {
+      "id": "sit_upper_back_turn",
+      "name": "上半身輕轉",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "upper_back"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐直，雙腳踩地，雙手交叉輕放胸前。",
+      "description": "雙手交叉放胸前，骨盆朝前，上半身向兩側小幅轉動。",
+      "instructions": [
+        "骨盆朝前，上半身輕向左轉並短停",
+        "上半身慢慢回正",
+        "上半身輕向右轉並短停",
+        "回正，雙手放下"
+      ],
+      "cautions": [
+        "不要用椅背或手臂拉扯增加轉動幅度。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "骨盆朝前，上半身輕向左轉並短停"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "上半身慢慢回正"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "上半身輕向右轉並短停"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回正，雙手放下"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_upper_back_turn_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手放胸前，上半身慢慢向左轉。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_upper_back_turn_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢回到中間。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_upper_back_turn_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "現在向右轉，轉到舒服的位置就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_upper_back_turn_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "慢慢回正，放鬆雙手。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面略帶俯視，骨盆固定朝前；左轉、回中、右轉、回中，不翻轉鏡像標籤。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "seated",
+        "office"
+      ]
+    },
+    {
+      "id": "sit_finger_open",
+      "name": "手指輕開合",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "hands"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐穩，前臂舒服地放在大腿上，手腕保持自然。",
+      "description": "前臂放在腿上，雙手輕握拳再張開，慢慢重複。",
+      "instructions": [
+        "輕握拳後張開手指，緩慢重複",
+        "繼續輕柔開合",
+        "依舒服速度重複開合",
+        "停止開合，雙手自然放鬆"
+      ],
+      "cautions": [
+        "不要握緊、強扳手指或強求伸直。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "輕握拳後張開手指，緩慢重複"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "繼續輕柔開合"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "依舒服速度重複開合"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "停止開合，雙手自然放鬆"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_finger_open_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "前臂放在腿上，輕握拳，再張開手指。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_finger_open_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢開合，不用握緊。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_finger_open_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續照自己的速度，輕輕張開再放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_finger_open_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "停下來，放鬆雙手。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "坐姿全身加手部近景，清楚呈現輕握與張開，不誇張拉長手指。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "sit_wrist_flex",
+      "name": "手腕上下活動",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "wrists"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐穩，前臂放在大腿，雙手略超出膝前，手掌朝下。",
+      "description": "前臂支撐在腿上，手腕小幅向上、向下活動。",
+      "instructions": [
+        "手腕小幅上抬、下放，緩慢重複",
+        "維持手臂穩定，持續小幅活動",
+        "繼續上下活動手腕",
+        "手腕回到自然位置"
+      ],
+      "cautions": [
+        "不以另一隻手壓手腕，不在手腕上承重。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "手腕小幅上抬、下放，緩慢重複"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "維持手臂穩定，持續小幅活動"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續上下活動手腕"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "手腕回到自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_wrist_flex_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "前臂放穩，手腕輕輕往上抬，再放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_wrist_flex_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "小小活動，不用彎到底。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_wrist_flex_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續慢慢上下活動，手臂保持放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_wrist_flex_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "回到自然位置，休息一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側面手部近景，前臂固定，只有手腕在舒服範圍上下活動。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "sit_neck_turn",
+      "name": "頸部輕轉頭",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "neck"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐直，看向前方，肩膀放下，頭部不前伸。",
+      "description": "肩膀保持放鬆，頭部小幅轉向左、右再回正。",
+      "instructions": [
+        "頭部慢慢向左轉，舒服範圍內短停",
+        "頭部慢慢回正",
+        "頭部慢慢向右轉，舒服範圍內短停",
+        "頭部回正，放鬆"
+      ],
+      "cautions": [
+        "不做頸部大繞圈，不用手施壓；暈眩立即停止。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "頭部慢慢向左轉，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "頭部慢慢回正"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "頭部慢慢向右轉，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "頭部回正，放鬆"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_neck_turn_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "肩膀放鬆，頭慢慢向左轉一點點。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_neck_turn_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢看回前方。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_neck_turn_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "現在慢慢向右轉，不用轉到底。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_neck_turn_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "回到前方，保持放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面加小幅側向示意，僅轉頭，肩膀不跟轉，不呈現仰頭。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "seated"
+      ]
+    },
+    {
+      "id": "sit_side_reach",
+      "name": "坐姿側身輕移",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "waist",
+        "upper_back"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐在無扶手穩固椅子上，雙腳踩穩，雙手垂放。",
+      "description": "雙腳踩穩，單手沿身側向下滑，軀幹小幅側彎再回正。",
+      "instructions": [
+        "左手沿身側向下滑，軀幹小幅向左",
+        "慢慢回到中間",
+        "右手沿身側向下滑，軀幹小幅向右",
+        "慢慢回正"
+      ],
+      "cautions": [
+        "雙側臀部留在椅面；不向前彎或用力伸手碰地。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "左手沿身側向下滑，軀幹小幅向左"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "慢慢回到中間"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "右手沿身側向下滑，軀幹小幅向右"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "慢慢回正"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_side_reach_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "左手沿身側往下，身體輕輕向左。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_side_reach_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢回到中間。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_side_reach_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換右手往下滑，身體輕輕向右。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_side_reach_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "回到中間，坐穩放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面全身，臀部不離椅面，軀幹側移幅度小，兩腳固定踩地。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "flexibility"
+      ]
+    },
+    {
+      "id": "sit_elbow_bend",
+      "name": "手肘輕彎伸",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "arms"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐穩，雙臂垂在身旁，手掌朝前，手指放鬆。",
+      "description": "上臂留在身旁，雙手緩慢靠近肩膀再放下。",
+      "instructions": [
+        "雙肘緩慢彎曲再伸回，重複",
+        "保持上臂靠身側，繼續彎伸",
+        "繼續舒適幅度的彎伸",
+        "雙手緩慢放下"
+      ],
+      "cautions": [
+        "不拿重物，不強行鎖直手肘。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙肘緩慢彎曲再伸回，重複"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "保持上臂靠身側，繼續彎伸"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續舒適幅度的彎伸"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "雙手緩慢放下"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_elbow_bend_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "手臂放身旁，彎手肘，雙手靠近肩膀。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_elbow_bend_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "再慢慢放下，不要甩手。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_elbow_bend_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續輕輕彎曲，再慢慢伸回。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_elbow_bend_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙手放下，放鬆手臂。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "斜前方視角，上臂保持垂直，前臂平順彎伸，不做快速擺動。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "sit_ankle_pump",
+      "name": "坐姿腳踝勾放",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "ankles",
+        "calves"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐穩，雙腳踩地，預留腳前方活動空間。",
+      "description": "一腳略向前、腳跟輕放地，腳尖緩慢勾起再放下，兩側依序進行。",
+      "instructions": [
+        "左腳略向前，腳跟留地，腳尖勾放",
+        "左腳收回，準備右腳",
+        "右腳略向前，腳跟留地，腳尖勾放",
+        "右腳收回，雙腳踩穩"
+      ],
+      "cautions": [
+        "不要強行繃腳或勾腳；膝蓋不必完全伸直。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "左腳略向前，腳跟留地，腳尖勾放"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "左腳收回，準備右腳"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "右腳略向前，腳跟留地，腳尖勾放"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "右腳收回，雙腳踩穩"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_ankle_pump_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "左腳往前一點，腳跟留地，腳尖勾起再放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_ankle_pump_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "左腳收回，換右腳。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_ankle_pump_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "右腳跟留地，腳尖慢慢勾起再放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_ankle_pump_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "右腳收回，雙腳踩穩。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側面腳部近景，腳跟固定，腳尖上下，15 秒前完成換腳準備。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "seated"
+      ]
+    },
+    {
+      "id": "sit_knee_extend",
+      "name": "坐姿膝部輕伸",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "sitting",
+      "body_regions": [
+        "knees"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "chair"
+      ],
+      "setup": "坐穩，雙腳踩地，雙手扶椅面，膝前留空。",
+      "description": "大腿保持在椅面，單腳緩慢伸膝再放回，左右依序活動。",
+      "instructions": [
+        "左膝緩慢伸展再彎回，重複小幅活動",
+        "左腳放回地面",
+        "右膝緩慢伸展再彎回，重複小幅活動",
+        "右腳放回地面"
+      ],
+      "cautions": [
+        "大腿不離開椅面，不踢腿或強求鎖直膝蓋。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "左膝緩慢伸展再彎回，重複小幅活動"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "左腳放回地面"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "右膝緩慢伸展再彎回，重複小幅活動"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "右腳放回地面"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "sit_knee_extend_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "左腳慢慢往前抬，膝蓋伸一點，再放回。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_knee_extend_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "左腳踩穩，準備換腳。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_knee_extend_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "右腳慢慢往前抬，再輕輕放回。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "sit_knee_extend_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙腳踩地，放鬆腿部。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側面坐姿，僅小腿繞膝部緩慢抬放，軀幹保持穩定。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "stand_shoulder_circles",
+      "name": "站姿肩膀繞圈",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "shoulders"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "雙腳與髖同寬站穩，膝蓋不鎖死，身旁留空。",
+      "description": "站穩後肩膀小幅向前、向後繞圈，雙臂自然垂放。",
+      "instructions": [
+        "肩膀小幅向前繞圈",
+        "保持慢速向前繞圈",
+        "肩膀改向後繞圈",
+        "停止繞圈，自然垂肩"
+      ],
+      "cautions": [
+        "不扭腰、踮腳或讓頭部跟著繞圈。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "肩膀小幅向前繞圈"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "保持慢速向前繞圈"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "肩膀改向後繞圈"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "停止繞圈，自然垂肩"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_shoulder_circles_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙腳站穩，肩膀慢慢向前繞小圈。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_shoulder_circles_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "輕輕繞，別憋氣。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_shoulder_circles_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換方向，肩膀慢慢向後繞圈。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_shoulder_circles_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "慢慢停下，放鬆肩膀。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面站姿，膝蓋自然，肩部小圈箭頭，15 秒反向。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "stand_chest_open",
+      "name": "站姿胸前舒展",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "chest",
+        "shoulders"
+      ],
+      "movement_type": "stretch",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "雙腳與髖同寬，雙手垂放，腰背保持自然。",
+      "description": "站穩，雙臂在低處打開，讓胸前輕微伸展再放鬆。",
+      "instructions": [
+        "雙臂低低打開，肩膀輕向後下方",
+        "放鬆雙臂回到身側",
+        "再次低低打開，舒服範圍內短停",
+        "雙臂回身側"
+      ],
+      "cautions": [
+        "不後仰挺腰，不將手臂用力往後拉。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙臂低低打開，肩膀輕向後下方"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "放鬆雙臂回到身側"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "再次低低打開，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "雙臂回身側"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_chest_open_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "站穩，雙手低低打開，肩膀輕輕往後。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_chest_open_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢收回，放鬆一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_chest_open_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "再輕輕打開，保持自然呼吸。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_chest_open_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙手收回，放鬆肩膀。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "斜前方站姿，雙手不高過肩，軀幹不後仰，呈現打開和回收。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "seated"
+      ]
+    },
+    {
+      "id": "stand_finger_open",
+      "name": "站姿手指開合",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "hands"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "站穩，雙肘彎曲靠近身側，手腕保持自然。",
+      "description": "雙肘靠近身旁，手指輕握再張開，慢慢重複。",
+      "instructions": [
+        "輕握拳再張開手指",
+        "依舒服速度持續開合",
+        "繼續小幅開合，肩膀放鬆",
+        "停止，雙手放鬆"
+      ],
+      "cautions": [
+        "不強扳手指，不因看手而低頭失去平衡。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "輕握拳再張開手指"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "依舒服速度持續開合"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續小幅開合，肩膀放鬆"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "停止，雙手放鬆"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_finger_open_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙肘靠身旁，雙手輕握，再張開手指。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_finger_open_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "不用握緊，慢慢來。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_finger_open_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續輕輕開合，肩膀保持放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_finger_open_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "放鬆雙手，慢慢垂下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "站姿加手部近景，雙肘貼近身側，輕握與張開循環。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "stand_wrist_flex",
+      "name": "站姿手腕活動",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "wrists"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "站穩，雙肘貼近身側，前臂朝前，手掌朝下。",
+      "description": "雙肘彎曲靠身旁，手腕小幅向上、向下活動。",
+      "instructions": [
+        "手腕輕抬與下放，慢慢重複",
+        "前臂保持穩定，繼續活動",
+        "繼續小幅上下活動",
+        "回到自然位置，雙手垂下"
+      ],
+      "cautions": [
+        "不強壓手腕，不聳肩或用全手臂甩動。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "手腕輕抬與下放，慢慢重複"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "前臂保持穩定，繼續活動"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續小幅上下活動"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回到自然位置，雙手垂下"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_wrist_flex_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙肘靠身旁，手腕輕輕往上，再往下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_wrist_flex_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "小幅度就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_wrist_flex_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續慢慢活動，別用力彎到底。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_wrist_flex_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "放鬆手腕，雙手放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "斜側面，前臂水平但不僵硬，手腕上下小幅移動。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "stand_elbow_bend",
+      "name": "站姿手肘彎伸",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "arms"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "站穩，雙臂垂在身旁，手掌朝前，不持重物。",
+      "description": "上臂留在身旁，雙肘緩慢彎曲、伸回。",
+      "instructions": [
+        "緩慢彎肘再伸回",
+        "繼續彎伸，上臂留在原位",
+        "依舒服幅度重複",
+        "放下雙手，回到自然站姿"
+      ],
+      "cautions": [
+        "不鎖肘、不擺腰借力，不拿啞鈴。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "緩慢彎肘再伸回"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "繼續彎伸，上臂留在原位"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "依舒服幅度重複"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "放下雙手，回到自然站姿"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_elbow_bend_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "彎曲手肘，雙手慢慢靠近肩膀，再放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_elbow_bend_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "上臂留在身旁。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_elbow_bend_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續慢慢彎伸，不用伸得很直。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_elbow_bend_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙手放下，放鬆手臂。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "站姿斜前視角，前臂彎伸，肩部穩定，無器材。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "stand_neck_turn",
+      "name": "站姿輕轉頭",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "neck"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "雙腳穩定站立，看向前方，肩膀放鬆。",
+      "description": "站穩看前方，頭部輕轉向左、右再回正。",
+      "instructions": [
+        "頭慢慢向左轉，舒服範圍內短停",
+        "頭回到前方",
+        "頭慢慢向右轉，舒服範圍內短停",
+        "回到前方"
+      ],
+      "cautions": [
+        "平衡不穩者改坐姿；暈眩停止，不做頸部大繞圈。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "頭慢慢向左轉，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "頭回到前方"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "頭慢慢向右轉，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回到前方"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_neck_turn_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "先站穩，頭慢慢向左轉一點點。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_neck_turn_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢看回前方。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_neck_turn_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換向右轉，肩膀不要跟著動。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_neck_turn_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "回到前方，放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面站姿，小幅轉頭，軀幹與肩不轉，不仰頭。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "seated"
+      ]
+    },
+    {
+      "id": "stand_side_slide",
+      "name": "站姿側身輕滑",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "waist"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "雙腳與髖同寬，雙手放在身側，站穩後開始。",
+      "description": "一手沿大腿外側向下滑，身體小幅側彎，再換方向。",
+      "instructions": [
+        "左手沿大腿向下滑，身體輕向左側彎",
+        "回到中間站穩",
+        "右手沿大腿向下滑，身體輕向右側彎",
+        "回到自然站姿"
+      ],
+      "cautions": [
+        "不前彎或後仰，不伸手碰地，不追求大幅度。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "左手沿大腿向下滑，身體輕向左側彎"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "回到中間站穩"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "右手沿大腿向下滑，身體輕向右側彎"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回到自然站姿"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_side_slide_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "左手沿大腿往下滑，身體輕輕向左。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_side_slide_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢回到中間。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_side_slide_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換右手往下滑，身體輕輕向右。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_side_slide_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "慢慢回正，站穩。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "正面全身，雙腳固定，骨盆不大幅側推，左右小幅側彎。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "flexibility"
+      ]
+    },
+    {
+      "id": "stand_calf_wall",
+      "name": "扶牆小腿伸展",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "calves",
+        "ankles"
+      ],
+      "movement_type": "stretch",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "wall"
+      ],
+      "setup": "面向穩固牆面，雙手輕扶牆，地面止滑，預留後方空間。",
+      "description": "雙手扶牆，前後站立，後腳跟留地，兩側依序輕伸展。",
+      "instructions": [
+        "左腳小步後退，前膝微彎，左腳跟留地",
+        "收回左腳，站穩並準備換側",
+        "右腳小步後退，前膝微彎，右腳跟留地",
+        "收回右腳，站穩"
+      ],
+      "cautions": [
+        "雙腳朝前，後腳跟不強壓；換腳可暫停，不急著跨步。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "左腳小步後退，前膝微彎，左腳跟留地"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "收回左腳，站穩並準備換側"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "右腳小步後退，前膝微彎，右腳跟留地"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "收回右腳，站穩"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_calf_wall_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "左腳退一小步，腳跟留地，前膝微彎。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_calf_wall_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢收回，站穩。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_calf_wall_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換右腳後退，腳跟留地，輕輕伸展。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_calf_wall_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "收回右腳，站穩放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側視全身，牆與手部接觸清楚，後腳跟著地，呈現完整換腳。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "flexibility"
+      ]
+    },
+    {
+      "id": "stand_arm_raise",
+      "name": "雙臂向前輕抬",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "shoulders",
+        "arms"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "站穩，雙臂垂下，手掌相對，前方留空。",
+      "description": "雙臂朝前緩慢抬起，最高不超過肩高，再放下。",
+      "instructions": [
+        "雙臂朝前輕抬再放下，重複",
+        "繼續舒服幅度抬放",
+        "維持慢速抬放，不聳肩",
+        "雙手放回身側"
+      ],
+      "cautions": [
+        "不過頭、不拿重物；肩部不適則降低高度或停止。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙臂朝前輕抬再放下，重複"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "繼續舒服幅度抬放"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "維持慢速抬放，不聳肩"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "雙手放回身側"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_arm_raise_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手朝前慢慢抬起，不超過肩膀，再放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_arm_raise_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "輕輕抬，別聳肩。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_arm_raise_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續照舒服的高度，慢慢抬起再放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_arm_raise_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙手放下，休息一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側面站姿，雙臂最多肩高，不挺腰，手掌相對。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "stand_shoulder_blades",
+      "name": "肩胛輕收放",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "standing",
+      "body_regions": [
+        "upper_back",
+        "shoulders"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [],
+      "setup": "站穩，雙臂自然垂下，頭與腰背保持自然。",
+      "description": "雙手垂放，肩胛骨輕輕靠近再鬆開，不夾緊或挺腰。",
+      "instructions": [
+        "肩胛輕向後靠近，短停再放鬆",
+        "維持小幅收放",
+        "繼續輕收再放鬆",
+        "回到肩膀自然位置"
+      ],
+      "cautions": [
+        "不將胸口用力頂出、不聳肩或憋氣。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "肩胛輕向後靠近，短停再放鬆"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "維持小幅收放"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續輕收再放鬆"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回到肩膀自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "stand_shoulder_blades_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手垂下，肩胛骨輕輕往後靠，再放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_shoulder_blades_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "小小收一下就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_shoulder_blades_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續輕收再放鬆，不用力夾緊。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "stand_shoulder_blades_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "放鬆肩膀，自然站好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "背面與側面對照，肩胛小幅靠近，軀幹中立，不誇大夾背。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "lie_ankle_pump",
+      "name": "仰躺腳踝勾放",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "ankles",
+        "calves"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺在穩定平面，雙腿舒服伸展，頭頸可用薄墊支撐。",
+      "description": "仰躺，雙腳自然分開，腳尖慢慢勾向自己再輕輕放遠。",
+      "instructions": [
+        "雙腳踝慢慢勾腳、放腳",
+        "保持腿部放鬆，持續勾放",
+        "繼續舒適幅度的勾放",
+        "腳踝回到自然位置"
+      ],
+      "cautions": [
+        "不強行繃腳，不以腳跟用力推床面。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙腳踝慢慢勾腳、放腳"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "保持腿部放鬆，持續勾放"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續舒適幅度的勾放"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "腳踝回到自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_ankle_pump_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "躺穩，腳尖慢慢勾向自己，再輕輕放遠。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_ankle_pump_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "小幅度就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_ankle_pump_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續慢慢勾腳，再輕輕放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_ankle_pump_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "停下，讓雙腳自然放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "仰躺全身加腳部側視近景，雙腳踝勾放，不抬整條腿。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "lie_finger_open",
+      "name": "仰躺手指開合",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "hands"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺，雙膝可彎、腳掌踩穩，雙臂放在身旁。",
+      "description": "雙臂放在身旁，雙手輕握拳再張開手指。",
+      "instructions": [
+        "雙手輕握再張開",
+        "維持輕柔開合",
+        "繼續緩慢開合",
+        "停止，雙手自然放鬆"
+      ],
+      "cautions": [
+        "不強扳手指，不將拳頭壓向地面。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙手輕握再張開"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "維持輕柔開合"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續緩慢開合"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "停止，雙手自然放鬆"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_finger_open_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手放身旁，輕輕握拳，再張開手指。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_finger_open_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢來，不用握緊。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_finger_open_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續輕輕開合，肩膀保持放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_finger_open_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "停下，放鬆雙手。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "仰躺俯視與手部近景，雙臂留在平面上，手指清楚開合。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "lie_heel_slide",
+      "name": "腳跟輕滑動",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "knees",
+        "hips"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "free",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺在平穩表面，雙腿舒服伸展，腳跟有足夠滑動空間。",
+      "description": "仰躺，腳跟貼著平面慢慢滑近臀部再滑回，兩側依序進行。",
+      "instructions": [
+        "左腳跟貼面滑近臀部，再緩慢滑回",
+        "左腿放鬆，準備右腳",
+        "右腳跟貼面滑近臀部，再緩慢滑回",
+        "回到自然位置"
+      ],
+      "cautions": [
+        "不用力拖曳腳跟，不強求膝蓋完全彎曲或伸直。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "左腳跟貼面滑近臀部，再緩慢滑回"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "左腿放鬆，準備右腳"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "右腳跟貼面滑近臀部，再緩慢滑回"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回到自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_heel_slide_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "左腳跟慢慢滑近臀部，再輕輕滑回。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_heel_slide_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "放鬆左腿，準備換腳。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_heel_slide_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換右腳跟慢慢滑近，再輕輕滑回。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_heel_slide_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙腿放鬆，休息一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側面仰躺，腳跟保持接觸平面，膝蓋隨滑動彎伸，不抬腿。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "lie_ankle_circles",
+      "name": "仰躺腳踝小圈",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "ankles"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat",
+        "cushion"
+      ],
+      "setup": "仰躺，小腿下墊薄墊，腳跟略超出墊緣，腳踝能自由活動。",
+      "description": "小腿用薄墊托住，兩腳踝小幅畫圈後反方向。",
+      "instructions": [
+        "雙腳踝各自小幅繞圈",
+        "維持小幅慢速繞圈",
+        "兩腳踝各自反方向繞圈",
+        "停止，腳踝回到自然位置"
+      ],
+      "cautions": [
+        "只有腳踝活動，不以整條腿旋轉；不強求圓圈完整。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙腳踝各自小幅繞圈"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "維持小幅慢速繞圈"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "兩腳踝各自反方向繞圈"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "停止，腳踝回到自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_ankle_circles_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "小腿墊穩，兩隻腳踝各自慢慢畫小圈。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_ankle_circles_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "輕輕畫圈就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_ankle_circles_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "現在各自換方向，繼續慢慢畫圈。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_ankle_circles_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "慢慢停下，放鬆雙腳。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "仰躺腳部近景，標示兩腳各自的旋轉箭頭，15 秒反向。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "lie_knee_roll",
+      "name": "屈膝小幅左右移",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "waist",
+        "hips"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺，雙膝彎曲、腳掌踩穩，雙膝靠近但不夾緊。",
+      "description": "仰躺屈膝，雙膝靠近，輕向兩側小幅移動，肩膀留在平面。",
+      "instructions": [
+        "雙膝輕向左移，舒服範圍內短停",
+        "雙膝慢慢回到中間",
+        "雙膝輕向右移，舒服範圍內短停",
+        "雙膝回到中間"
+      ],
+      "cautions": [
+        "不強行讓膝蓋碰地，不用手向下壓膝。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙膝輕向左移，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "雙膝慢慢回到中間"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "雙膝輕向右移，舒服範圍內短停"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "雙膝回到中間"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_knee_roll_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙膝靠近，慢慢往左移一點，肩膀留地。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_knee_roll_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "慢慢回到中間。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_knee_roll_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "現在往右移一點，幅度小小的就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_knee_roll_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "回到中間，雙腳踩穩。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "仰躺俯視與側視，雙肩留地，膝蓋左右小幅移，保持腿部支撐。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "back"
+      ]
+    },
+    {
+      "id": "lie_pelvic_tilt",
+      "name": "骨盆輕輕回擺",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "waist",
+        "hips"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺，雙膝彎曲，雙腳與髖同寬踩穩，雙手放在身旁。",
+      "description": "仰躺屈膝，骨盆輕微後傾，讓腰部靠近平面，再放鬆。",
+      "instructions": [
+        "輕輕後傾骨盆，腰部靠近平面，再放鬆",
+        "保持自然呼吸，緩慢重複",
+        "繼續小幅後傾與放鬆",
+        "回到腰背自然位置"
+      ],
+      "cautions": [
+        "不抬臀成橋式，不強壓腰部或用力收腹憋氣。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "輕輕後傾骨盆，腰部靠近平面，再放鬆"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "保持自然呼吸，緩慢重複"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續小幅後傾與放鬆"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "回到腰背自然位置"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_pelvic_tilt_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "骨盆輕輕後傾，腰靠近地面，再放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_pelvic_tilt_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "臀部留地，別憋氣。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_pelvic_tilt_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續小小後傾，再慢慢放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_pelvic_tilt_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "回到自然位置，休息一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側視骨盆局部，以小箭頭標示極小後傾，臀部全程留地。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "back"
+      ]
+    },
+    {
+      "id": "lie_single_knee_hug",
+      "name": "單膝輕靠近身體",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "hips",
+        "waist"
+      ],
+      "movement_type": "stretch",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺屈膝、雙腳踩穩，頭頸放鬆，雙手能輕鬆碰到大腿後側。",
+      "description": "仰躺屈膝，雙手托住單側大腿後方，輕帶近身體再換側。",
+      "instructions": [
+        "托住左大腿後側，左膝輕靠近身體，右腳留地",
+        "左腳慢慢放回地面",
+        "托住右大腿後側，右膝輕靠近身體，左腳留地",
+        "右腳放回地面"
+      ],
+      "cautions": [
+        "不壓膝蓋、不抬頭追膝；碰不到大腿時略過，不勉強抓取。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "托住左大腿後側，左膝輕靠近身體，右腳留地"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "左腳慢慢放回地面"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "托住右大腿後側，右膝輕靠近身體，左腳留地"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "右腳放回地面"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_single_knee_hug_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手托左大腿後側，左膝輕輕靠近身體。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_single_knee_hug_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "左腳慢慢放回地面。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_single_knee_hug_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "換托右大腿，右膝輕靠近，別用力拉。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_single_knee_hug_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "右腳放回，放鬆一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側視仰躺，雙手托大腿而非膝蓋，對側腳踩地，完整顯示換腳。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "back"
+      ]
+    },
+    {
+      "id": "lie_wrist_flex",
+      "name": "仰躺手腕勾放",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "wrists"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺，上臂貼在身旁平面，手肘彎曲，前臂朝上，雙手放鬆。",
+      "description": "上臂支撐在身旁、前臂朝上，手腕小幅前後活動。",
+      "instructions": [
+        "上臂固定，手腕緩慢勾放",
+        "持續小幅活動，不碰臉",
+        "繼續慢速勾放手腕",
+        "手腕回正，前臂慢慢放下"
+      ],
+      "cautions": [
+        "不向臉部擺手、不持重物；肩膀難以放鬆時略過。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "上臂固定，手腕緩慢勾放"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "持續小幅活動，不碰臉"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續慢速勾放手腕"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "手腕回正，前臂慢慢放下"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_wrist_flex_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "上臂放穩，前臂朝上，手腕輕輕勾放。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_wrist_flex_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "只動手腕就好。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_wrist_flex_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續小幅度活動，雙手不要靠近臉。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_wrist_flex_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "放鬆手腕，慢慢放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "側視上臂貼地、前臂朝上，手腕在遠離臉部的位置小幅勾放。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    },
+    {
+      "id": "lie_arm_slide",
+      "name": "雙臂貼地輕滑",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "shoulders",
+        "arms"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺，雙膝可彎、雙腳踩穩，雙臂放身旁，兩側留空。",
+      "description": "雙臂由身旁貼著平面向外滑，再滑回，不超過肩高。",
+      "instructions": [
+        "雙臂貼面向外滑，再滑回，緩慢重複",
+        "保持舒服幅度，手臂不過肩高",
+        "繼續向外滑與滑回",
+        "雙臂回到身旁"
+      ],
+      "cautions": [
+        "不強壓手背貼地、不抬腰；有摩擦或肩痛時停止。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "雙臂貼面向外滑，再滑回，緩慢重複"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "保持舒服幅度，手臂不過肩高"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續向外滑與滑回"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "雙臂回到身旁"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_arm_slide_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "雙手沿地面往外滑一點，再慢慢滑回。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_arm_slide_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "手臂不要超過肩膀。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_arm_slide_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續輕輕滑開再收回，不用勉強。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_arm_slide_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "雙手回到身旁，放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "俯視仰躺，雙臂以低於肩線的弧線滑動，腰背不離地。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": []
+    },
+    {
+      "id": "lie_elbow_bend",
+      "name": "仰躺手肘彎伸",
+      "content_version": "0.1.0",
+      "status": "draft",
+      "review_status": "pending_professional_review",
+      "position": "lying",
+      "body_regions": [
+        "arms"
+      ],
+      "movement_type": "mobility",
+      "access_tier": "paid",
+      "duration_seconds": 30,
+      "gap_after_seconds": 3,
+      "equipment": [
+        "mat"
+      ],
+      "setup": "仰躺，雙臂放身旁、手掌朝上，雙肘周圍留空。",
+      "description": "上臂放在身旁，前臂慢慢抬起再放回，手肘不鎖直。",
+      "instructions": [
+        "上臂留地，彎肘抬起前臂再放回",
+        "保持上臂支撐，繼續彎伸",
+        "繼續舒適幅度的彎伸",
+        "前臂慢慢放回平面"
+      ],
+      "cautions": [
+        "不甩手、不將手肘壓向平面，不強求完全伸直。"
+      ],
+      "movement_timeline": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "instruction": "上臂留地，彎肘抬起前臂再放回"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 15,
+          "instruction": "保持上臂支撐，繼續彎伸"
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 25,
+          "instruction": "繼續舒適幅度的彎伸"
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 30,
+          "instruction": "前臂慢慢放回平面"
+        }
+      ],
+      "voice_cues": [
+        {
+          "id": "lie_elbow_bend_cue_01",
+          "at_seconds": 0,
+          "max_duration_seconds": 9,
+          "text": "上臂留地，彎手肘，前臂抬起再慢慢放下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_elbow_bend_cue_02",
+          "at_seconds": 10,
+          "max_duration_seconds": 4,
+          "text": "不用把手碰到肩膀。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_elbow_bend_cue_03",
+          "at_seconds": 15,
+          "max_duration_seconds": 9,
+          "text": "繼續輕輕彎伸，肩膀保持放鬆。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        },
+        {
+          "id": "lie_elbow_bend_cue_04",
+          "at_seconds": 25,
+          "max_duration_seconds": 4,
+          "text": "慢慢放下雙手，休息一下。",
+          "audio_path": null,
+          "measured_duration_seconds": null
+        }
+      ],
+      "animation_brief": "斜側視仰躺，上臂固定，前臂只繞肘部抬放，手不碰臉。",
+      "media": {
+        "status": "not_created",
+        "image_path": null,
+        "animation_path": null,
+        "animation_format": "mp4",
+        "animation_playback": "follow_movement_timeline",
+        "animation_duration_seconds": null,
+        "figma_url": null
+      },
+      "source_ids": [
+        "office"
+      ]
+    }
+  ]
+}
