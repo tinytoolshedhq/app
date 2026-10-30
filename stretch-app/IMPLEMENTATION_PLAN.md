@@ -213,3 +213,12 @@ interface AudioService {
 | 7. EAS dev build 與 TestFlight build | 每次都要 Chun 同意 | 蘋果大師 |
 | 8. Figma：先用 Starter，超出才升級 | 先免費 | previewer／黑嘛嘛 |
 | 9. （選用）網域，用於 API 與 CDN | 每年約十幾美元，未查證 | 黑嘛嘛 |
+
+## 資安審查建議（M4／M5 實作時納入）
+1. （中）購買時將使用者 UUID 設為 `appAccountToken`，後端驗證時比對 appAccountToken 與 session 使用者一致，避免外流的 signedTransaction 被別的帳號先 verify 而佔走額度。
+2. （中）App Store Server Notifications V2 webhook 以相同 x5c 憑證鏈驗證 `signedPayload`，依 `notificationUUID` 去重；未驗證的通知一律丟棄，防偽造 REFUND 或重放。
+3. （低）Apple identity token 驗證 iss、aud（bundle ID）、exp、nonce；session JWT 簽章密鑰放 secret store，有效期短。
+4. （低）toneText 除長度上限外過濾控制字元，伺服器端固定系統指令，避免使用者改寫模型行為。
+5. （低）log 與錯誤訊息不記錄 signedTransaction、identity token、session JWT、簽名 URL、toneText 原文（必要時只記 hash 或前後幾碼）；簽名 URL 有效期短（例如 15 分鐘）。
+6. （低）R2 分開 bucket：預設語音包公開、私人音檔私有，不共用同一 bucket 以路徑區分。
+
