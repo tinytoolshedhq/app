@@ -6,6 +6,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   restoreProUnlock,
+  runIapBusy,
   canPresentRedeemCode,
   presentRedeemCodeSheet,
   isProUnlocked,
@@ -40,7 +41,7 @@ export default function SettingsScreen() {
     if (busy || busyLock.current) return;
     if (!beginBusy()) return;
     try {
-      const r = await restoreProUnlock();
+      const r = await runIapBusy(() => restoreProUnlock());
       if (r.ok && r.restored !== false) {
         setPro(true);
         Alert.alert(t('settings.restore'), t('iap.restored'));

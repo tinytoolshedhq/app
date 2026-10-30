@@ -23,8 +23,12 @@ import {
   CANONICAL_PRO_PRODUCT_ID,
   resolveProProductId,
   entitlementGrantConfig,
+  iapActionConfig,
+  IAP_UI_TIMEOUT_MS,
   purchaseTransactionId,
   grantDedupeKey,
+  runIapBusy,
+  isNativeIapPlatform,
 } from '../src/iap';
 import {
   isProUnlocked,
@@ -40,6 +44,7 @@ import {
 
 const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
 const realNow = entitlementGrantConfig.now.bind(entitlementGrantConfig);
+const realIapTimeoutMs = iapActionConfig.timeoutMs;
 const FULLPACK = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.tinytoolshed.stretch.fullpack';
 
 describe('iap entitlement helpers', () => {
@@ -147,6 +152,10 @@ describe('iap', () => {
     entitlementGrantConfig.sleep = realEntitlementSleep;
     entitlementGrantConfig.now = realNow;
     entitlementGrantConfig.retryDelaysMs = [1000, 3000];
+    iapActionConfig.timeoutMs = realIapTimeoutMs;
+    const iap = require('expo-iap');
+    iap.initConnection.mockReset();
+    iap.initConnection.mockImplementation(async () => {});
   });
 
   it('simulates purchase in test env', async () => {
@@ -349,5 +358,65 @@ describe('iap', () => {
     expect(settings).toMatch(/ActivityIndicator/);
     expect(settings).toMatch(/disabled=\{busy\}/);
     expect(settings).toMatch(/busyLock/);
+    expect(paywall).toMatch(/runIapBusy/);
+    expect(settings).toMatch(/runIapBusy/);
+  });
+
+  it('restore on unavailable IAP resolves instead of hanging', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    const origInit = iap.initConnection;
+    iap.initConnection = undefined;
+    try {
+      const r = await restoreProUnlock();
+      expect(r.ok).toBe(false);
+      expect(r.restored).toBe(false);
+      expect(r.error).toBeTruthy();
+    } finally {
+      iap.initConnection = origInit;
+    }
+  });
+
+  it('times out a hung restore so loading can clear', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    iap.initConnection.mockImplementation(() => new Promise(() => {}));
+    iapActionConfig.timeoutMs = 30;
+    const r = await restoreProUnlock();
+    expect(r.ok).toBe(false);
+    expect(r.timedOut).toBe(true);
+    expect(r.error).toMatch(/稍後再試/);
+  });
+
+  it('runIapBusy clears loading after the UI timeout', async () => {
+    iapActionConfig.timeoutMs = 20;
+    const r = await runIapBusy(() => new Promise(() => {}));
+    expect(r.ok).toBe(false);
+    expect(r.timedOut).toBe(true);
+    expect(r.error).toMatch(/稍後再試/);
+  });
+
+  it('does not treat web as a native IAP platform', () => {
+    expect(isNativeIapPlatform('web')).toBe(false);
+    expect(isNativeIapPlatform('ios')).toBe(true);
+    expect(IAP_UI_TIMEOUT_MS).toBe(15_000);
+  });
+
+  it('starts the 14-day window from now when pending has neither pendingSince nor ts', async () => {
+    const AsyncStorage = require('@react-native-async-storage/async-storage');
+    await AsyncStorage.setItem('stretch/proUnlocked/v1', JSON.stringify({
+      unlocked: true,
+      source: 'event',
+    }));
+    expect(parseProRecord(JSON.stringify({ unlocked: true, source: 'event' }))).toMatchObject({
+      pendingVerification: true,
+      pendingSince: undefined,
+    });
+    const rec = await getProRecord(9_000);
+    expect(rec.pendingVerification).toBe(true);
+    expect(rec.pendingSince).toBe(9_000);
+    const stored = JSON.parse(await AsyncStorage.getItem('stretch/proUnlocked/v1'));
+    expect(stored.pendingSince).toBe(9_000);
+    expect(stored.ts).toBe(9_000);
   });
 });

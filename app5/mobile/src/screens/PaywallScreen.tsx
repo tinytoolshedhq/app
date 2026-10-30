@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   purchaseProUnlock,
   restoreProUnlock,
+  runIapBusy,
   getProDisplayPrice,
   canPresentRedeemCode,
   presentRedeemCodeSheet,
@@ -69,7 +70,7 @@ export default function PaywallScreen() {
   async function buy() {
     if (busy || pro || !beginBusy()) return;
     try {
-      const r = await purchaseProUnlock();
+      const r = await runIapBusy(() => purchaseProUnlock());
       if (r.ok) {
         setPro(true);
         return;
@@ -84,7 +85,7 @@ export default function PaywallScreen() {
   async function restore() {
     if (busy || !beginBusy()) return;
     try {
-      const r = await restoreProUnlock();
+      const r = await runIapBusy(() => restoreProUnlock());
       if (r.ok && r.restored !== false) {
         setPro(true);
         Alert.alert(t('settings.restore'), t('iap.restored'));

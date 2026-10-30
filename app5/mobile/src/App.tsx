@@ -4,11 +4,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { initializeI18n, t } from './i18n';
+import { installWebAlert } from './lib/webAlert';
 import { loadBundledContent } from './content';
 import { startPurchaseUpdates, verifyProOnLaunch } from './iap';
 import { initPrefs } from './storage';
 import AppNavigator from './navigation/AppNavigator';
 import { colors } from './theme/colors';
+
+installWebAlert();
 
 export default function App() {
   const [ready, setReady] = useState(false);

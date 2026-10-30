@@ -70,9 +70,31 @@ export function isPendingExpired(
   return now - since > maxAgeMs;
 }
 
-export async function getProRecord(): Promise<ProRecord> {
+export async function getProRecord(now: number = Date.now()): Promise<ProRecord> {
   try {
-    return parseProRecord(await AsyncStorage.getItem(PRO_KEY));
+    const record = parseProRecord(await AsyncStorage.getItem(PRO_KEY));
+    if (
+      record.pendingVerification
+      && (record.pendingSince == null || !Number.isFinite(record.pendingSince))
+    ) {
+      const pendingSince = now;
+      const next: ProRecord = {
+        ...record,
+        pendingSince,
+        ts: record.ts ?? pendingSince,
+        source: record.source || 'event',
+      };
+      try {
+        await AsyncStorage.setItem(PRO_KEY, JSON.stringify({
+          unlocked: true,
+          source: next.source,
+          ts: next.ts,
+          pendingSince,
+        }));
+      } catch { /* ignore */ }
+      return next;
+    }
+    return record;
   } catch {
     return { unlocked: false, pendingVerification: false };
   }
@@ -103,7 +125,7 @@ export async function setProUnlocked(
   }
   try {
     if (pendingVerification) {
-      const existing = await getProRecord();
+      const existing = await getProRecord(now);
       if (existing.unlocked && !existing.pendingVerification) {
         notifyPro(true);
         return;

@@ -73,6 +73,44 @@ export const entitlementGrantConfig = {
   },
 };
 
+/** UI / native IAP safety net so restore and purchase cannot spin forever (web, Expo Go, hung StoreKit). */
+export const IAP_UI_TIMEOUT_MS = 15_000;
+
+export const iapActionConfig = {
+  timeoutMs: IAP_UI_TIMEOUT_MS,
+};
+
+export function isNativeIapPlatform(os = Platform.OS) {
+  return os === 'ios' || os === 'android';
+}
+
+export async function withTimeout<T>(
+  work: Promise<T>,
+  timeoutMs: number,
+  timedOutResult: T,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(timedOutResult), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+/** Wrap purchase/restore so a hung IAP call still clears the loading state. */
+export async function runIapBusy(work: () => Promise<UnlockResult>): Promise<UnlockResult> {
+  return withTimeout(
+    work(),
+    iapActionConfig.timeoutMs,
+    { ok: false, error: t('iap.busyTimeout'), timedOut: true },
+  );
+}
+
 function easBuildProfile() {
   return String(
     process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE || '',
@@ -112,6 +150,7 @@ function runningInExpoGo() {
 }
 
 export function allowSimulate() {
+  if (!isNativeIapPlatform()) return false;
   if (easBuildProfile() === 'production') return false;
   if (process.env.EXPO_PUBLIC_IAP_SIMULATE === '0') return false;
   if (typeof __DEV__ !== 'undefined' && __DEV__ === true) return true;
@@ -351,6 +390,7 @@ export async function grantFullpackPurchase(purchase: PurchaseLike) {
 
 export async function startPurchaseUpdates() {
   try {
+    if (!isNativeIapPlatform()) return;
     const iap = loadIap();
     if (!iap?.initConnection || typeof iap.purchaseUpdatedListener !== 'function') return;
     await iap.initConnection();
@@ -402,6 +442,7 @@ export type UnlockResult = {
   simulated?: boolean;
   skipped?: boolean;
   alreadyOwned?: boolean;
+  timedOut?: boolean;
   error?: string;
   purchase?: PurchaseLike;
 };
@@ -468,41 +509,68 @@ function waitForPurchaseEvent(iap: ExpoIap, timeoutMs = 120000) {
   };
 }
 
-async function tryNativeRestore() {
+async function tryNativeRestore(): Promise<UnlockResult> {
+  if (!isNativeIapPlatform()) {
+    throw new Error('IAP unavailable');
+  }
   const iap = loadIap();
-  if (!iap?.initConnection || !iap?.getAvailablePurchases) {
+  const initConnection = iap?.initConnection;
+  if (!initConnection || !iap?.getAvailablePurchases) {
     throw new Error('IAP unavailable');
   }
 
-  await iap.initConnection();
-  try {
-    if (typeof iap.restorePurchases === 'function') {
-      try {
-        await iap.restorePurchases();
-      } catch { /* continue to query */ }
+  const timedOut: UnlockResult = {
+    ok: false,
+    restored: false,
+    timedOut: true,
+    error: t('iap.busyTimeout'),
+  };
+  return withTimeout((async (): Promise<UnlockResult> => {
+    await initConnection();
+    try {
+      if (typeof iap.restorePurchases === 'function') {
+        try {
+          await iap.restorePurchases();
+        } catch { /* continue to query */ }
+      }
+      if (await unlockFromEntitlements(iap)) {
+        return { ok: true, restored: true };
+      }
+      return { ok: true, restored: false };
+    } finally {
+      await endIapIfEphemeral(iap);
     }
-    if (await unlockFromEntitlements(iap)) {
-      return { ok: true, restored: true };
-    }
-    return { ok: true, restored: false };
-  } finally {
-    await endIapIfEphemeral(iap);
-  }
+  })(), iapActionConfig.timeoutMs, timedOut);
 }
 
 async function tryNativePurchase() {
+  if (!isNativeIapPlatform()) {
+    throw new Error('IAP unavailable');
+  }
   const iap = loadIap();
   if (!iap?.initConnection || !iap?.requestPurchase) {
     throw new Error('IAP unavailable');
   }
 
-  await iap.initConnection();
+  const initConnection = iap.initConnection;
+  const fetchProducts = iap.fetchProducts;
+  const ready = await withTimeout(
+    (async () => {
+      await initConnection();
+      if (typeof fetchProducts === 'function') {
+        await fetchProducts({ skus: [PRO_PRODUCT_ID], type: 'in-app' });
+      }
+      return true as const;
+    })(),
+    iapActionConfig.timeoutMs,
+    false as const,
+  );
+  if (!ready) {
+    return { ok: false, error: t('iap.busyTimeout'), timedOut: true };
+  }
+
   const waiter = waitForPurchaseEvent(iap);
   try {
-    if (typeof iap.fetchProducts === 'function') {
-      await iap.fetchProducts({ skus: [PRO_PRODUCT_ID], type: 'in-app' });
-    }
-
     let returned: PurchaseLike | void;
     try {
       returned = await iap.requestPurchase({
@@ -600,17 +668,18 @@ export async function purchaseProUnlock(): Promise<UnlockResult> {
 export async function restoreProUnlock(): Promise<UnlockResult> {
   try {
     const native = await tryNativeRestore();
+    if (native.timedOut) return native;
     if (native.ok && native.restored) return native;
     if (await isProUnlocked()) {
       return { ok: true, restored: true };
     }
     if (native.ok) return native;
-  } catch (e) {
+  } catch {
     if (await isProUnlocked()) {
       return { ok: true, restored: true };
     }
     if (!allowSimulate()) {
-      return { ok: false, restored: false, error: String((e as Error)?.message || e) };
+      return { ok: false, restored: false, error: t('iap.cannotRestore') };
     }
   }
 
@@ -645,6 +714,7 @@ function pickDisplayPrice(product: PurchaseLike | null | undefined) {
 export async function getProDisplayPrice() {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
+    if (!isNativeIapPlatform()) return null;
     const iap = loadIap();
     if (!iap?.initConnection || typeof iap.fetchProducts !== 'function') return null;
     await iap.initConnection();
@@ -673,7 +743,11 @@ export async function verifyProOnLaunch() {
     return;
   }
   const now = entitlementGrantConfig.now();
-  const record = await getProRecord();
+  const record = await getProRecord(now);
+  if (!isNativeIapPlatform()) {
+    if (isPendingExpired(record, now)) await setProUnlocked(false);
+    return;
+  }
   try {
     const iap = loadIap();
     if (!iap?.initConnection || !iap?.getAvailablePurchases) {

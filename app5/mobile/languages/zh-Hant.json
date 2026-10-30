@@ -9,7 +9,8 @@
     "duration": "你想要活動多久？",
     "preview": "預覽",
     "settings": "設定",
-    "safety": "若疼痛、麻木、暈眩或不適，請立即停止。這不是醫療建議。"
+    "safety": "若疼痛、麻木、暈眩或不適，請立即停止。這不是醫療建議。",
+    "consult": "已有傷勢、手術後、懷孕或有活動限制者，先確認內容是否適合自身情況。"
   },
   "duration": {
     "sec": "{n} 秒",
@@ -68,6 +69,7 @@
     "processing": "等待中…",
     "unavailable": "無法使用內購",
     "timeout": "等待購買逾時",
+    "busyTimeout": "這次沒有完成，請稍後再試。",
     "cancel": "取消",
     "simTitle": "模擬購買（開發）",
     "simBody": "要為 {productId} 授予權限嗎？",
