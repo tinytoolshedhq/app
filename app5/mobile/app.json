@@ -1,0 +1,69 @@
+{
+  "expo": {
+    "name": "伸展",
+    "slug": "stretch",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "stretch",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tinytoolshed.stretch",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "zh-Hant",
+        "CFBundleLocalizations": [
+          "zh-Hant"
+        ],
+        "CFBundleAllowMixedLocalizations": true,
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "runtimeVersion": {
+        "policy": "sdkVersion"
+      }
+    },
+    "android": {
+      "package": "com.tinytoolshed.stretch",
+      "adaptiveIcon": {
+        "backgroundColor": "#E8F2EC",
+        "foregroundImage": "./assets/icon.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "zh-Hant"
+            ],
+            "android": [
+              "zh-Hant",
+              "zh-TW",
+              "zh-HK"
+            ]
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.0"
+          }
+        }
+      ],
+      "expo-iap"
+    ],
+    "locales": {
+      "zh-Hant": "./languages/ios/zh-Hant.json",
+      "zh-TW": "./languages/ios/zh-Hant.json",
+      "zh-HK": "./languages/ios/zh-Hant.json"
+    },
+    "owner": "leowang1105"
+  }
+}

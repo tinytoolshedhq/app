@@ -1,0 +1,36 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true,
+        "image": "macos-tahoe-26.5-xcode-26.6"
+      },
+      "env": {
+        "EXPO_PUBLIC_IAP_PRODUCT_ID": "com.tinytoolshed.stretch.fullpack",
+        "EXPO_PUBLIC_EAS_BUILD_PROFILE": "preview",
+        "EXPO_PUBLIC_IAP_SIMULATE": "1"
+      }
+    },
+    "preview-ios-sim": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
+    },
+    "production": {
+      "ios": {
+        "image": "macos-tahoe-26.5-xcode-26.6"
+      },
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_IAP_PRODUCT_ID": "com.tinytoolshed.stretch.fullpack",
+        "EXPO_PUBLIC_EAS_BUILD_PROFILE": "production"
+      }
+    }
+  }
+}

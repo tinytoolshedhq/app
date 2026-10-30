@@ -1,0 +1,268 @@
+import { Platform } from 'react-native';
+import {
+  purchaseProUnlock,
+  restoreProUnlock,
+  verifyProOnLaunch,
+  getProDisplayPrice,
+  startPurchaseUpdates,
+  stopPurchaseUpdates,
+  grantFullpackPurchase,
+  canPresentRedeemCode,
+  presentRedeemCodeSheet,
+  allowSimulate,
+  purchaseMatches,
+  isRevoked,
+  isPendingPurchase,
+  isEntitledPurchase,
+  isAlreadyOwnedError,
+  isUserCancelledError,
+  isDeferredError,
+  decideUnlockFromPurchases,
+  EMPTY_LIST_REVOKE_AFTER,
+  PRO_PRODUCT_ID,
+  CANONICAL_PRO_PRODUCT_ID,
+  resolveProProductId,
+  entitlementGrantConfig,
+  purchaseTransactionId,
+  grantDedupeKey,
+} from '../src/iap';
+import {
+  isProUnlocked,
+  isPendingVerification,
+  parseProRecord,
+  clearProUnlocked,
+  setProUnlocked,
+  subscribePro,
+  getEmptyPurchaseStreak,
+} from '../src/iap/entitlements';
+
+const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
+const FULLPACK = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.tinytoolshed.stretch.fullpack';
+
+describe('iap entitlement helpers', () => {
+  it('uses the placeholder Full Pack product id', () => {
+    expect(FULLPACK).toBe('com.tinytoolshed.stretch.fullpack');
+    expect(CANONICAL_PRO_PRODUCT_ID).toBe('com.tinytoolshed.stretch.fullpack');
+    expect(PRO_PRODUCT_ID).toBe('com.tinytoolshed.stretch.fullpack');
+    expect(purchaseMatches({ productId: FULLPACK })).toBe(true);
+    expect(purchaseMatches({ id: FULLPACK })).toBe(true);
+    expect(purchaseMatches({ sku: FULLPACK })).toBe(true);
+    expect(purchaseMatches({ ids: [FULLPACK] })).toBe(true);
+    expect(purchaseMatches({ productId: 'com.other.app.sku' })).toBe(false);
+  });
+
+  it('ignores EXPO_PUBLIC_IAP_PRODUCT_ID override in production builds', () => {
+    expect(resolveProProductId({
+      override: 'com.other.app.sku',
+      dev: false,
+      profile: 'production',
+    })).toBe(CANONICAL_PRO_PRODUCT_ID);
+    expect(resolveProProductId({
+      override: 'com.dev.app.sku',
+      dev: true,
+      profile: '',
+    })).toBe('com.dev.app.sku');
+  });
+
+  it('treats pending and revoked rows as not entitled', () => {
+    expect(isPendingPurchase({ productId: FULLPACK, purchaseState: 'pending' })).toBe(true);
+    expect(isRevoked({ productId: FULLPACK, revocationDate: '2026-01-01' })).toBe(true);
+    expect(isEntitledPurchase({ productId: FULLPACK })).toBe(true);
+    expect(isEntitledPurchase({ productId: FULLPACK, purchaseState: 'pending' })).toBe(false);
+    expect(isAlreadyOwnedError({ code: 'E_ALREADY_OWNED' })).toBe(true);
+    expect(isUserCancelledError({ code: 'E_USER_CANCELLED' })).toBe(true);
+    expect(isDeferredError({ code: 'E_DEFERRED' })).toBe(true);
+  });
+
+  it('rebuilds unlock from entitlements and does not revoke on a single empty list', () => {
+    expect(decideUnlockFromPurchases([{ productId: FULLPACK }], { currentlyUnlocked: false, emptyStreak: 2 }))
+      .toEqual({ unlocked: true, emptyStreak: 0, revoke: false, entitled: true });
+    expect(decideUnlockFromPurchases([], { currentlyUnlocked: true, emptyStreak: 0 }))
+      .toEqual({ unlocked: true, emptyStreak: 1, revoke: false, entitled: false });
+    expect(decideUnlockFromPurchases([], {
+      currentlyUnlocked: true,
+      emptyStreak: EMPTY_LIST_REVOKE_AFTER - 1,
+    })).toEqual({
+      unlocked: false,
+      emptyStreak: EMPTY_LIST_REVOKE_AFTER,
+      revoke: true,
+      entitled: false,
+    });
+  });
+
+  it('parses legacy and pendingVerification Pro records', () => {
+    expect(parseProRecord(null)).toEqual({ unlocked: false, pendingVerification: false });
+    expect(parseProRecord('1')).toEqual({
+      unlocked: true,
+      pendingVerification: false,
+      source: 'store',
+    });
+    expect(parseProRecord(JSON.stringify({ unlocked: true, source: 'event', ts: 42 }))).toEqual({
+      unlocked: true,
+      pendingVerification: true,
+      source: 'event',
+      ts: 42,
+    });
+  });
+
+  it('dedupes purchase grants by transactionId', () => {
+    const a = { productId: FULLPACK, transactionId: '100000012345' };
+    const b = { productId: FULLPACK, transactionId: '100000012345', purchaseToken: 'jws' };
+    expect(purchaseTransactionId(a)).toBe('100000012345');
+    expect(grantDedupeKey(a)).toBe(grantDedupeKey(b));
+  });
+});
+
+describe('iap', () => {
+  beforeEach(async () => {
+    await stopPurchaseUpdates();
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '1';
+    delete process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE;
+    delete process.env.EAS_BUILD_PROFILE;
+    entitlementGrantConfig.retryDelaysMs = [1000, 3000];
+    entitlementGrantConfig.sleep = jest.fn(async () => {});
+    const iap = require('expo-iap');
+    iap.__resetIapMock?.();
+    iap.finishTransaction.mockClear();
+    iap.purchaseUpdatedListener.mockClear();
+    iap.getAvailablePurchases.mockClear();
+    iap.requestPurchase.mockClear();
+    iap.isTransactionVerifiedIOS.mockReset();
+    iap.isTransactionVerifiedIOS.mockResolvedValue(true);
+    await clearProUnlocked();
+  });
+
+  afterEach(async () => {
+    await stopPurchaseUpdates();
+    entitlementGrantConfig.sleep = realEntitlementSleep;
+    entitlementGrantConfig.retryDelaysMs = [1000, 3000];
+  });
+
+  it('simulates purchase in test env', async () => {
+    const result = await purchaseProUnlock();
+    expect(result.ok).toBe(true);
+    expect(await isProUnlocked()).toBe(true);
+  });
+
+  it('simulates restore in test env', async () => {
+    const result = await restoreProUnlock();
+    expect(result.ok).toBe(true);
+  });
+
+  it('does not revoke unlock on launch in IAP_SIMULATE mode', async () => {
+    await setProUnlocked(true);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(true);
+  });
+
+  it('reads StoreKit displayPrice and never hardcodes a fallback', async () => {
+    const price = await getProDisplayPrice();
+    expect(price).toBe('NT$90');
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/PaywallScreen.tsx'), 'utf8');
+    expect(paywall).not.toMatch(/NT\$90/);
+    expect(paywall).toMatch(/displayPrice|getProDisplayPrice/);
+  });
+
+  it('registers a persistent purchase listener at app start', async () => {
+    const iap = require('expo-iap');
+    const app = require('fs').readFileSync(require('path').join(__dirname, '../src/App.tsx'), 'utf8');
+    expect(app).toMatch(/startPurchaseUpdates/);
+    await startPurchaseUpdates();
+    expect(iap.initConnection).toHaveBeenCalled();
+    expect(iap.purchaseUpdatedListener).toHaveBeenCalled();
+  });
+
+  it('unlocks from a fullpack purchase-updated event and finishes the transaction', async () => {
+    const iap = require('expo-iap');
+    await startPurchaseUpdates();
+    const unlocked = new Promise<void>((resolve) => {
+      const unsub = subscribePro((v) => {
+        if (v) {
+          unsub();
+          resolve();
+        }
+      });
+    });
+    iap.__emitPurchaseUpdated({ productId: FULLPACK });
+    await unlocked;
+    expect(await isProUnlocked()).toBe(true);
+    expect(iap.finishTransaction).toHaveBeenCalledWith({
+      purchase: { productId: FULLPACK },
+      isConsumable: false,
+    });
+  });
+
+  it('persists pendingVerification when entitlements lag and verification is not true', async () => {
+    const iap = require('expo-iap');
+    const AsyncStorage = require('@react-native-async-storage/async-storage');
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    iap.isTransactionVerifiedIOS.mockResolvedValue(false);
+    expect(await grantFullpackPurchase({ productId: FULLPACK })).toBe(true);
+    expect(await isProUnlocked()).toBe(true);
+    expect(await isPendingVerification()).toBe(true);
+    const stored = JSON.parse(await AsyncStorage.getItem('stretch/proUnlocked/v1'));
+    expect(stored).toEqual(expect.objectContaining({ unlocked: true, source: 'event' }));
+  });
+
+  it('does not unlock a pending purchase', async () => {
+    expect(await grantFullpackPurchase({
+      productId: FULLPACK,
+      purchaseState: 'pending',
+    })).toBe(false);
+    expect(await isProUnlocked()).toBe(false);
+  });
+
+  it('shows Redeem Code next to Restore on iOS only', () => {
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/PaywallScreen.tsx'), 'utf8');
+    const settings = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/SettingsScreen.tsx'), 'utf8');
+    expect(paywall).toMatch(/settings\.restore/);
+    expect(paywall).toMatch(/canPresentRedeemCode/);
+    expect(settings).toMatch(/settings\.restore/);
+    expect(settings).toMatch(/canPresentRedeemCode/);
+    expect(canPresentRedeemCode('ios')).toBe(true);
+    expect(canPresentRedeemCode('android')).toBe(false);
+  });
+
+  it('presents the App Store code redemption sheet on iOS', async () => {
+    const iap = require('expo-iap');
+    expect(Platform.OS).toBe('ios');
+    const r = await presentRedeemCodeSheet();
+    expect(r.ok).toBe(true);
+    expect(iap.presentCodeRedemptionSheet).toHaveBeenCalled();
+  });
+
+  it('verifyProOnLaunch grants a matching entitlement even if JWS is false', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    iap.isTransactionVerifiedIOS.mockResolvedValue(false);
+    iap.getAvailablePurchases.mockResolvedValueOnce([{ productId: FULLPACK }]);
+    await verifyProOnLaunch();
+    expect(await isProUnlocked()).toBe(true);
+    expect(await getEmptyPurchaseStreak()).toBe(0);
+    expect(await isPendingVerification()).toBe(false);
+  });
+
+  it('never enables IAP simulation on the production profile', () => {
+    const eas = require('../eas.json');
+    expect(eas.build.production.env.EXPO_PUBLIC_IAP_SIMULATE).toBeUndefined();
+    expect(JSON.stringify(eas.build.production)).not.toMatch(/IAP_SIMULATE/);
+    expect(eas.build.preview.env.EXPO_PUBLIC_IAP_SIMULATE).toBe('1');
+    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE = 'production';
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '1';
+    expect(allowSimulate()).toBe(false);
+  });
+
+  it('shows a disabled processing state on paywall and settings while purchase or restore runs', () => {
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/PaywallScreen.tsx'), 'utf8');
+    const settings = require('fs').readFileSync(require('path').join(__dirname, '../src/screens/SettingsScreen.tsx'), 'utf8');
+    expect(paywall).toMatch(/iap\.processing/);
+    expect(paywall).toMatch(/ActivityIndicator/);
+    expect(paywall).toMatch(/disabled=\{busy \|\| pro\}/);
+    expect(paywall).toMatch(/busyLock/);
+    expect(settings).toMatch(/iap\.processing/);
+    expect(settings).toMatch(/ActivityIndicator/);
+    expect(settings).toMatch(/disabled=\{busy\}/);
+    expect(settings).toMatch(/busyLock/);
+  });
+});

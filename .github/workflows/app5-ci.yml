@@ -1,0 +1,31 @@
+name: app5 mobile CI
+
+on:
+  pull_request:
+    paths:
+      - 'app5/mobile/**'
+      - 'stretch-app/exercises.zh-Hant.json'
+      - '.github/workflows/app5-ci.yml'
+
+jobs:
+  build-test-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app5/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app5/mobile/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test --silent
+      - name: Audit (high/critical) with allowlist
+        run: npx audit-ci --config audit-ci.json
+      - name: Expo export iOS JS bundle
+        run: npx expo export --platform ios --output-dir /tmp/stretch-ios-export

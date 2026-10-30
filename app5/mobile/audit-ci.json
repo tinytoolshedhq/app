@@ -1,0 +1,9 @@
+{
+  "allowlist": [
+    "GHSA-vfj7-8cjw-p6xm",
+    "GHSA-86w9-cpqp-85rv"
+  ],
+  "report-type": "important",
+  "fail-on-severity": "high",
+  "skip-dev": true
+}

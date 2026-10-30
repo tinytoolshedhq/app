@@ -1,0 +1,90 @@
+{
+  "app": {
+    "title": "伸展",
+    "loading": "載入中…"
+  },
+  "home": {
+    "posture": "你現在是？",
+    "region": "你想要活動哪裡？",
+    "duration": "你想要活動多久？",
+    "preview": "預覽",
+    "settings": "設定",
+    "safety": "若疼痛、麻木、暈眩或不適，請立即停止。這不是醫療建議。"
+  },
+  "duration": {
+    "sec": "{n} 秒",
+    "min": "{n} 分"
+  },
+  "preview": {
+    "title": "本次動作",
+    "start": "開始",
+    "repeats": "本次會重複部分動作",
+    "equipment": "所需條件",
+    "unlock": "解鎖其餘動作",
+    "empty": "沒有符合的動作",
+    "change": "請改選姿勢、部位或時間",
+    "needsUnlock": "其餘動作需買斷後才能使用",
+    "gapNote": "活動 {active}，另有每段 3 秒間隔"
+  },
+  "player": {
+    "pause": "暫停",
+    "resume": "繼續",
+    "prev": "上一個",
+    "skip": "略過",
+    "mute": "靜音",
+    "unmute": "語音",
+    "next": "下一個",
+    "done": "完成",
+    "again": "再做一次",
+    "home": "回到首頁",
+    "gap": "準備"
+  },
+  "paywall": {
+    "headline": "解鎖全部動作",
+    "body": "一次買斷。無訂閱、無加購。",
+    "buy": "買斷",
+    "once": "一次買斷",
+    "priceFail": "無法取得價格",
+    "freeNote": "免費版各姿勢有少量基礎動作"
+  },
+  "settings": {
+    "title": "設定",
+    "voice": "語音提示",
+    "voiceOn": "開",
+    "voiceOff": "關",
+    "unlock": "解鎖全部動作",
+    "restore": "恢復購買",
+    "redeem": "兌換代碼",
+    "unlocked": "已解鎖"
+  },
+  "reason": {
+    "no_matching_content": "這個姿勢與部位沒有可用動作",
+    "needs_unlock": "符合的動作尚未解鎖",
+    "equipment_unavailable": "目前沒有符合器材條件的動作",
+    "invalid_duration": "請選擇 30 秒的倍數"
+  },
+  "iap": {
+    "buyFail": "購買失敗",
+    "processing": "等待中…",
+    "unavailable": "無法使用內購",
+    "timeout": "等待購買逾時",
+    "cancel": "取消",
+    "simTitle": "模擬購買（開發）",
+    "simBody": "要為 {productId} 授予權限嗎？",
+    "simBuy": "模擬購買",
+    "devTitle": "模擬恢復",
+    "devRestoreBody": "要授予權限嗎？",
+    "restore": "恢復",
+    "restored": "已恢復購買",
+    "nothingToRestore": "找不到已購買紀錄",
+    "cannotRestore": "此平台無法恢復"
+  },
+  "common": {
+    "back": "返回",
+    "cancel": "取消",
+    "fail": "失敗",
+    "done": "完成",
+    "retry": "再試",
+    "unlocked": "已解鎖"
+  }
+}
