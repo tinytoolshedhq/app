@@ -2,11 +2,13 @@
 // app5 試聽與成本實測：gpt-realtime-2.1-mini（只能走 Realtime API）
 // 用法：node measure_cost.mjs [--dry-run] [--lang zh-TW|ja|en] [--voice marin] [--max-usd 0.50] [--out DIR]
 // 金鑰只從 process.env.OPENAI_API_KEY 讀取；本腳本絕不印出、記錄或寫入金鑰或 authorization header。
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const DEFAULT_OUT = "/workspace/audition-output/stretch";
 
 // ---- 官方參數（查證日 2026-10-30）----
 // 模型頁：https://developers.openai.com/api/docs/models/gpt-realtime-2.1-mini
@@ -40,7 +42,7 @@ const ASSUME = {
 
 // ---- 參數 ----
 const argv = process.argv.slice(2);
-const opt = { dryRun: false, lang: null, voice: "marin", maxUsd: 0.5, out: path.resolve(HERE, "..", "audition"), reasoning: "minimal" };
+const opt = { dryRun: false, lang: null, voice: "marin", maxUsd: 0.5, out: DEFAULT_OUT, reasoning: "minimal" };
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === "--dry-run") opt.dryRun = true;
@@ -73,13 +75,84 @@ const charCount = (s) => [...s.replace(/\s+/g, "")].length;
 const costOf = (u) =>
   (u.inText * PRICE.textInput + u.inCached * PRICE.textCachedInput + u.inAudio * PRICE.audioInput +
    u.outText * PRICE.textOutput + u.outAudio * PRICE.audioOutput) / 1e6;
-function estimate(c) {
+function estimate(c, audioTokensPerSecond = ASSUME.audioTokensPerSecond) {
   const chars = charCount(c.text);
   const secs = chars / ASSUME.charsPerSecond[c.lang];
   const textTok = Math.ceil(chars * ASSUME.textTokensPerChar[c.lang]);
   const u = { inText: ASSUME.instructionTokens + textTok, inCached: 0, inAudio: 0,
-    outText: Math.ceil(textTok * ASSUME.transcriptTokenRatio), outAudio: Math.ceil(secs * ASSUME.audioTokensPerSecond) };
+    outText: Math.ceil(textTok * ASSUME.transcriptTokenRatio), outAudio: Math.ceil(secs * audioTokensPerSecond) };
   return { chars, secs, u, cost: costOf(u) };
+}
+
+function gitCapture(args, cwd) {
+  try {
+    return {
+      ok: true,
+      status: 0,
+      text: execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(),
+    };
+  } catch (e) {
+    return { ok: false, status: e.status ?? 1, text: "" };
+  }
+}
+
+function nearestExistingRealpath(target) {
+  let cur = path.resolve(target);
+  while (!fs.existsSync(cur)) {
+    const parent = path.dirname(cur);
+    if (parent === cur) break;
+    cur = parent;
+  }
+  return fs.realpathSync(cur);
+}
+
+function walkUpHasDotGit(dir) {
+  let cur = dir;
+  for (;;) {
+    if (fs.existsSync(path.join(cur, ".git"))) return true;
+    const parent = path.dirname(cur);
+    if (parent === cur) return false;
+    cur = parent;
+  }
+}
+
+function isGitIgnored(outAbs, ancestor) {
+  const top = gitCapture(["rev-parse", "--show-toplevel"], ancestor);
+  if (!top.ok || !top.text) return false;
+  const rel = path.relative(top.text, path.resolve(outAbs));
+  if (path.isAbsolute(rel) || rel.startsWith(`..${path.sep}`) || rel === "..") return false;
+  const chk = gitCapture(["check-ignore", "-q", "--", rel || "."], top.text);
+  return chk.ok;
+}
+
+function inspectOutDir(outDir) {
+  const abs = path.resolve(outDir);
+  const ancestor = nearestExistingRealpath(abs);
+  const rp = gitCapture(["rev-parse", "--is-inside-work-tree"], ancestor);
+  const inside = rp.text === "true" || (!rp.ok && walkUpHasDotGit(ancestor));
+  const ignored = inside && isGitIgnored(abs, ancestor);
+  return { abs, ancestor, inside, ignored, blocked: inside && !ignored };
+}
+
+function assertOutAllowed(outDir, { dryRun }) {
+  const info = inspectOutDir(outDir);
+  if (dryRun) {
+    let detail = `既有祖先 ${info.ancestor}`;
+    if (!info.inside) detail += "，不在 git 工作區（通過）";
+    else if (info.ignored) detail += "，位於 git 工作區但路徑已被 gitignore（通過）";
+    else detail += "，位於 git 工作區且可被追蹤（拒絕）";
+    console.log(`[dry-run] git 檢查：${detail}`);
+  }
+  if (info.blocked) {
+    console.error(`錯誤：輸出目錄 ${info.abs} 位於 git 工作區內（既有祖先 ${info.ancestor}），拒絕執行以免音檔被提交。請用 --out 指到 repo 以外的路徑（預設 ${DEFAULT_OUT}）。`);
+    process.exit(1);
+  }
+}
+
+function maskSecrets(s) {
+  return String(s ?? "").replace(/sk-[A-Za-z0-9_-]+/g, (m) => (
+    m.length <= 5 ? `${m.slice(0, 3)}***` : `${m.slice(0, 3)}…${m.slice(-2)}`
+  ));
 }
 
 // 一組 10 個動作的字數（以 exercises.zh-Hant.json 前 10 個動作的 voice_cues 估算）
@@ -127,6 +200,8 @@ function csvRow(r) {
 }
 const CSV_HEADER = "id,lang,chars,input_text_tokens,output_audio_tokens,output_text_tokens,audio_seconds,audio_tokens_per_second,cost_usd";
 
+assertOutAllowed(opt.out, { dryRun: opt.dryRun });
+
 // ---- dry-run：不連網、不碰金鑰值 ----
 if (opt.dryRun) {
   console.log(`[dry-run] 不連網。模型 ${MODEL}，voice ${opt.voice}，上限 US$${opt.maxUsd.toFixed(2)}，輸出位置 ${opt.out}`);
@@ -152,7 +227,7 @@ if (preTotal > opt.maxUsd) { console.error(`預估 US$${preTotal.toFixed(4)} 超
 
 let WebSocketImpl;
 try { WebSocketImpl = (await import("ws")).default; }
-catch { console.error("需要 ws 套件：請在 tts-audition/ 執行 npm install"); process.exit(1); }
+catch { console.error("需要 ws 套件：請在 tts-audition/ 執行 npm ci --ignore-scripts"); process.exit(1); }
 
 const instructionsFor = (lang) =>
   `You are a text-to-speech reader. Read the user's text aloud exactly, word for word, in ${lang === "zh-TW" ? "Taiwanese Mandarin (Traditional Chinese)" : lang === "ja" ? "natural standard Japanese" : "natural English"}. ` +
@@ -174,7 +249,7 @@ function speakOne(c) {
     const ws = new WebSocketImpl(WS_URL, { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` } });
     const chunks = []; let transcript = "";
     const timer = setTimeout(() => { ws.terminate(); reject(new Error(`${c.id} 逾時`)); }, 60000);
-    const fail = (msg) => { clearTimeout(timer); try { ws.close(); } catch {} reject(new Error(msg)); };
+    const fail = (msg) => { clearTimeout(timer); try { ws.close(); } catch {} reject(new Error(maskSecrets(msg))); };
     ws.on("error", (e) => fail(`${c.id} 連線錯誤：${e?.code ?? "unknown"}`)); // 不輸出 e 物件本身
     ws.on("unexpected-response", (_req, res) => fail(`${c.id} 連線被拒：HTTP ${res.statusCode}`));
     ws.on("open", () => {
@@ -189,7 +264,7 @@ function speakOne(c) {
       let ev; try { ev = JSON.parse(raw.toString()); } catch { return; }
       if (ev.type === "response.output_audio.delta") chunks.push(Buffer.from(ev.delta, "base64"));
       else if (ev.type === "response.output_audio_transcript.done") transcript = ev.transcript ?? "";
-      else if (ev.type === "error") fail(`${c.id} API 錯誤：${ev.error?.type ?? ""} ${ev.error?.code ?? ""} ${ev.error?.message ?? ""}`);
+      else if (ev.type === "error") fail(`${c.id} API 錯誤：${maskSecrets(`${ev.error?.type ?? ""} ${ev.error?.code ?? ""} ${ev.error?.message ?? ""}`)}`);
       else if (ev.type === "response.done") {
         clearTimeout(timer); ws.close();
         if (ev.response?.status !== "completed") return reject(new Error(`${c.id} 回應狀態 ${ev.response?.status}`));
@@ -201,11 +276,13 @@ function speakOne(c) {
 
 fs.mkdirSync(opt.out, { recursive: true });
 const rows = []; let spent = 0;
-for (const c of cues) {
-  const est = estimate(c).cost;
+let audioTokPerSec = ASSUME.audioTokensPerSecond;
+for (let i = 0; i < cues.length; i++) {
+  const c = cues[i];
+  const est = estimate(c, audioTokPerSec).cost;
   if (spent + est > opt.maxUsd) { console.error(`已花 US$${spent.toFixed(4)}，下一句預估會超過上限，停止。`); break; }
   let r;
-  try { r = await speakOne(c); } catch (e) { console.error(e.message); break; }
+  try { r = await speakOne(c); } catch (e) { console.error(maskSecrets(e.message)); break; }
   const ud = r.usage, inD = ud.input_token_details ?? {}, outD = ud.output_token_details ?? {};
   const cached = inD.cached_tokens_details ?? {};
   const outText = outD.text_tokens ?? 0, outAudio = outD.audio_tokens ?? 0;
@@ -222,6 +299,16 @@ for (const c of cues) {
     output_text_tokens: outText, audio_seconds: +secs.toFixed(3), audio_tokens_per_second: +(outAudio / secs).toFixed(2), cost_usd: +cost.toFixed(6) };
   rows.push(row);
   console.log(`${c.id}: ${secs.toFixed(2)}s, 音訊 ${outAudio} tok, US$${cost.toFixed(5)}（累計 US$${spent.toFixed(4)}）`);
+  if (i === 0 && secs > 0 && outAudio > 0) {
+    audioTokPerSec = outAudio / secs;
+    const remaining = cues.slice(1).reduce((s, x) => s + estimate(x, audioTokPerSec).cost, 0);
+    const projected = spent + remaining;
+    console.log(`第一句後校正：每秒 ${audioTokPerSec.toFixed(2)} 音訊 token；重估總花費 US$${projected.toFixed(4)}`);
+    if (projected > opt.maxUsd) {
+      console.error(`校正後預估 US$${projected.toFixed(4)} 超過上限 US$${opt.maxUsd}，停止。`);
+      break;
+    }
+  }
 }
 if (rows.length) {
   fs.writeFileSync(path.join(opt.out, "results.csv"), [CSV_HEADER, ...rows.map(csvRow)].join("\n") + "\n");

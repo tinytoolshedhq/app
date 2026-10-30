@@ -7,25 +7,25 @@
   - 英文：calf、hamstring、ankles、quadriceps。
 - `cues.json`：`[{id, lang, exerciseId, text}]`，共 42 句，給腳本讀。
 - `measure_cost.mjs`：成本實測腳本（Node 18 以上，實跑時用 `ws` 套件）。
-- `package.json`、`.gitignore`（排除 *.wav、輸出資料夾、results.csv、node_modules）。
+- `package.json`、`package-lock.json`、`.gitignore`（排除 *.wav、*.pcm、results.csv、summary.json、node_modules）。
 
 文字原則：口語、像教練在旁邊說話。只寫動作與安全提醒（輕輕、別用力拉），不寫療效，也不寫「經專業審核」。內容狀態為 `source_referenced`。
 
 ## 怎麼執行
 1. 先只跑預估，這一步不連網：`node measure_cost.mjs --dry-run [--lang ja] [--voice cedar]`
-2. 實跑前要先經 Chun 同意，因為實跑會花錢。金鑰由黑嘛嘛透過 secret store 設成環境變數 `OPENAI_API_KEY`，不要貼在聊天、檔案或指令裡。
+2. 實跑會花錢，**必須先經 Chun 同意**。金鑰只由黑嘛嘛在**單次執行**時注入環境變數 `OPENAI_API_KEY`：不要 export 進 `~/.bashrc` 或其他共用 shell 設定，不要放在指令列，不要貼在聊天或檔案裡。
 3. 實跑步驟：
-   - `npm install`
+   - `npm ci --ignore-scripts`
    - `node measure_cost.mjs --lang zh-TW --voice marin --max-usd 0.50`
 4. 可用參數：
    - `--lang`：zh-TW、ja、en
    - `--voice`：alloy、ash、ballad、coral、echo、sage、shimmer、verse、marin、cedar（官方建議 marin 或 cedar）
    - `--max-usd`：花費上限，預設 0.50；預估會超過就停
-   - `--out`：輸出位置
+   - `--out`：輸出位置，預設 `/workspace/audition-output/stretch`。若解析後落在可被 git 追蹤的工作區內，腳本會拒絕執行（`--dry-run` 也會檢查並回報）
    - `--reasoning`：minimal（預設）、low，或 none（不送這個欄位）
 
 ## 怎麼聽
-- 輸出預設放在 `/workspace/stretch-app/audition/<lang>/<id>.<voice>.wav`。這個資料夾不進 repo。
+- 輸出預設放在 `/workspace/audition-output/stretch/<lang>/<id>.<voice>.wav`（可用 `--out` 覆寫）。此路徑不進 git；腳本若偵測輸出會寫進 git 工作區會拒絕執行。
 - 格式是 PCM16、24kHz、單聲道 WAV，可以直接用 QuickTime 或 VLC 播放。
 - 每個語言資料夾裡有 `transcripts.tsv`，欄位是 id、原文、模型逐字稿。逐字稿只能參考，**照念是否準確一定要人工聽**，尤其是讀音測試句。
 
