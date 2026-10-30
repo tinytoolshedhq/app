@@ -53,11 +53,13 @@ function pickFirst(candidates: Exercise[]): Exercise {
   return best![0];
 }
 
-function pickNext(prev: Exercise, candidates: Exercise[]): Exercise {
+function pickNext(prev: Exercise, candidates: Exercise[], usedIds: Set<string>): Exercise {
   const sorted = [...candidates].sort(byId);
-  const sameSetupDiff = sorted.filter((e) => e.setup === prev.setup && e.id !== prev.id);
+  const unused = sorted.filter((e) => !usedIds.has(e.id));
+  const pool = unused.length > 0 ? unused : sorted;
+  const sameSetupDiff = pool.filter((e) => e.setup === prev.setup && e.id !== prev.id);
   if (sameSetupDiff.length) return sameSetupDiff[0];
-  const otherDiff = sorted.filter((e) => e.id !== prev.id);
+  const otherDiff = pool.filter((e) => e.id !== prev.id);
   if (otherDiff.length) return otherDiff[0];
   return prev;
 }
@@ -91,9 +93,11 @@ export function buildRoutine(req: RoutineRequest): RoutineResult {
   }
 
   const units: Exercise[] = [];
+  const usedIds = new Set<string>();
   for (let i = 0; i < n; i += 1) {
-    const next = i === 0 ? pickFirst(unlockedPool) : pickNext(units[i - 1], unlockedPool);
+    const next = i === 0 ? pickFirst(unlockedPool) : pickNext(units[i - 1], unlockedPool, usedIds);
     units.push(next);
+    usedIds.add(next.id);
   }
 
   const unique = new Set(units.map((e) => e.id)).size;

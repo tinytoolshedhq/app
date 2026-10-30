@@ -213,6 +213,20 @@ describe('routine builder', () => {
     expect(result.units.every((e) => e.access_tier === 'free')).toBe(true);
   });
 
+  it('uses distinct eligible exercises before repeating (supine 5 min has 10)', () => {
+    const result = buildRoutine({
+      exercises: pack.exercises,
+      position: 'lying',
+      bodyRegion: 'whole_body',
+      durationSeconds: 300,
+      unlocked: true,
+    });
+    expect(result.units).toHaveLength(10);
+    expect(new Set(result.units.map((e) => e.id)).size).toBe(10);
+    expect(result.repeatsSomeMoves).toBe(false);
+    expect(result.units.every((e) => e.position === 'lying')).toBe(true);
+  });
+
   it('rejects a duration that is not a 30s multiple', () => {
     const result = buildRoutine({
       exercises: pack.exercises,
