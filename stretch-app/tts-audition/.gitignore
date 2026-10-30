@@ -1,0 +1,7 @@
+# 試聽輸出不進 repo（防呆；預設輸出在 /workspace/audition-output/stretch）
+*.wav
+*.pcm
+audition/
+results.csv
+summary.json
+node_modules/
