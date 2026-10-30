@@ -7,8 +7,7 @@
 1. Expo（managed workflow）放在 `app5/`，慣例跟 app3/app4 一樣（TypeScript、expo-router、expo-iap）。
 2. 自訂 AI 語音第一版就做：後端、可恢復身分、綁定已驗證購買的 10 次額度、原子預留＋冪等鍵、快取、試聽頻率限制。
 3. 預設語音使用事先生成的 AI 音檔，隨內容包下載，所有使用者共用。
-4. 不找專業審核。改成「官方來源＋注意事項」。`review_status` 不可寫成專業審核通過，文案不可宣稱有治療效果（見 §9）。
-   - README §8.7、§10、§12 和 JSON `review_status: pending_professional_review` 仍寫著「專業審核」，需要在規格 PR 一併改寫，例如改成 `review_status: "source_referenced"`。這項由 Chun 或黑嘛嘛確認用詞。
+4. 不找專業審核。改成「官方來源＋注意事項」。已決定 `review_status` 為 `source_referenced`，不可寫成專業審核通過，文案不可宣稱有治療效果（見 §9）。
 
 ## 1. 模組切分
 

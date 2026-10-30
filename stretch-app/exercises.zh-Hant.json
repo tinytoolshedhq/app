@@ -5,14 +5,14 @@
   "created_at": "2026-10-30",
   "title": "伸展與活動初始內容包",
   "status": "draft",
-  "review_status": "pending_professional_review",
+  "review_status": "source_referenced",
   "media_status": "not_created",
   "notes": [
     "本檔為內容草稿，尚不包含實體動畫、圖片與語音。",
     "30 秒編排為原創產品草案，參考來源不代表其認證或建議此時間安排。",
     "包含不同姿勢的相似活動版本；動作涵蓋伸展與關節活動。",
     "所有躺姿均為仰躺，左右側包含在同一筆動作，不獨立分類。",
-    "部分動作為一般活動設計，source_ids 為空，必須由專業人士確認後再發布。"
+    "部分動作為一般活動設計，source_ids 為空，參考官方來源與注意事項。"
   ],
   "categories": {
     "positions": [
@@ -183,7 +183,7 @@
       "懷孕",
       "不確定動作是否適合自己"
     ],
-    "professional_review_required_before_release": true
+    "references_official_sources_and_cautions": true
   },
   "sources": [
     {
@@ -217,7 +217,7 @@
       "name": "肩膀輕繞圈",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "shoulders"
@@ -315,7 +315,7 @@
       "name": "胸前輕伸展",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "chest",
@@ -414,7 +414,7 @@
       "name": "上半身輕轉",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "upper_back"
@@ -513,7 +513,7 @@
       "name": "手指輕開合",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "hands"
@@ -611,7 +611,7 @@
       "name": "手腕上下活動",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "wrists"
@@ -709,7 +709,7 @@
       "name": "頸部輕轉頭",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "neck"
@@ -807,7 +807,7 @@
       "name": "坐姿側身輕移",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "waist",
@@ -906,7 +906,7 @@
       "name": "手肘輕彎伸",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "arms"
@@ -1004,7 +1004,7 @@
       "name": "坐姿腳踝勾放",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "ankles",
@@ -1103,7 +1103,7 @@
       "name": "坐姿膝部輕伸",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "sitting",
       "body_regions": [
         "knees"
@@ -1199,7 +1199,7 @@
       "name": "站姿肩膀繞圈",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "shoulders"
@@ -1295,7 +1295,7 @@
       "name": "站姿胸前舒展",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "chest",
@@ -1392,7 +1392,7 @@
       "name": "站姿手指開合",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "hands"
@@ -1488,7 +1488,7 @@
       "name": "站姿手腕活動",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "wrists"
@@ -1584,7 +1584,7 @@
       "name": "站姿手肘彎伸",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "arms"
@@ -1680,7 +1680,7 @@
       "name": "站姿輕轉頭",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "neck"
@@ -1776,7 +1776,7 @@
       "name": "站姿側身輕滑",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "waist"
@@ -1872,7 +1872,7 @@
       "name": "扶牆小腿伸展",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "calves",
@@ -1971,7 +1971,7 @@
       "name": "雙臂向前輕抬",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "shoulders",
@@ -2066,7 +2066,7 @@
       "name": "肩胛輕收放",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "standing",
       "body_regions": [
         "upper_back",
@@ -2161,7 +2161,7 @@
       "name": "仰躺腳踝勾放",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "ankles",
@@ -2258,7 +2258,7 @@
       "name": "仰躺手指開合",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "hands"
@@ -2356,7 +2356,7 @@
       "name": "腳跟輕滑動",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "knees",
@@ -2453,7 +2453,7 @@
       "name": "仰躺腳踝小圈",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "ankles"
@@ -2550,7 +2550,7 @@
       "name": "屈膝小幅左右移",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "waist",
@@ -2649,7 +2649,7 @@
       "name": "骨盆輕輕回擺",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "waist",
@@ -2748,7 +2748,7 @@
       "name": "單膝輕靠近身體",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "hips",
@@ -2847,7 +2847,7 @@
       "name": "仰躺手腕勾放",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "wrists"
@@ -2945,7 +2945,7 @@
       "name": "雙臂貼地輕滑",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "shoulders",
@@ -3042,7 +3042,7 @@
       "name": "仰躺手肘彎伸",
       "content_version": "0.1.0",
       "status": "draft",
-      "review_status": "pending_professional_review",
+      "review_status": "source_referenced",
       "position": "lying",
       "body_regions": [
         "arms"
