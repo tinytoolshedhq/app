@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "伸展",
+    "slug": "stretch",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "stretch",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tinytoolshed.stretch",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "zh-Hant",
+        "CFBundleLocalizations": [
+          "en",
+          "zh-Hant"
+        ],
+        "CFBundleAllowMixedLocalizations": true,
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "This app does not access your photos. This text is required by a system component.",
+        "NSPhotoLibraryAddUsageDescription": "This app does not add photos to your library. This text is required by a system component."
+      },
+      "runtimeVersion": {
+        "policy": "sdkVersion"
+      }
+    },
+    "android": {
+      "package": "com.tinytoolshed.stretch",
+      "adaptiveIcon": {
+        "backgroundColor": "#E8F2EC",
+        "foregroundImage": "./assets/icon.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "en",
+              "zh-Hant"
+            ],
+            "android": [
+              "en",
+              "zh-Hant",
+              "zh-TW",
+              "zh-HK"
+            ]
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.0"
+          }
+        }
+      ],
+      "expo-iap"
+    ],
+    "locales": {
+      "en": "./languages/ios/en.json",
+      "zh-Hant": "./languages/ios/zh-Hant.json",
+      "zh-TW": "./languages/ios/zh-Hant.json",
+      "zh-HK": "./languages/ios/zh-Hant.json"
+    },
+    "owner": "leowang1105"
+  }
+}
