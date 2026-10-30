@@ -7,6 +7,9 @@ on:
       - 'stretch-app/exercises.zh-Hant.json'
       - '.github/workflows/app5-ci.yml'
 
+permissions:
+  contents: read
+
 jobs:
   build-test-audit:
     runs-on: ubuntu-latest
