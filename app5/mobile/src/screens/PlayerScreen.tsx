@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -92,7 +92,7 @@ export default function PlayerScreen() {
   }
 
   const shown = snap.phase === 'gap' ? snap.next : snap.current;
-  const instruction = snap.phase === 'gap' ? `${t('player.next')}：${snap.next?.name ?? ''}` : snap.instruction;
+  const instruction = snap.phase === 'gap' ? t('player.next') : snap.instruction;
   const count = snap.phase === 'gap' ? snap.gapRemaining : snap.unitRemaining;
 
   return (
@@ -115,15 +115,22 @@ export default function PlayerScreen() {
         </Pressable>
       </View>
 
-      <AnimationPlaceholder
-        name={shown?.name}
-        instruction={instruction}
-        phase={snap.phase}
-      />
+      <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        <AnimationPlaceholder
+          name={shown?.name}
+          instruction={instruction}
+          phase={snap.phase}
+        />
 
-      <Text style={styles.count}>{formatCountdown(count)}</Text>
-      <Text style={styles.phase}>{snap.phase === 'gap' ? t('player.gap') : (shown?.name ?? '')}</Text>
-      <Text style={styles.note}>{gapNote}</Text>
+        <Text style={styles.count}>{formatCountdown(count)}</Text>
+        {snap.phase === 'gap' ? <Text style={styles.phase}>{t('player.gap')}</Text> : null}
+        {(shown?.cautions ?? []).map((c) => (
+          <Text key={c} style={styles.caution}>{c}</Text>
+        ))}
+        <Text style={styles.note}>{gapNote}</Text>
+        <Text style={styles.consult}>{t('home.consult')}</Text>
+        <Text style={styles.safety}>{t('home.safety')}</Text>
+      </ScrollView>
 
       <View style={styles.controls}>
         <Pressable
@@ -158,13 +165,18 @@ export default function PlayerScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20 },
+  body: { flex: 1 },
+  bodyContent: { paddingBottom: 12 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   link: { color: colors.brand, fontSize: 16 },
   linkBtn: { marginTop: 16, alignItems: 'center' },
   progress: { color: colors.l2, fontSize: 16 },
   count: { marginTop: 20, fontSize: 56, fontWeight: '700', color: colors.label, textAlign: 'center' },
   phase: { textAlign: 'center', color: colors.l2, fontSize: 16, marginTop: 4 },
+  caution: { textAlign: 'center', color: colors.red, fontSize: 13, lineHeight: 18, marginTop: 8 },
   note: { textAlign: 'center', color: colors.l3, fontSize: 13, marginTop: 8 },
+  consult: { textAlign: 'center', color: colors.l2, fontSize: 13, lineHeight: 18, marginTop: 8 },
+  safety: { textAlign: 'center', color: colors.l2, fontSize: 13, lineHeight: 18, marginTop: 4 },
   title: { fontSize: 28, fontWeight: '700', color: colors.label, marginTop: 24, textAlign: 'center' },
   controls: { marginTop: 'auto', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   ctrl: { paddingVertical: 14, paddingHorizontal: 12 },

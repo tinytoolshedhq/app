@@ -32,8 +32,18 @@ describe('copy', () => {
         expect(`${file}: ${text.includes(phrase) ? phrase : ''}`).not.toContain(phrase);
       }
     }
-    expect(zh.home.safety).toMatch(/不是醫療建議/);
+    expect(zh.home.safety).toBe('若疼痛、麻木、暈眩或不適，請立即停止。這不是醫療建議。');
+    expect(zh.home.consult).toBe('已有傷勢、手術後、懷孕或有活動限制者，先確認內容是否適合自身情況。');
     expect(JSON.stringify(zh)).not.toMatch(/審核通過/);
+    const preview = fs.readFileSync(path.join(__dirname, '../src/screens/PreviewScreen.tsx'), 'utf8');
+    const player = fs.readFileSync(path.join(__dirname, '../src/screens/PlayerScreen.tsx'), 'utf8');
+    expect(preview).toMatch(/ex\.cautions/);
+    expect(preview).toMatch(/home\.consult/);
+    expect(preview).toMatch(/home\.safety/);
+    expect(player).toMatch(/cautions/);
+    expect(player).toMatch(/home\.consult/);
+    expect(player).toMatch(/home\.safety/);
+    expect(player.match(/shown\?\.name/g)?.length).toBe(1);
   });
 
   it('declares App Store photo usage strings like app4 (ITMS-90683)', () => {

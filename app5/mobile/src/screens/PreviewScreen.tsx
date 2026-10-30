@@ -76,6 +76,9 @@ export default function PreviewScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{ex.name}</Text>
                 <Text style={styles.setup}>{ex.setup}</Text>
+                {ex.cautions.map((c) => (
+                  <Text key={c} style={styles.caution}>{c}</Text>
+                ))}
               </View>
             </View>
           ))
@@ -83,6 +86,7 @@ export default function PreviewScreen() {
         {equipmentLabels.length ? (
           <Text style={styles.equip}>{t('preview.equipment')}：{equipmentLabels.join('、')}</Text>
         ) : null}
+        <Text style={styles.consult}>{t('home.consult')}</Text>
         <Text style={styles.safety}>{t('home.safety')}</Text>
       </ScrollView>
 
@@ -116,6 +120,8 @@ const styles = StyleSheet.create({
   n: { width: 24, color: colors.l3, fontSize: 16 },
   name: { fontSize: 16, fontWeight: '600', color: colors.label },
   setup: { marginTop: 2, fontSize: 13, color: colors.l2 },
+  caution: { marginTop: 4, fontSize: 13, color: colors.red, lineHeight: 18 },
+  consult: { marginTop: 16, color: colors.l2, fontSize: 13, lineHeight: 20 },
   empty: { fontSize: 18, fontWeight: '600', color: colors.label, marginTop: 24 },
   reason: { marginTop: 8, color: colors.l2, fontSize: 15 },
   change: { marginTop: 8, color: colors.l2, fontSize: 15 },
