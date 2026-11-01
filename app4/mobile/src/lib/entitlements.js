@@ -74,6 +74,7 @@ export async function getProRecord(now = Date.now()) {
       try {
         await AsyncStorage.setItem(PRO_KEY, JSON.stringify({
           unlocked: true,
+          pendingVerification: true,
           source: next.source,
           ts: next.ts,
           pendingSince,
@@ -123,6 +124,7 @@ export async function setProUnlocked(unlocked, { pendingVerification = false, no
         : now;
       await AsyncStorage.setItem(PRO_KEY, JSON.stringify({
         unlocked: true,
+        pendingVerification: true,
         source: 'event',
         ts: now,
         pendingSince,

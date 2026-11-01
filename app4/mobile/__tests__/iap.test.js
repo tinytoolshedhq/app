@@ -365,7 +365,12 @@ describe('iap flows', () => {
       source: 'event',
     }));
     const rec = await getProRecord(9_000);
+    expect(rec.pendingVerification).toBe(true);
     expect(rec.pendingSince).toBe(9_000);
+    const stored = JSON.parse(await AsyncStorage.getItem('decibelmeter/proUnlocked/v1'));
+    expect(stored.pendingVerification).toBe(true);
+    expect(stored.pendingSince).toBe(9_000);
+    expect(stored.ts).toBe(9_000);
   });
 
   it('keeps Pro across empty lists until the streak', async () => {

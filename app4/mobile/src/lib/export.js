@@ -37,8 +37,10 @@ function loadViewShot() {
   }
 }
 
-function csvEscape(value) {
-  const s = value == null ? '' : String(value);
+/** Neutralize spreadsheet formula injection (=, +, -, @, tab, CR). */
+export function csvEscape(value) {
+  let s = value == null ? '' : String(value);
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }

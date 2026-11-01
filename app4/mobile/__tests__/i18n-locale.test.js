@@ -123,7 +123,7 @@ describe('copy', () => {
     expect(enIos.NSPhotoLibraryAddUsageDescription).toBe(app.expo.ios.infoPlist.NSPhotoLibraryAddUsageDescription);
     expect(zhIos.NSPhotoLibraryUsageDescription).toMatch(/不會使用你的照片/);
     expect(zhIos.NSPhotoLibraryUsageDescription).toMatch(/系統元件/);
-    expect(zhIos.NSPhotoLibraryAddUsageDescription).toMatch(/不會把照片加進相簿|不會使用你的照片/);
+    expect(zhIos.NSPhotoLibraryAddUsageDescription).toBe('只有在你選擇儲存匯出的圖片時，才會把圖片加入相簿。');
   });
 
   it('does not hardcode CJK in app source', () => {

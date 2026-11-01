@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveRecord, getRecords, initRecords, resetRecordsForTests, updateRecordNote } from '../src/data/records';
 import { setProUnlocked, clearProUnlocked } from '../src/lib/entitlements';
 import { FREE_RECORD_LIMIT } from '../src/lib/gating';
-import { recordsToCsv } from '../src/lib/export';
+import { csvEscape, recordsToCsv } from '../src/lib/export';
 
 describe('records repository', () => {
   beforeEach(async () => {
@@ -54,5 +54,29 @@ describe('records repository', () => {
     expect(csv).toMatch(/60/);
     expect(csv).toMatch(/"hi, there"/);
     expect(csv).not.toMatch(/dB\(A\)/i);
+  });
+
+  it('prefixes a quote on CSV cells that start with formula characters', () => {
+    expect(csvEscape('=SUM(A1)')).toBe("'=SUM(A1)");
+    expect(csvEscape('+1+1')).toBe("'+1+1");
+    expect(csvEscape('-2')).toBe("'-2");
+    expect(csvEscape('@cmd')).toBe("'@cmd");
+    expect(csvEscape('\tHYPERLINK')).toBe("'\tHYPERLINK");
+    expect(csvEscape('\rCMD')).toBe("'\rCMD");
+    expect(csvEscape('note')).toBe('note');
+    expect(csvEscape('=evil,"x"')).toBe(`"'=evil,""x"""`);
+    const csv = recordsToCsv([{
+      createdAt: '2026-01-01T00:00:00.000Z',
+      durationMs: 1000,
+      current: 60,
+      max: 70,
+      avg: 62,
+      min: 40,
+      note: '=HYPERLINK("http://evil")',
+      calibrationName: '+home',
+      offset: 2,
+    }]);
+    expect(csv).toContain("\"'=HYPERLINK(\"\"http://evil\"\")\"");
+    expect(csv).toContain("'+home");
   });
 });

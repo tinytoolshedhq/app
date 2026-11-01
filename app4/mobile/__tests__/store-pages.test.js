@@ -22,6 +22,12 @@ describe('app4 store pages', () => {
     expect(privacy.toLowerCase()).toMatch(/calibration adjustment/);
     expect(privacy.toLowerCase()).toMatch(/no account, network, analytics, or ads/);
     expect(privacy.toLowerCase()).toMatch(/estimate/);
+    expect(privacy).toMatch(/系統分享面板/);
+    expect(privacy).toMatch(/CSV、圖片或 PDF/);
+    expect(privacy).toMatch(/本 App 自己不會上傳/);
+    expect(privacy.toLowerCase()).toMatch(/system share sheet/);
+    expect(privacy.toLowerCase()).toMatch(/csv, image, pdf/);
+    expect(privacy.toLowerCase()).toMatch(/uploads nothing/);
     expect(privacy).toMatch(/tinytoolshedhq@gmail\.com/);
     expect(support).toMatch(/tinytoolshedhq@gmail\.com/);
   });
