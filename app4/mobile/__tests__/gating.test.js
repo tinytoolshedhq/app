@@ -5,7 +5,6 @@ import {
   INACCURATE_HIGH,
   INACCURATE_LOW,
   canAddCalibration,
-  canEditNote,
   canExport,
   canSaveRecord,
   canUseVibration,
@@ -45,11 +44,10 @@ describe('calibration count', () => {
   });
 });
 
-describe('export, notes, vibration', () => {
+describe('export and vibration', () => {
   it('are Pro-only', () => {
     expect(canExport({ isPro: false })).toBe(false);
     expect(canExport({ isPro: true })).toBe(true);
-    expect(canEditNote({ isPro: false })).toBe(false);
     expect(canUseVibration({ isPro: false })).toBe(false);
     expect(paywallReason({ action: 'export', isPro: false })).toBe('export');
     expect(paywallReason({ action: 'export', isPro: true })).toBeNull();

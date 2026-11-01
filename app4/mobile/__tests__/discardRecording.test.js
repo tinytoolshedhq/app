@@ -148,10 +148,11 @@ describe('stopAndDiscardCache', () => {
 describe('useMetering cleanup call sites', () => {
   it('discards cache before start, on stop, and on unmount', () => {
     const src = fs.readFileSync(path.join(__dirname, '../src/hooks/useMetering.js'), 'utf8');
-    expect(src).toMatch(/import \{ stopAndDiscardCache \} from '\.\.\/lib\/discardRecording'/);
-    expect(src).toMatch(/const start = useCallback\(async \(\) => \{[\s\S]*await stopAndDiscardCache\(recorder\)[\s\S]*prepareToRecordAsync/);
-    expect(src).toMatch(/const stopRecorder = useCallback\(async \(\) => \{[\s\S]*await stopAndDiscardCache\(recorder\)/);
-    expect(src).toMatch(/useEffect\(\(\) => \(\) => \{[\s\S]*stopRecorder\(\)/);
+    const life = fs.readFileSync(path.join(__dirname, '../src/lib/recorderLifecycle.js'), 'utf8');
+    expect(life).toMatch(/import \{ discardRecordingUri, retryPendingDiscards, stopAndDiscardCache \} from '\.\/discardRecording'/);
+    expect(life).toMatch(/await discardLeftover\(\);[\s\S]*prepareToRecordAsync\(options\)/);
+    expect(life).toMatch(/await stopAndDiscardCache\(rec, deps\.deleteAsync\)/);
+    expect(src).toMatch(/useEffect\(\(\) => \(\) => \{[\s\S]*lifeRef\.current\.release\(\)/);
     expect(src).toMatch(/requestRecordingPermissionsAsync/);
     expect(src).toMatch(/tickMeter\(meterRef\.current, sample\)/);
     expect(src).toMatch(/freezeMeter/);

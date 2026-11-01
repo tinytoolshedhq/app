@@ -95,7 +95,9 @@ describe('EAS identifiers and Expo Go constraints', () => {
 
   it('enables recorder metering, pauses in background, and applies measurement mode after record', () => {
     const hook = fs.readFileSync(path.join(__dirname, '../src/hooks/useMetering.js'), 'utf8');
-    expect(hook).toMatch(/isMeteringEnabled:\s*true/);
+    const life = fs.readFileSync(path.join(__dirname, '../src/lib/recorderLifecycle.js'), 'utf8');
+    expect(life).toMatch(/isMeteringEnabled:\s*true/);
+    expect(hook).toMatch(/useAudioRecorder\(RECORDING_OPTIONS\)/);
     expect(hook).toMatch(/useAudioRecorderState/);
     expect(hook).toMatch(/AppState\.addEventListener/);
     expect(hook).toMatch(/recorder\.pause\(/);
@@ -104,10 +106,10 @@ describe('EAS identifiers and Expo Go constraints', () => {
     expect(hook).toMatch(/tickMeter\(meterRef\.current, sample\)/);
     expect(hook).toMatch(/sessionDisplayStats\(session, offset\)/);
     expect(hook).toMatch(/applyOffset\(smoothed, offset\)/);
-    expect(hook).toMatch(/recorder\.record\(\);[\s\S]*await enableMeasurementMode\(\)/);
-    expect(hook).toMatch(/try \{\s*await enableMeasurementMode\(\);/);
+    expect(life).toMatch(/rec\.record\(\);[\s\S]*await deps\.enableMeasurementMode\(\)/);
+    expect(life).toMatch(/prepareToRecordAsync\(options\)/);
     expect(hook).toMatch(/setAudioModeAsync hardcodes AVAudioSession mode \.default/);
-    expect(hook).toMatch(/await restoreSession\(\)/);
-    expect(hook).toMatch(/const stopRecorder = useCallback\(async \(\) => \{[\s\S]*restoreSession/);
+    expect(life).toMatch(/await deps\.restoreSession\(\)/);
+    expect(hook).toMatch(/lifeRef\.current\.release\(\)/);
   });
 });

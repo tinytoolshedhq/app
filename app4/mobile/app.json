@@ -65,7 +65,15 @@
         }
       ],
       "expo-asset",
-      "expo-iap"
+      "expo-iap",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "This app does not access your photos. This text is required by a system component.",
+          "savePhotosPermission": "Only used when you choose to save an exported image to your photo library.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ]
     ],
     "locales": {
       "en": "./languages/ios/en.json",

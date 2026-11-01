@@ -108,6 +108,12 @@ describe('copy', () => {
     expect(zh.records.latest).toBe('最多 10 筆');
     expect(zh.paywall.records).toBe('免費版最多保留 10 筆紀錄。');
     expect(blob).not.toMatch(/latest 10|recent 10|最近 10/);
+    expect(en.paywall.unlimited).toBe('Unlimited records');
+    expect(zh.paywall.unlimited).toBe('不限筆數');
+    expect(en.paywall.unlimited.toLowerCase()).not.toMatch(/note/);
+    expect(zh.paywall.unlimited).not.toMatch(/備註/);
+    expect(en.records.note).toBeUndefined();
+    expect(en.records.notePlaceholder).toBeUndefined();
   });
 
   it('keeps the system mic purpose string friendly, deleted right away, and not saved', () => {

@@ -2,14 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import {
   getRecordingPermissionsAsync,
-  RecordingPresets,
   requestRecordingPermissionsAsync,
   setAudioModeAsync,
   useAudioRecorder,
   useAudioRecorderState,
 } from 'expo-audio';
 import { enableMeasurementMode, restoreSession } from 'audio-measurement-session';
-import { stopAndDiscardCache } from '../lib/discardRecording';
+import { RECORDING_OPTIONS, createRecorderLifecycle } from '../lib/recorderLifecycle';
 import {
   applyOffset,
   createSession,
@@ -22,12 +21,6 @@ import { shouldShowSettingsHint } from '../lib/openSettings';
 import { shouldAutoStopSession } from '../lib/gating';
 
 const POLL_MS = 100;
-
-const RECORDING_OPTIONS = {
-  ...RecordingPresets.LOW_QUALITY,
-  isMeteringEnabled: true,
-  numberOfChannels: 1,
-};
 
 function emptyMeter() {
   return { smoothed: null, session: createSession() };
@@ -54,6 +47,19 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
   const onDurationLimitRef = useRef(onDurationLimit);
   const isProRef = useRef(isPro);
   const autoStoppedRef = useRef(false);
+  const lifeRef = useRef(null);
+  if (lifeRef.current == null) {
+    lifeRef.current = createRecorderLifecycle({
+      recorder,
+      setAudioModeAsync,
+      enableMeasurementMode,
+      restoreSession,
+    });
+  }
+
+  useEffect(() => {
+    lifeRef.current.bind({ recorder });
+  }, [recorder]);
 
   useEffect(() => {
     onDurationLimitRef.current = onDurationLimit;
@@ -99,20 +105,6 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     setSession(next.session);
   }, [recorderState?.metering, running]);
 
-  const stopRecorder = useCallback(async () => {
-    await stopAndDiscardCache(recorder);
-    try {
-      await setAudioModeAsync({ allowsRecording: false });
-    } catch {
-      // audio mode is best-effort
-    }
-    try {
-      await restoreSession();
-    } catch {
-      // Expo Go / session restore is best-effort; never crash
-    }
-  }, [recorder]);
-
   const start = useCallback(async () => {
     let status;
     try {
@@ -130,22 +122,11 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     setPermission('granted');
     setSettingsHint(false);
     try {
-      await stopAndDiscardCache(recorder);
-      await setAudioModeAsync({
-        allowsRecording: true,
-        playsInSilentMode: true,
-      });
-      await recorder.prepareToRecordAsync();
-      recorder.record();
+      lifeRef.current.bind({ recorder });
+      await lifeRef.current.start();
       // expo-audio's setAudioModeAsync hardcodes AVAudioSession mode .default
-      // (see AudioModule.setAudioMode). Apply .measurement *after* that, once
-      // recording has started, so AGC / voice processing are off in native
-      // builds. Expo Go: enableMeasurementMode feature-detects and no-ops.
-      try {
-        await enableMeasurementMode();
-      } catch {
-        // missing native module or session error: keep expo-audio's session
-      }
+      // (see AudioModule.setAudioMode). Lifecycle applies .measurement *after*
+      // record() via enableMeasurementMode. Expo Go: feature-detects and no-ops.
       pausedByBackgroundRef.current = false;
       autoStoppedRef.current = false;
       const fresh = emptyMeter();
@@ -178,8 +159,9 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     setStartedAt(null);
     setRunning(false);
     pausedByBackgroundRef.current = false;
-    await stopRecorder();
-  }, [stopRecorder]);
+    lifeRef.current.bind({ recorder });
+    await lifeRef.current.stop();
+  }, [recorder]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
@@ -213,10 +195,12 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     return () => sub.remove();
   }, [recorder]);
 
+  // Unmount only. Do not depend on the recorder identity — that would
+  // stop+release the session whenever the SharedRef was recreated.
   useEffect(() => () => {
     runningRef.current = false;
-    stopRecorder().catch(() => {});
-  }, [stopRecorder]);
+    lifeRef.current.release().catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!running) return undefined;

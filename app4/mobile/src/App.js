@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeI18n } from './i18n';
 import { initPrefs } from './data/prefs';
@@ -39,9 +40,11 @@ export default function App() {
   if (!ready) return null;
 
   return (
-    <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <MeterScreen />
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar style="dark" />
+        <MeterScreen />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

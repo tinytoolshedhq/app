@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Image export before / after</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #e8e4de; margin: 24px; color: #1C1A17; }
+    h1 { font-size: 20px; }
+    p { max-width: 720px; line-height: 1.5; color: #6B6560; }
+    .row { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+    figure { margin: 0; }
+    figcaption { margin-top: 8px; font-size: 13px; color: #6B6560; width: 390px; }
+    .phone {
+      width: 390px; height: 520px; background: #1C1A17; border-radius: 24px; overflow: hidden;
+      position: relative; box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    }
+    .status { height: 48px; background: #1C1A17; color: #fff; font-size: 13px; display: flex;
+      align-items: center; justify-content: space-between; padding: 0 16px; }
+    .sheet { position: absolute; left: 0; right: 0; top: 72px; bottom: 0; background: #F7F5F2;
+      border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 16px 20px; overflow: hidden; }
+    .title { font-weight: 600; font-size: 20px; }
+    .links { color: #3F8A57; font-weight: 600; margin: 10px 0 8px; }
+    .item { padding: 10px 0; border-bottom: 1px solid #E6E1DA; font-size: 14px; }
+    .meta { color: #8A837C; font-size: 12px; margin-top: 4px; }
+    .done { position: absolute; left: 20px; right: 20px; bottom: 16px; background: #1C1A17; color: #fff;
+      text-align: center; padding: 12px; border-radius: 12px; font-weight: 600; }
+    .cut { position: absolute; left: 0; right: 0; bottom: 64px; height: 48px;
+      background: linear-gradient(transparent, #F7F5F2 70%); pointer-events: none; }
+    .cut-line { position: absolute; left: 8px; right: 8px; bottom: 108px; border-top: 2px dashed #C65B45; }
+    .badge { position: absolute; right: 12px; bottom: 118px; background: #C65B45; color: #fff;
+      font-size: 11px; padding: 3px 6px; border-radius: 4px; }
+    .card { width: 390px; background: #F7F5F2; padding: 28px 24px; box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
+    .card h2 { margin: 0 0 6px; font-size: 22px; }
+    .est { color: #8A837C; font-size: 13px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Image export — what TestFlight captured vs the dedicated card</h1>
+  <p>
+    Before: <code>captureRef</code> targeted the live records list inside the modal
+    <code>ScrollView</code> (max height 88%). On a phone that viewport clips the list,
+    so the PNG looks like a cropped screenshot of the sheet — later rows cut off,
+    and if a row was expanded the note field / Delete button were in the image.
+    Status bar and the Done button sit outside <code>shotRef</code>, but the sheet
+    edge still crops the content. After: an off-screen 390-wide export card with
+    every record and no chrome.
+  </p>
+  <div class="row">
+    <figure>
+      <div class="phone" id="before">
+        <div class="status"><span>9:41</span><span>Decibel Meter</span></div>
+        <div class="sheet">
+          <div class="title">Records</div>
+          <div class="links">CSV &nbsp; Image &nbsp; PDF</div>
+          <div class="item">10/31/2026, 9:41 AM<div class="meta">Max 72 · Avg 59 · Min 48</div></div>
+          <div class="item">10/30/2026, 6:12 PM<div class="meta">Max 81 · Avg 64 · Min 51</div></div>
+          <div class="item">10/30/2026, 12:05 PM<div class="meta">Max 58 · Avg 46 · Min 38</div></div>
+          <div class="item">10/29/2026, 9:30 PM<div class="meta">Max 88 · Avg 74 · Min 55</div></div>
+          <div class="item">10/29/2026, 8:15 AM<div class="meta">Max 45 · Avg 36 · Min 28</div></div>
+          <div class="done">Done</div>
+          <div class="cut"></div>
+          <div class="cut-line"></div>
+          <div class="badge">clipped</div>
+        </div>
+      </div>
+      <figcaption>BEFORE — on-screen sheet capture. List is clipped at the sheet/Done edge; looks like a cropped screenshot.</figcaption>
+    </figure>
+    <figure>
+      <div class="card" id="after">
+        <h2>Records</h2>
+        <div class="est">All values are estimates for reference only.</div>
+        <div class="item">10/31/2026, 9:41 AM<div class="meta">Max 72 · Avg 59 · Min 48<br>1:24</div></div>
+        <div class="item">10/30/2026, 6:12 PM<div class="meta">Max 81 · Avg 64 · Min 51<br>2:36</div></div>
+        <div class="item">10/30/2026, 12:05 PM<div class="meta">Max 58 · Avg 46 · Min 38<br>3:21</div></div>
+        <div class="item">10/29/2026, 9:30 PM<div class="meta">Max 88 · Avg 74 · Min 55<br>1:02</div></div>
+        <div class="item">10/29/2026, 8:15 AM<div class="meta">Max 45 · Avg 36 · Min 28<br>4:00</div></div>
+      </div>
+      <figcaption>AFTER — dedicated off-screen card. Full list, no status bar, no CSV/Image/PDF row, no Done button, no notes field.</figcaption>
+    </figure>
+  </div>
+</body>
+</html>

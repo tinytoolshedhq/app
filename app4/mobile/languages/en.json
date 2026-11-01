@@ -58,10 +58,9 @@
     "title": "Records",
     "empty": "No saved records.",
     "open": "Records",
-    "note": "Note",
-    "notePlaceholder": "Note",
-    "viewOnly": "View only",
     "delete": "Delete",
+    "deleteTitle": "Delete record",
+    "deleteConfirm": "Delete this record?",
     "latest": "Up to 10"
   },
   "export": {
@@ -72,7 +71,12 @@
     "pdfTitle": "Decibel Meter records (estimate)",
     "estimateNote": "All values are estimates for reference only.",
     "unavailable": "Export is not available here.",
-    "fail": "Could not export."
+    "fail": "Could not export.",
+    "savedPhotos": "Saved to Photos",
+    "sharedImage": "Share sheet opened. Choose Save to Photos or another app. If you cancelled, nothing was saved.",
+    "csvShared": "CSV is ready. In the share sheet, choose Save to Files (or another app) to pick the location. If you cancelled, nothing was saved.",
+    "cancelled": "Export cancelled.",
+    "permissionDenied": "Photo access was denied. The image was not saved."
   },
   "paywall": {
     "title": "Full Pack",
@@ -83,7 +87,7 @@
     "export": "Export is in Full Pack.",
     "duration": "Free sessions stop at 5 minutes.",
     "calibration": "Free includes one calibration.",
-    "unlimited": "Unlimited records and notes",
+    "unlimited": "Unlimited records",
     "exports": "Export CSV, image, PDF",
     "time": "Unlimited measurement time",
     "profiles": "Named calibrations",
@@ -112,6 +116,7 @@
     "fail": "Couldn’t do that.",
     "retry": "Retry",
     "unlocked": "Unlocked",
+    "cancel": "Cancel",
     "close": "Close",
     "ok": "OK"
   }
