@@ -5,6 +5,9 @@ import { formatDb, formatDuration } from '../lib/meter';
 
 /** Fixed-width card captured off-screen. No chrome, no notes, no safe-area. */
 export const EXPORT_CARD_WIDTH = 390;
+export const EXPORT_CARD_PADDING_H = 32;
+export const EXPORT_CARD_PADDING_V = 32;
+export const EXPORT_CARD_BG = '#F7F5F2';
 
 export default function ExportCard({ records, width = EXPORT_CARD_WIDTH }) {
   const rows = Array.isArray(records) ? records : [];
@@ -37,9 +40,9 @@ export default function ExportCard({ records, width = EXPORT_CARD_WIDTH }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#F7F5F2',
-    paddingHorizontal: 24,
-    paddingVertical: 28,
+    backgroundColor: EXPORT_CARD_BG,
+    paddingHorizontal: EXPORT_CARD_PADDING_H,
+    paddingVertical: EXPORT_CARD_PADDING_V,
   },
   title: {
     fontSize: 22,

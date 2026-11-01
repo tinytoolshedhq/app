@@ -234,4 +234,64 @@ describe('useMetering start/stop cycles', () => {
     });
     await probe.unmount();
   });
+
+  it('advances elapsed and still auto-stops after background during prepare', async () => {
+    let releasePrepare;
+    const prepareGate = new Promise((resolve) => {
+      releasePrepare = resolve;
+    });
+    const innerPrepare = recorder.prepareToRecordAsync.getMockImplementation();
+    recorder.prepareToRecordAsync.mockImplementation(async (options) => {
+      await prepareGate;
+      if (innerPrepare) return innerPrepare(options);
+      recorder.uri = 'file:///tmp/hook-new.m4a';
+    });
+    const onDurationLimit = jest.fn();
+    const spy = jest.spyOn(gating, 'shouldAutoStopSession').mockReturnValue(false);
+    const probe = await mount({ onDurationLimit });
+
+    let startP;
+    await act(async () => {
+      startP = probe.get().start();
+    });
+    expect(probe.get().running).toBe(false);
+
+    await act(async () => {
+      appStateHandler('inactive');
+      await Promise.resolve();
+      appStateHandler('background');
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      releasePrepare();
+      await startP;
+    });
+    expect(probe.get().running).toBe(true);
+
+    await act(async () => {
+      appStateHandler('active');
+      await Promise.resolve();
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    const elapsedAtForeground = probe.get().elapsedMs;
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    });
+    expect(probe.get().elapsedMs).toBeGreaterThan(elapsedAtForeground);
+    expect(probe.get().running).toBe(true);
+
+    spy.mockReturnValue(true);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(probe.get().running).toBe(false);
+    expect(onDurationLimit).toHaveBeenCalled();
+    expect(recorder.getMeta().released).toBe(false);
+
+    await probe.unmount();
+    spy.mockRestore();
+  });
 });

@@ -183,6 +183,39 @@ describe('recorder lifecycle', () => {
     await life.stop();
   });
 
+  it('does not toggle allowsRecording while paused (crash-fix risk)', async () => {
+    const { life, setAudioModeAsync } = setup();
+    await life.start();
+    setAudioModeAsync.mockClear();
+    expect(await life.pause()).toBe(true);
+    expect(setAudioModeAsync).not.toHaveBeenCalled();
+    expect(await life.resume()).toBe(true);
+    expect(setAudioModeAsync).not.toHaveBeenCalled();
+    await life.stop();
+  });
+
+  it('queued pause after prepare still leaves a resumable session', async () => {
+    const { recorder, life } = setup();
+    let releasePrepare;
+    const gate = new Promise((resolve) => {
+      releasePrepare = resolve;
+    });
+    const inner = recorder.prepareToRecordAsync.getMockImplementation();
+    recorder.prepareToRecordAsync.mockImplementation(async (options) => {
+      await gate;
+      return inner(options);
+    });
+    const startP = life.start();
+    const pauseP = life.pause();
+    releasePrepare();
+    await startP;
+    expect(await pauseP).toBe(true);
+    expect(life.getPhase()).toBe(PHASE.PAUSED);
+    expect(await life.resume()).toBe(true);
+    expect(life.isRecording()).toBe(true);
+    await life.stop();
+  });
+
   it('pause and resume no-op after stop or release', async () => {
     const { recorder, life } = setup();
     await life.start();

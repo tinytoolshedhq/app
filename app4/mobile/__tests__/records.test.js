@@ -64,12 +64,14 @@ describe('records repository', () => {
       calibrationName: 'home',
       offset: 2,
     }]);
-    expect(csv).toMatch(/Current,Max,Avg,Min,Calibration,Offset/);
+    expect(csv.charCodeAt(0)).toBe(0xFEFF);
+    expect(csv).toMatch(/Current \(dB\),Max \(dB\),Avg \(dB\),Min \(dB\),Calibration,Adjust/);
     expect(csv).toMatch(/Duration \(s\)/);
     expect(csv).not.toMatch(/durationMs/);
     expect(csv).not.toMatch(/,note,/);
     expect(csv).not.toMatch(/hi, there/);
     expect(csv).toMatch(/60/);
+    expect(csv).not.toMatch(/Offset/);
     expect(csv).not.toMatch(/dB\(A\)/i);
     const html = recordsToHtml([{
       createdAt: '2026-01-01T00:00:00.000Z',
@@ -123,20 +125,42 @@ describe('records repository', () => {
       calibrationName: 'home',
       offset: 0,
     };
-    expect(formatCsvDurationSeconds(1500)).toBe('1.5');
+    expect(formatCsvDurationSeconds(1500)).toBe('2');
+    expect(formatCsvDurationSeconds(1499)).toBe('1');
     expect(formatCsvDurationSeconds(1000)).toBe('1');
     expect(formatCsvDate(row.createdAt)).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
     setLocale('en');
     const en = recordsToCsv([row]);
-    expect(en.split('\n')[0]).toBe('Created,Duration (s),Current,Max,Avg,Min,Calibration,Offset');
-    expect(en).toMatch(/,1\.5,/);
+    expect(en.startsWith('\uFEFF')).toBe(true);
+    expect(en.replace(/^\uFEFF/, '').split('\n')[0]).toBe(
+      'Created,Duration (s),Current (dB),Max (dB),Avg (dB),Min (dB),Calibration,Adjust',
+    );
+    expect(en).toMatch(/,2,/);
+    expect(en).not.toMatch(/,1\.5,/);
     expect(en).toMatch(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
     expect(en).not.toMatch(/2026-06-15T13:04:05/);
     expect(en).not.toMatch(/durationMs|duration_s|createdAt/);
+    expect(en).not.toMatch(/dB\(A\)/i);
     setLocale('zh-Hant');
     const zh = recordsToCsv([row]);
-    expect(zh.split('\n')[0]).toBe('建立時間,時長（秒）,目前,最大,平均,最小,校準,偏移');
-    expect(zh).toMatch(/,1\.5,/);
+    expect(zh.startsWith('\uFEFF')).toBe(true);
+    expect(zh.replace(/^\uFEFF/, '').split('\n')[0]).toBe(
+      '建立時間,時長（秒）,目前 (dB),最大 (dB),平均 (dB),最小 (dB),校準,調整',
+    );
+    expect(zh).toMatch(/,2,/);
+    expect(zh).not.toMatch(/偏移/);
+    expect(zh).not.toMatch(/dB\(A\)/i);
     setLocale('en');
+  });
+
+  it('escapes CSV header cells the same way as values', () => {
+    const src = require('fs').readFileSync(
+      require('path').join(__dirname, '../src/lib/export.js'),
+      'utf8',
+    );
+    expect(src).toMatch(/\]\.map\(csvEscape\)/);
+    expect(src).toMatch(/CSV_UTF8_BOM/);
+    expect(src).toMatch(/t\('settings\.offset'\)/);
+    expect(src).toMatch(/Math\.round/);
   });
 });

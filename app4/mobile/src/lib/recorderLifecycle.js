@@ -174,6 +174,12 @@ export function createRecorderLifecycle(initial = {}) {
     }
     state.pauseCount += 1;
     state.phase = PHASE.PAUSED;
+    // Do not setAudioModeAsync({ allowsRecording: false }) while paused.
+    // Changing the AVAudioSession category leaves the native AVAudioRecorder
+    // alive (cache file still bound). That is the same class of reuse that
+    // crashed TestFlight 1.1.0 after Stop deleted the file and the next
+    // prepare reused the dead recorder. Stop already turns recording off
+    // after stopAndDiscardCache. Restore-on-resume is therefore skipped too.
     return true;
   }
 
@@ -221,6 +227,13 @@ export function createRecorderLifecycle(initial = {}) {
     },
     getPhase: () => state.phase,
     isRecording: () => state.phase === PHASE.RECORDING,
+    isStarting: () => state.phase === PHASE.STARTING,
+    isPaused: () => state.phase === PHASE.PAUSED,
+    isSessionActive: () => (
+      state.phase === PHASE.STARTING
+      || state.phase === PHASE.RECORDING
+      || state.phase === PHASE.PAUSED
+    ),
     isReleased: () => state.phase === PHASE.RELEASED,
     getStopCount: () => state.stopCount,
     getPrepareCount: () => state.prepareCount,

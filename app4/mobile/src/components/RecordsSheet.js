@@ -15,7 +15,7 @@ import { formatDb, formatDuration } from '../lib/meter';
 import { canExport } from '../lib/gating';
 import { mapExportError, mapExportSuccess, shareCsv, shareImage, sharePdf } from '../lib/export';
 import { deleteRecord } from '../data/records';
-import ExportCard, { EXPORT_CARD_WIDTH } from './ExportCard';
+import ExportCard, { EXPORT_CARD_BG, EXPORT_CARD_WIDTH } from './ExportCard';
 
 export default function RecordsSheet({
   visible,
@@ -123,7 +123,7 @@ export default function RecordsSheet({
             ))}
           </ScrollView>
           <View pointerEvents="none" style={styles.offscreen} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <View ref={exportRef} collapsable={false}>
+            <View ref={exportRef} collapsable={false} style={styles.exportCapture}>
               <ExportCard records={records} width={EXPORT_CARD_WIDTH} />
             </View>
           </View>
@@ -173,9 +173,16 @@ const styles = StyleSheet.create({
   swipeDeleteText: { color: '#fff', fontWeight: '600', fontSize: 15 },
   offscreen: {
     position: 'absolute',
-    left: -EXPORT_CARD_WIDTH - 80,
-    top: 0,
+    left: 0,
+    top: -4000,
     width: EXPORT_CARD_WIDTH,
+    backgroundColor: EXPORT_CARD_BG,
+    overflow: 'visible',
+  },
+  exportCapture: {
+    backgroundColor: EXPORT_CARD_BG,
+    width: EXPORT_CARD_WIDTH,
+    overflow: 'visible',
   },
   done: {
     backgroundColor: '#1C1A17',
