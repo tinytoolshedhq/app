@@ -1,30 +1,32 @@
-# SuperGrok ↔ Grok Bot Operating Agreement
+# Bot 協作規範
 
-## Core Rules (must follow)
-1. Primary conversation partner is **SuperGrok**. Only call Grok Bots when the task truly requires the shared computer, browser logins, scheduled routines, or local execution.
-2. Minimize Grok Bot weekly limit usage.
-3. Push **directly to main**. Do **not** open PRs for shared/ documentation or handoff files.
-4. Pure documentation (README, OPERATING.md, drafts without secrets) does **not** need review by 漏洞大師.
+## 必須遵守
+1. 使用者可直接向任何職責相符的 bot 交辦，不設主要對話 bot。
+2. Bot 之間的任務、問題與結果一律透過本 repo 的檔案交接。不得直接向其他 bot 傳送任務內容或進行來回討論。
+3. 交辦時，在 `shared/tasks/<收件 bot>/inbox/` 新增一份任務檔；只寫目標、必要背景、相關檔案及完成條件。不要複製整段聊天紀錄。
+4. 收件 bot 只讀指定任務及完成工作所需的檔案或差異，不要預設掃描整個 repo、其他 bot 的 inbox 或歷史任務。
+5. 結果寫入 `shared/results/<任務檔名>`，包含結論、產出位置及需要使用者決定的事項。完成後將任務移至該 bot 的 `done/`。需要其他 bot 接手時，另寫一份任務並引用結果檔，不直接傳訊息。
+6. 自動喚醒只傳任務路徑與版本資訊，不帶整份文件或聊天紀錄。不用模型定時詢問是否有新任務。若未接好自動觸發，由使用者提供任務路徑啟動。
+7. `shared/` 的純文件與交接檔直接 push 到 main，不開 PR。程式碼變更仍遵守各專案規範。
+8. 不將密鑰、登入憑證或 webhook secret 寫入 repo。公開發文等操作仍遵守原有的使用者授權條件。
 
-## Shared Workspaces
-- **Short-term execution** → `tinytoolshedhq/app/shared/`
-  - `drafts/` — posts, scripts, replies ready for bots
-  - `tasks/` — briefs for specific bots
-  - `calendar/` — schedules
-- **Long-term durable** → `tinytoolshedhq/tinytoolshed-backup/shared/`
-  - `strategy/` — refined strategy docs
-  - `notes/` — SuperGrok notes and summaries
+## 職責
+- 可憐的碼農：程式修改、PR、Expo/EAS builds。
+- 亞洲小編／美洲小編／歐洲小編：各自負責的發文、回覆及已登入帳號操作。
+- 黑麻麻：確有跨 bot 協調需求時，透過上述任務檔流程協調。
+- 其他 bot：只處理各自職責內的任務。
+- 胖嘟嘟阿姨、漏洞大師：預定移除，不再建立新任務或審核依賴。此文件不會刪除平台上的 bot。
 
-## When to call which Bot
-- 可憐的碼農 — code changes, PRs, Expo/EAS builds
-- 亞洲小編 / 美洲小編 / 歐洲小編 — actual posting, replying, operating logged-in accounts
-- 漏洞大師 — secret / credential leak scans
-- 黑麻麻 — only when coordination inside the bot system is needed
-- Others only when their specific responsibility is required
+## 共享位置
+- 本 repo `shared/`：短期任務、草稿、排程與結果。
+- `tinytoolshedhq/tinytoolshed-backup/shared/`：長期策略及筆記。只在任務需要時讀取；本次未同步修改該 repo。
 
-## Bot Prompt Style
-Keep bot prompts short and point to files already in the repo.
-Example: "pull shared/drafts/week-43/ and schedule according to calendar. Do not post until approved."
+## 啟動設定
+每個 bot 的常駐指令與 routine 指令都應加入：
 
-## New Chat Starter
-User will say: "請先讀 shared/OPERATING.md 再繼續" or paste a short reminder. Read this file (and the one in the backup repo) and follow all rules above.
+> 開始處理 repo 工作前，讀取目前版本的 shared/OPERATING.md 並遵守。Bot 之間只透過 shared/tasks/ 與 shared/results/ 交接，不直接傳訊息。收到任務路徑後，只讀該任務與必要引用；結果寫回 repo。
+
+## 實作狀態
+本文件是協作約定，不能自行限制平台上的工具、權限或通訊方式。
+目前 repo 尚未接上任務檔到 Grok Bot 的自動觸發；新增文件不會自行喚醒 bot。
+任務目錄使用方式及觸發範圍見 `shared/tasks/README.md`。
