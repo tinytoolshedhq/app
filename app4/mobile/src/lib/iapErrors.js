@@ -40,6 +40,15 @@ export function mapIapError(error) {
   return t('iap.buyFail');
 }
 
+/** Restore failures use the restore-specific string, not “can’t purchase here”. */
+export function mapRestoreError(error) {
+  if (isUserCancelledError(error)) return t('iap.cancelled');
+  if (isAlreadyOwnedError(error)) return t('iap.restored');
+  if (isDeferredError(error)) return t('iap.pending');
+  if (isTimeoutError(error)) return t('iap.timeout');
+  return t('iap.cannotRestore');
+}
+
 export function unavailableError() {
   const err = new Error('IAP_UNAVAILABLE');
   err.code = 'IAP_UNAVAILABLE';

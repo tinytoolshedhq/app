@@ -12,6 +12,7 @@ import {
   isDeferredError,
   isUserCancelledError,
   mapIapError,
+  mapRestoreError,
   unavailableError,
 } from './iapErrors';
 import { t } from '../i18n';
@@ -681,7 +682,7 @@ export async function restoreProUnlock() {
       return { ok: true, restored: true };
     }
     if (!allowSimulate()) {
-      return { ok: false, restored: false, error: mapIapError(e) };
+      return { ok: false, restored: false, error: mapRestoreError(e) };
     }
   }
 

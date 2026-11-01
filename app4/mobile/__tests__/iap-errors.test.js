@@ -6,6 +6,7 @@ import {
   isUnavailableError,
   isUserCancelledError,
   mapIapError,
+  mapRestoreError,
 } from '../src/lib/iapErrors';
 
 describe('iap error classification', () => {
@@ -41,5 +42,16 @@ describe('localized error mapping', () => {
     expect(mapIapError({ timedOut: true })).toBe(t('iap.timeout'));
     expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restored'));
     expect(mapIapError(new Error('IAP unavailable'))).not.toMatch(/IAP unavailable/i);
+  });
+
+  it('maps restore failures to cannotRestore, not purchase unavailable', () => {
+    setLocale('en');
+    expect(mapRestoreError({ code: 'IAP_UNAVAILABLE', message: 'IAP unavailable' })).toBe(t('iap.cannotRestore'));
+    expect(mapRestoreError({ code: 'IAP_UNAVAILABLE' })).not.toBe(t('iap.unavailable'));
+    expect(mapRestoreError({ message: 'boom' })).toBe(t('iap.cannotRestore'));
+    expect(mapRestoreError({ timedOut: true })).toBe(t('iap.timeout'));
+    setLocale('zh-Hant');
+    expect(mapRestoreError({ code: 'IAP_UNAVAILABLE' })).toBe('這裡無法恢復。');
+    expect(mapRestoreError({ code: 'IAP_UNAVAILABLE' })).not.toBe('這裡無法購買。');
   });
 });

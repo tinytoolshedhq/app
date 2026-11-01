@@ -36,13 +36,15 @@ describe('app4 store pages', () => {
     expect(support).toMatch(/US\$2\.99/);
     expect(support).toMatch(/一次性買斷/);
     expect(support).toMatch(/沒有訂閱、廣告或試用/);
-    expect(support).toMatch(/最近 10 筆紀錄，僅供檢視/);
+    expect(support).toMatch(/最多 10 筆紀錄，僅供檢視/);
+    expect(support).not.toMatch(/最近 10 筆/);
     expect(support).toMatch(/不限筆數與備註/);
     expect(support).toMatch(/設定 &gt; 恢復購買/);
     expect(support).toMatch(/讀數是估計值，僅供參考/);
     expect(support).toMatch(/one-time App Store purchase/i);
     expect(support).toMatch(/No subscription, ads, or trial/i);
-    expect(support).toMatch(/Latest 10 records, view-only/);
+    expect(support).toMatch(/Up to 10 records, view-only/);
+    expect(support).not.toMatch(/Latest 10|recent 10/i);
     expect(support).toMatch(/Unlimited records and notes/);
     expect(support).toMatch(/Settings &gt; Restore Purchases/);
     expect(support).toMatch(/estimates for reference only/i);

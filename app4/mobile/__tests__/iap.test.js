@@ -39,7 +39,8 @@ import {
   setProUnlocked,
   subscribePro,
 } from '../src/lib/entitlements';
-import { mapIapError } from '../src/lib/iapErrors';
+import { mapIapError, mapRestoreError } from '../src/lib/iapErrors';
+import { setLocale, t } from '../src/i18n';
 
 const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
 const realNow = entitlementGrantConfig.now.bind(entitlementGrantConfig);
@@ -328,6 +329,33 @@ describe('iap flows', () => {
 
   it('maps purchase errors through i18n', () => {
     expect(mapIapError({ code: 'IAP_UNAVAILABLE', message: 'IAP unavailable' })).not.toBe('IAP unavailable');
+  });
+
+  it('restore failures use cannotRestore, not purchase unavailable', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE = 'production';
+    iap.initConnection.mockRejectedValueOnce({
+      code: 'IAP_UNAVAILABLE',
+      message: 'IAP unavailable',
+    });
+    const r = await restoreProUnlock();
+    expect(r.ok).toBe(false);
+    expect(r.error).toBe(t('iap.cannotRestore'));
+    expect(r.error).toBe("Can’t restore here.");
+    expect(r.error).not.toBe(t('iap.unavailable'));
+    expect(mapRestoreError({ code: 'IAP_UNAVAILABLE' })).toBe(t('iap.cannotRestore'));
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/components/PaywallSheet.js'), 'utf8');
+    const settings = require('fs').readFileSync(require('path').join(__dirname, '../src/components/SettingsSheet.js'), 'utf8');
+    expect(paywall).toMatch(/r\.error/);
+    expect(settings).toMatch(/r\.error/);
+    const src = require('fs').readFileSync(require('path').join(__dirname, '../src/lib/iap.js'), 'utf8');
+    expect(src).toMatch(/error: mapRestoreError\(e\)/);
+    setLocale('zh-Hant');
+    iap.initConnection.mockRejectedValueOnce({ code: 'IAP_UNAVAILABLE' });
+    const zh = await restoreProUnlock();
+    expect(zh.error).toBe('這裡無法恢復。');
+    setLocale('en');
   });
 
   it('shows Restore on paywall and settings', () => {

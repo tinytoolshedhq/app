@@ -103,6 +103,11 @@ describe('copy', () => {
     expect(en.accuracy.warning.toLowerCase()).toMatch(/inaccurate|estimate/);
     expect(en.accuracy.tip.toLowerCase()).toMatch(/case/);
     expect(en.accuracy.tip.toLowerCase()).toMatch(/airpods|external mic/);
+    expect(en.records.latest).toBe('Up to 10');
+    expect(en.paywall.records).toBe('Free keeps up to 10 records.');
+    expect(zh.records.latest).toBe('最多 10 筆');
+    expect(zh.paywall.records).toBe('免費版最多保留 10 筆紀錄。');
+    expect(blob).not.toMatch(/latest 10|recent 10|最近 10/);
   });
 
   it('keeps the system mic purpose string friendly, deleted right away, and not saved', () => {

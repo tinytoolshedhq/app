@@ -62,7 +62,7 @@
     "notePlaceholder": "備註",
     "viewOnly": "僅供檢視",
     "delete": "刪除",
-    "latest": "最近 10 筆"
+    "latest": "最多 10 筆"
   },
   "export": {
     "title": "匯出",
@@ -79,7 +79,7 @@
     "once": "一次解鎖，沒有訂閱。",
     "buy": "解鎖",
     "priceFail": "讀不到價格，請再試。",
-    "records": "免費版保留最近 10 筆紀錄。",
+    "records": "免費版最多保留 10 筆紀錄。",
     "export": "匯出屬於完整包。",
     "duration": "免費版每次最多 5 分鐘。",
     "calibration": "免費版有一組校準。",

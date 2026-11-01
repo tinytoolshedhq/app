@@ -62,7 +62,7 @@
     "notePlaceholder": "Note",
     "viewOnly": "View only",
     "delete": "Delete",
-    "latest": "Latest 10"
+    "latest": "Up to 10"
   },
   "export": {
     "title": "Export",
@@ -79,7 +79,7 @@
     "once": "One-time unlock. No subscription.",
     "buy": "Unlock",
     "priceFail": "Price unavailable. Try again.",
-    "records": "Free keeps the latest 10 records.",
+    "records": "Free keeps up to 10 records.",
     "export": "Export is in Full Pack.",
     "duration": "Free sessions stop at 5 minutes.",
     "calibration": "Free includes one calibration.",
