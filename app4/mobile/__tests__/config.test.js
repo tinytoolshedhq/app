@@ -10,12 +10,12 @@ function easBlob() {
 }
 
 describe('EAS identifiers and Expo Go constraints', () => {
-  it('uses com.tinytoolshed.decibelmeter, build 2, version 1.0.0, and the EAS project', () => {
+  it('uses com.tinytoolshed.decibelmeter, build 2, version 1.1.0, and the EAS project', () => {
     expect(app.expo.ios.bundleIdentifier).toBe('com.tinytoolshed.decibelmeter');
     expect(app.expo.android.package).toBe('com.tinytoolshed.decibelmeter');
     expect(app.expo.ios.buildNumber).toBe('2');
-    expect(app.expo.version).toBe('1.0.0');
-    expect(pkg.version).toBe('1.0.0');
+    expect(app.expo.version).toBe('1.1.0');
+    expect(pkg.version).toBe('1.1.0');
     expect(app.expo.owner).toBe('leowang1105');
     expect(app.expo.extra.eas.projectId).toBe('117e579d-6aec-40ea-8e97-19bc314debcb');
     expect(app.expo.android.permissions).toEqual(['RECORD_AUDIO', 'MODIFY_AUDIO_SETTINGS']);
@@ -75,15 +75,21 @@ describe('EAS identifiers and Expo Go constraints', () => {
     expect(local.modules.map((m) => m.class)).toEqual(['AudioMeasurementSessionModule']);
   });
 
-  it('keeps Expo Go working: SDK 57, no extra store native modules', () => {
+  it('keeps Expo Go working: SDK 57, optional IAP require, 15s purchase timeout', () => {
     expect(pkg.dependencies.expo).toMatch(/57/);
     expect(pkg.dependencies['expo-audio']).toBeTruthy();
     expect(pkg.dependencies['expo-file-system']).toBeTruthy();
     expect(pkg.dependencies['audio-measurement-session']).toBe('file:./modules/audio-measurement-session');
+    expect(pkg.dependencies['expo-iap']).toBeTruthy();
     expect(pkg.dependencies['react-native-live-audio-fft']).toBeUndefined();
     expect(pkg.dependencies['react-native-audio-api']).toBeUndefined();
     expect(pkg.dependencies['expo-av']).toBeUndefined();
-    expect(pkg.dependencies['expo-iap']).toBeUndefined();
+    const iap = fs.readFileSync(path.join(__dirname, '../src/lib/iap.js'), 'utf8');
+    expect(iap).toMatch(/function loadIap\(\)/);
+    expect(iap).toMatch(/require\('expo-iap'\)/);
+    expect(iap).toMatch(/catch \{\s*return \{\};/);
+    expect(iap).toMatch(/IAP_UI_TIMEOUT_MS = 15_000/);
+    expect(iap).toMatch(/isNativeIapPlatform/);
   });
 
   it('enables recorder metering, pauses in background, and applies measurement mode after record', () => {

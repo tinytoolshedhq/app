@@ -23,6 +23,7 @@ import {
   gaugeFill,
   gaugeColor,
   formatDb,
+  formatDuration,
   formatOffset,
 } from '../src/lib/meter';
 
@@ -136,8 +137,8 @@ describe('smoothLevel', () => {
 
 describe('session max/avg', () => {
   it('starts empty and formats as em dash', () => {
-    expect(createSession()).toEqual({ count: 0, sum: 0, max: null });
-    expect(sessionDisplayStats(createSession(), 0)).toEqual({ max: null, avg: null, count: 0 });
+    expect(createSession()).toEqual({ count: 0, sum: 0, max: null, min: null });
+    expect(sessionDisplayStats(createSession(), 0)).toEqual({ max: null, min: null, avg: null, count: 0 });
     expect(formatDb(null)).toBe('—');
   });
 
@@ -146,7 +147,7 @@ describe('session max/avg', () => {
     for (let i = 0; i < 5000; i += 1) {
       session = addDisplaySample(session, 40 + (i % 3));
     }
-    expect(Object.keys(session).sort()).toEqual(['count', 'max', 'sum']);
+    expect(Object.keys(session).sort()).toEqual(['count', 'max', 'min', 'sum']);
     expect(session.count).toBe(5000);
     expect(session.samples).toBeUndefined();
   });
@@ -168,7 +169,7 @@ describe('session max/avg', () => {
     expect(stats.max).toBeCloseTo(state.smoothed, 5);
     expect(stats.max).toBeLessThan(rawLast);
     expect(stats.avg).toBeCloseTo(smoothedSeries.reduce((a, b) => a + b, 0) / smoothedSeries.length, 5);
-    expect(Object.keys(state.session).sort()).toEqual(['count', 'max', 'sum']);
+    expect(Object.keys(state.session).sort()).toEqual(['count', 'max', 'min', 'sum']);
   });
 
   it('freezes the last smoothed value on stop instead of the last raw sample', () => {
@@ -268,5 +269,8 @@ describe('gauge and format helpers', () => {
     expect(formatOffset(0)).toBe('0');
     expect(formatOffset(4)).toBe('+4');
     expect(formatOffset(-3)).toBe('-3');
+    expect(formatDuration(0)).toBe('0:00');
+    expect(formatDuration(5 * 60 * 1000)).toBe('5:00');
+    expect(formatDuration(65_000)).toBe('1:05');
   });
 });

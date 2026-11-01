@@ -78,7 +78,7 @@ export function smoothLevel(previous, next, alpha = DEFAULT_SMOOTH_ALPHA) {
 }
 
 export function createSession() {
-  return { count: 0, sum: 0, max: null };
+  return { count: 0, sum: 0, max: null, min: null };
 }
 
 /** Accumulate one smoothed base dB (pre-offset) into O(1) running stats. */
@@ -89,16 +89,25 @@ export function addDisplaySample(session, displayDb) {
     count: base.count + 1,
     sum: base.sum + displayDb,
     max: base.max == null ? displayDb : Math.max(base.max, displayDb),
+    min: base.min == null ? displayDb : Math.min(base.min, displayDb),
   };
 }
 
 export function sessionDisplayStats(session, offset = 0) {
-  if (!session || !session.count) return { max: null, avg: null, count: 0 };
+  if (!session || !session.count) return { max: null, min: null, avg: null, count: 0 };
   return {
     max: applyOffset(session.max, offset),
+    min: applyOffset(session.min, offset),
     avg: applyOffset(session.sum / session.count, offset),
     count: session.count,
   };
+}
+
+export function formatDuration(ms) {
+  const n = Math.max(0, Math.floor(Number(ms) || 0) / 1000);
+  const m = Math.floor(n / 60);
+  const s = Math.floor(n % 60);
+  return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 /**

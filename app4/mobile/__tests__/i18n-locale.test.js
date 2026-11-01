@@ -71,8 +71,8 @@ describe('copy', () => {
     const en = require('../languages/en.json');
     const zh = require('../languages/zh-Hant.json');
     expect(en.meter.estimate.toLowerCase()).toMatch(/approximate|estimate/);
-    expect(en.meter.estimate.toLowerCase()).toMatch(/not a professional|not legal/);
-    expect(zh.meter.estimate).toMatch(/估算|非專業/);
+    expect(en.meter.estimate.toLowerCase()).toMatch(/reference only/);
+    expect(zh.meter.estimate).toMatch(/估算|僅供參考/);
   });
 
   it('uses short denied copy, Adjust, and not-saved wording', () => {
@@ -89,14 +89,20 @@ describe('copy', () => {
     expect(en.settings.plus).not.toBe('Increase adjust');
     expect(zh.settings.minus).toBe('減少調整');
     expect(zh.settings.plus).toBe('增加調整');
-    expect(en.settings.offsetRecalc.toLowerCase()).toMatch(/recalculates the current, max, and average/);
+    expect(en.settings.offsetRecalc.toLowerCase()).toMatch(/recalculates the current, max, min, and average/);
     expect(zh.settings.offsetRecalc).toMatch(/重新計算/);
     expect(zh.settings.offsetRecalc).toMatch(/目前/);
     expect(zh.settings.offsetRecalc).toMatch(/最大/);
     expect(zh.settings.offsetRecalc).toMatch(/平均/);
     const blob = `${JSON.stringify(en)}\n${JSON.stringify(zh)}`.toLowerCase();
     expect(blob).not.toMatch(/not recorded/);
+    expect(blob).not.toMatch(/db\(a\)/);
+    expect(blob).not.toMatch(/hearing|medical|spl\b/);
+    expect(blob).not.toMatch(/iap unavailable/);
     expect(JSON.stringify(zh)).not.toMatch(/不會錄下來/);
+    expect(en.accuracy.warning.toLowerCase()).toMatch(/inaccurate|estimate/);
+    expect(en.accuracy.tip.toLowerCase()).toMatch(/case/);
+    expect(en.accuracy.tip.toLowerCase()).toMatch(/airpods|external mic/);
   });
 
   it('keeps the system mic purpose string friendly, deleted right away, and not saved', () => {
@@ -144,5 +150,17 @@ describe('copy', () => {
   it('shows the calibration remapping note on the settings sheet', () => {
     const src = fs.readFileSync(path.join(__dirname, '../src/components/SettingsSheet.js'), 'utf8');
     expect(src).toMatch(/t\('settings\.offsetRecalc'\)/);
+  });
+
+  it('never ships raw English IAP errors and uses iPad max width', () => {
+    const iap = fs.readFileSync(path.join(__dirname, '../src/lib/iap.js'), 'utf8');
+    const errors = fs.readFileSync(path.join(__dirname, '../src/lib/iapErrors.js'), 'utf8');
+    const meter = fs.readFileSync(path.join(__dirname, '../src/screens/MeterScreen.js'), 'utf8');
+    expect(iap).not.toMatch(/new Error\(['"]IAP unavailable['"]\)/);
+    expect(errors).not.toMatch(/new Error\(['"]IAP unavailable['"]\)/);
+    expect(meter).toMatch(/CONTENT_MAX_WIDTH/);
+    expect(meter).toMatch(/accuracy\.warning/);
+    expect(meter).toMatch(/accuracy\.tip/);
+    expect(meter).toMatch(/meter\.min/);
   });
 });
