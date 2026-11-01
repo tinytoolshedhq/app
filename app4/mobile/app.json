@@ -29,6 +29,11 @@
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS"
       ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#163A3A",
         "foregroundImage": "./assets/icon.png"
@@ -65,7 +70,16 @@
         }
       ],
       "expo-asset",
-      "expo-iap"
+      "expo-iap",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "This app does not access your photos. This text is required by a system component.",
+          "savePhotosPermission": "Only used when you choose to save an exported image to your photo library.",
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": []
+        }
+      ]
     ],
     "locales": {
       "en": "./languages/ios/en.json",

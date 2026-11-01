@@ -18,10 +18,6 @@ export function canExport({ isPro = false } = {}) {
   return isPro === true;
 }
 
-export function canEditNote({ isPro = false } = {}) {
-  return isPro === true;
-}
-
 export function canUseVibration({ isPro = false } = {}) {
   return isPro === true;
 }

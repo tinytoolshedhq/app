@@ -4,6 +4,16 @@ Last uploaded TestFlight build: **3** (version `1.1.0`).
 
 `eas.json` uses `cli.appVersionSource: local` and production `autoIncrement: true`. EAS bumps `ios.buildNumber` in `app.json` before a production build, so `main` must keep the last used value (`"3"`). The next production build becomes **4** and will not collide with the uploaded build 3.
 
+## Next build (after 3) — TestFlight owner fixes
+
+Do not change the last uploaded build number above. These land in the next EAS production build (4):
+
+- **Crash:** start → stop → start no longer crashes. After Stop we delete the metering cache file; the next Start now always calls `prepareToRecordAsync(RECORDING_OPTIONS)` so expo-audio creates a new native `AVAudioRecorder` instead of reusing the one whose file was deleted. Start/stop/pause/resume/release share one serialized queue; AppState background/foreground pause/resume no-op if stop/release is pending or done; unmount releases once.
+- **Image export:** capture a dedicated off-screen export card (full records, no sheet chrome / status bar / buttons). After save: 「已儲存到相簿」 / "Saved to Photos" when `expo-media-library` actually writes to Photos; otherwise an accurate share-sheet message. Cancel and photo-permission denial are not reported as success. `app.json` adds the `expo-media-library` config plugin (existing photo Info.plist strings reused; version / buildNumber unchanged).
+- **CSV export:** short “Save to Files” hint with OK *before* the share sheet; brief success after a completed share (cancel = no success). Human-readable localized headers; duration in seconds; local `YYYY-MM-DD HH:mm:ss` dates. The file is written to the app cache, then shared — we do not claim Files → On My iPhone.
+- **Records delete:** swipe left to delete, with a confirm dialog and a one-line swipe hint.
+- **Notes removed:** no memo UI or writes. Old records that still have a `note` field load without crashing; CSV drops the notes column.
+
 Do not switch to `remote` appVersionSource here (that sync needs credentials). Do not run `eas build:version:*` from this tree.
 
 After each production iOS build, commit the bumped `ios.buildNumber` back to `main` via a PR so the next autoIncrement stays ahead of App Store Connect.

@@ -34,7 +34,7 @@ One-time non-consumable IAP. Price is set in App Store Connect (US$2.99), never 
 | Everyday level hint (e.g. ~60 dB ≈ conversation) | Yes | Yes |
 | Calibration | One | Named profiles |
 | Session length | Auto-stop at 5:00, data kept | Unlimited |
-| Records | Up to 10, view-only | Unlimited + notes |
+| Records | Up to 10 | Unlimited |
 | Export CSV / image / PDF | — | Yes |
 | Vibration over a set threshold | — | Yes |
 

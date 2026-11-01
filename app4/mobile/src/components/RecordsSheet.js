@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   Alert,
   Modal,
@@ -6,15 +6,16 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '../i18n';
 import { formatDb, formatDuration } from '../lib/meter';
-import { canEditNote, canExport } from '../lib/gating';
-import { mapExportError, shareCsv, shareImage, sharePdf } from '../lib/export';
-import { deleteRecord, updateRecordNote } from '../data/records';
+import { canExport } from '../lib/gating';
+import { mapExportError, mapExportSuccess, shareCsv, shareImage, sharePdf } from '../lib/export';
+import { deleteRecord } from '../data/records';
+import ExportCard, { EXPORT_CARD_WIDTH } from './ExportCard';
 
 export default function RecordsSheet({
   visible,
@@ -24,9 +25,8 @@ export default function RecordsSheet({
   onNeedPro,
 }) {
   const insets = useSafeAreaInsets();
-  const shotRef = useRef(null);
-  const [openId, setOpenId] = useState(null);
-  const open = records.find((r) => r.id === openId) || null;
+  const exportRef = useRef(null);
+  const swipeRefs = useRef({});
 
   async function onExport(kind) {
     if (!canExport({ isPro })) {
@@ -34,25 +34,49 @@ export default function RecordsSheet({
       return;
     }
     try {
-      if (kind === 'csv') await shareCsv(records);
-      else if (kind === 'pdf') await sharePdf(records);
-      else await shareImage(shotRef.current);
+      let result;
+      if (kind === 'csv') {
+        await new Promise((resolve) => {
+          Alert.alert(t('export.csv'), t('export.csvHint'), [
+            { text: t('common.ok'), onPress: () => resolve() },
+          ]);
+        });
+        result = await shareCsv(records);
+      } else if (kind === 'pdf') result = await sharePdf(records);
+      else result = await shareImage(exportRef.current);
+      if (!result?.outcome) return;
+      Alert.alert(t('common.ok'), mapExportSuccess(result.outcome));
     } catch (e) {
+      if (e?.code === 'EXPORT_CANCELLED') return;
       Alert.alert(t('common.fail'), mapExportError(e));
     }
   }
 
-  async function onNote(text) {
-    if (!open) return;
-    if (!canEditNote({ isPro })) {
-      onNeedPro?.('records');
-      return;
-    }
-    try {
-      await updateRecordNote(open.id, text);
-    } catch {
-      onNeedPro?.('records');
-    }
+  function confirmDelete(id) {
+    swipeRefs.current[id]?.close?.();
+    Alert.alert(t('records.deleteTitle'), t('records.deleteConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('records.delete'),
+        style: 'destructive',
+        onPress: () => {
+          deleteRecord(id);
+        },
+      },
+    ]);
+  }
+
+  function renderDelete(id) {
+    return (
+      <Pressable
+        onPress={() => confirmDelete(id)}
+        style={styles.swipeDelete}
+        accessibilityRole="button"
+        accessibilityLabel={t('records.delete')}
+      >
+        <Text style={styles.swipeDeleteText}>{t('records.delete')}</Text>
+      </Pressable>
+    );
   }
 
   return (
@@ -73,44 +97,36 @@ export default function RecordsSheet({
               <Text style={styles.link}>{t('export.pdf')}</Text>
             </Pressable>
           </View>
+          {records.length > 0 ? (
+            <Text style={styles.swipeHint}>{t('records.swipeHint')}</Text>
+          ) : null}
           <ScrollView>
-            <View ref={shotRef} collapsable={false} style={styles.shot}>
-              {records.length === 0 ? (
-                <Text style={styles.empty}>{t('records.empty')}</Text>
-              ) : records.map((r) => (
-                <Pressable
-                  key={r.id}
-                  onPress={() => setOpenId(openId === r.id ? null : r.id)}
-                  style={styles.row}
-                  accessibilityRole="button"
-                >
+            {records.length === 0 ? (
+              <Text style={styles.empty}>{t('records.empty')}</Text>
+            ) : records.map((r) => (
+              <Swipeable
+                key={r.id}
+                ref={(el) => {
+                  swipeRefs.current[r.id] = el;
+                }}
+                overshootRight={false}
+                renderRightActions={() => renderDelete(r.id)}
+              >
+                <View style={styles.row}>
                   <Text style={styles.when}>{new Date(r.createdAt).toLocaleString()}</Text>
                   <Text style={styles.stats}>
                     {t('meter.max')} {formatDb(r.max)} · {t('meter.avg')} {formatDb(r.avg)} · {t('meter.min')} {formatDb(r.min)}
                   </Text>
                   <Text style={styles.meta}>{formatDuration(r.durationMs)} · {t('export.estimateNote')}</Text>
-                  {openId === r.id ? (
-                    <View style={styles.detail}>
-                      {isPro ? (
-                        <TextInput
-                          value={r.note}
-                          onChangeText={onNote}
-                          placeholder={t('records.notePlaceholder')}
-                          style={styles.note}
-                          multiline
-                        />
-                      ) : (
-                        <Text style={styles.viewOnly}>{r.note || t('records.viewOnly')}</Text>
-                      )}
-                      <Pressable onPress={() => deleteRecord(r.id)} accessibilityRole="button">
-                        <Text style={styles.delete}>{t('records.delete')}</Text>
-                      </Pressable>
-                    </View>
-                  ) : null}
-                </Pressable>
-              ))}
-            </View>
+                </View>
+              </Swipeable>
+            ))}
           </ScrollView>
+          <View pointerEvents="none" style={styles.offscreen} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <View ref={exportRef} collapsable={false}>
+              <ExportCard records={records} width={EXPORT_CARD_WIDTH} />
+            </View>
+          </View>
           <Pressable onPress={onClose} style={styles.done} accessibilityRole="button">
             <Text style={styles.doneText}>{t('settings.done')}</Text>
           </Pressable>
@@ -135,25 +151,32 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: '600', color: '#1C1A17', marginBottom: 4 },
   hint: { fontSize: 13, color: '#8A837C', marginBottom: 8 },
+  swipeHint: { fontSize: 12, color: '#8A837C', marginBottom: 8 },
   exportRow: { flexDirection: 'row', gap: 16, marginBottom: 12 },
   link: { color: '#3F8A57', fontSize: 16, fontWeight: '600' },
-  shot: { backgroundColor: '#F7F5F2' },
   empty: { fontSize: 15, color: '#6B6560', paddingVertical: 16 },
-  row: { paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E6E1DA' },
+  row: {
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E6E1DA',
+    backgroundColor: '#F7F5F2',
+  },
   when: { fontSize: 14, color: '#1C1A17', fontWeight: '600' },
   stats: { fontSize: 14, color: '#6B6560', marginTop: 4, fontVariant: ['tabular-nums'] },
   meta: { fontSize: 12, color: '#8A837C', marginTop: 4 },
-  detail: { marginTop: 8 },
-  note: {
-    borderWidth: 1,
-    borderColor: '#E6E1DA',
-    borderRadius: 8,
-    padding: 8,
-    minHeight: 56,
-    color: '#1C1A17',
+  swipeDelete: {
+    backgroundColor: '#C65B45',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 88,
   },
-  viewOnly: { fontSize: 14, color: '#6B6560' },
-  delete: { color: '#C65B45', marginTop: 8, fontWeight: '600' },
+  swipeDeleteText: { color: '#fff', fontWeight: '600', fontSize: 15 },
+  offscreen: {
+    position: 'absolute',
+    left: -EXPORT_CARD_WIDTH - 80,
+    top: 0,
+    width: EXPORT_CARD_WIDTH,
+  },
   done: {
     backgroundColor: '#1C1A17',
     borderRadius: 12,

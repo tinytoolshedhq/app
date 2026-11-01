@@ -90,11 +90,43 @@ jest.mock('expo-constants', () => ({
 
 jest.mock('expo-file-system/legacy', () => ({
   deleteAsync: jest.fn(async () => {}),
+  cacheDirectory: 'file:///tmp/',
+  writeAsStringAsync: jest.fn(async () => {}),
 }), { virtual: true });
 
 jest.mock('expo-file-system', () => ({
   deleteAsync: jest.fn(async () => {}),
+  cacheDirectory: 'file:///tmp/',
+  writeAsStringAsync: jest.fn(async () => {}),
 }), { virtual: true });
+
+jest.mock('expo-media-library', () => ({
+  requestPermissionsAsync: jest.fn(async () => ({ granted: true, status: 'granted' })),
+  saveToLibraryAsync: jest.fn(async () => {}),
+}), { virtual: true });
+
+function mockSwipeable() {
+  const React = require('react');
+  const { View } = require('react-native');
+  const Swipeable = React.forwardRef(({ children, renderRightActions, ...props }, ref) => (
+    React.createElement(View, { ...props, ref }, renderRightActions?.(), children)
+  ));
+  Swipeable.displayName = 'Swipeable';
+  return Swipeable;
+}
+
+jest.mock('react-native-gesture-handler', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const Swipeable = mockSwipeable();
+  return {
+    GestureHandlerRootView: ({ children, ...props }) => React.createElement(View, props, children),
+    Swipeable,
+    default: { Swipeable },
+  };
+}, { virtual: true });
+
+jest.mock('react-native-gesture-handler/Swipeable', () => mockSwipeable(), { virtual: true });
 
 jest.mock('expo-audio', () => ({
   useAudioRecorder: jest.fn(() => ({

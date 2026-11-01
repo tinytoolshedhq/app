@@ -1,5 +1,5 @@
 import { KeyValueStorage } from './storage';
-import { canEditNote, canSaveRecord } from '../lib/gating';
+import { canSaveRecord } from '../lib/gating';
 import { isProUnlocked } from '../lib/entitlements';
 
 const storage = new KeyValueStorage();
@@ -38,6 +38,8 @@ function normalizeRecord(raw) {
     max: Number.isFinite(max) ? max : null,
     avg: Number.isFinite(avg) ? avg : null,
     min: Number.isFinite(min) ? min : null,
+    // Old v1.1 records may still have `note`. Keep it so JSON parse/load
+    // never throws; UI, CSV, and new writes ignore the field.
     note: typeof raw.note === 'string' ? raw.note : '',
     calibrationName: typeof raw.calibrationName === 'string' ? raw.calibrationName : '',
     offset: Number.isFinite(Number(raw.offset)) ? Number(raw.offset) : 0,
@@ -82,21 +84,10 @@ export async function saveRecord(input) {
     throw freeLimitError('records');
   }
   const rec = normalizeRecord({ ...input, id: input?.id || newId() });
-  if (!isPro) rec.note = '';
+  rec.note = '';
   records = [rec, ...records];
   await persist();
   return rec;
-}
-
-export async function updateRecordNote(id, note) {
-  const isPro = await isProUnlocked();
-  if (!canEditNote({ isPro })) {
-    throw freeLimitError('note');
-  }
-  const text = typeof note === 'string' ? note : '';
-  records = records.map((r) => (r.id === id ? { ...r, note: text } : r));
-  await persist();
-  return records.find((r) => r.id === id) || null;
 }
 
 export async function deleteRecord(id) {
