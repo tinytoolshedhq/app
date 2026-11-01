@@ -235,6 +235,66 @@ describe('useMetering start/stop cycles', () => {
     await probe.unmount();
   });
 
+  it('excludes background time when backgrounded during the permission await', async () => {
+    let releasePerm;
+    requestRecordingPermissionsAsync.mockImplementation(() => new Promise((resolve) => {
+      releasePerm = () => resolve({ granted: true, status: 'granted' });
+    }));
+    let now = Date.now();
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    const probe = await mount();
+    try {
+      let startP;
+      await act(async () => {
+        startP = probe.get().start();
+      });
+      expect(probe.get().running).toBe(false);
+
+      await act(async () => {
+        appStateHandler('inactive');
+        await Promise.resolve();
+        appStateHandler('background');
+        await Promise.resolve();
+      });
+
+      await act(async () => {
+        releasePerm();
+        await startP;
+      });
+      expect(probe.get().running).toBe(true);
+      expect(probe.get().elapsedMs).toBeLessThan(120);
+
+      now += 6000;
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      });
+      expect(probe.get().elapsedMs).toBeLessThan(500);
+
+      await act(async () => {
+        appStateHandler('active');
+        await Promise.resolve();
+        await Promise.resolve();
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      const elapsedAtForeground = probe.get().elapsedMs;
+      expect(elapsedAtForeground).toBeLessThan(500);
+
+      now += 400;
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      });
+      expect(probe.get().elapsedMs).toBeGreaterThan(elapsedAtForeground);
+      expect(probe.get().elapsedMs).toBeLessThan(1500);
+
+      await act(async () => {
+        await probe.get().stop();
+      });
+    } finally {
+      nowSpy.mockRestore();
+      await probe.unmount();
+    }
+  });
+
   it('does not count the prepare wait in elapsed', async () => {
     let releasePrepare;
     const prepareGate = new Promise((resolve) => {

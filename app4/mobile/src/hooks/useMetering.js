@@ -129,24 +129,32 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
   }, [foldElapsedClock]);
 
   const start = useCallback(async () => {
+    sessionIntentRef.current = true;
+    lifeRef.current.bind({ recorder });
+    // Visible to AppState before the permission prompt / prepare wait.
+    lifeRef.current.markStarting();
     let status;
     try {
       status = await requestRecordingPermissionsAsync();
     } catch {
+      sessionIntentRef.current = false;
+      lifeRef.current.cancelStarting();
+      pausedByBackgroundRef.current = false;
       setPermission('denied');
       setSettingsHint(true);
       return false;
     }
     if (!status.granted) {
+      sessionIntentRef.current = false;
+      lifeRef.current.cancelStarting();
+      pausedByBackgroundRef.current = false;
       setPermission(status.status || 'denied');
       setSettingsHint(shouldShowSettingsHint(status, { afterRequest: true }));
       return false;
     }
     setPermission('granted');
     setSettingsHint(false);
-    sessionIntentRef.current = true;
     try {
-      lifeRef.current.bind({ recorder });
       await lifeRef.current.start();
       // expo-audio's setAudioModeAsync hardcodes AVAudioSession mode .default
       // (see AudioModule.setAudioMode). Lifecycle applies .measurement *after*
@@ -169,6 +177,7 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
       return true;
     } catch {
       sessionIntentRef.current = false;
+      lifeRef.current.cancelStarting();
       runningRef.current = false;
       setRunning(false);
       return false;
@@ -224,6 +233,9 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
           return;
         }
         if (lifeRef.current?.isStarting?.() === true || (sessionIntentRef.current && !runningRef.current)) {
+          // Foreground during permission/prepare: let start() run the clock
+          // once record() begins. Background time is not held after this.
+          pausedByBackgroundRef.current = false;
           return;
         }
         pausedByBackgroundRef.current = false;

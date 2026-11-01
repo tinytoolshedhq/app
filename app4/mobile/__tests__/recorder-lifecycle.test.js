@@ -194,6 +194,32 @@ describe('recorder lifecycle', () => {
     await life.stop();
   });
 
+  it('markStarting lets pause-during-permission hold until record(), then pause', async () => {
+    const { life } = setup();
+    expect(life.markStarting()).toBe(true);
+    expect(life.isStarting()).toBe(true);
+    expect(await life.pause()).toBe(false);
+    expect(life.getStateForTests().pauseWhenReady).toBe(true);
+    await life.start();
+    expect(life.getPhase()).toBe(PHASE.PAUSED);
+    expect(life.getPauseCount()).toBe(1);
+    expect(await life.resume()).toBe(true);
+    expect(life.isRecording()).toBe(true);
+    await life.stop();
+  });
+
+  it('cancelStarting after a denied permission returns to idle', async () => {
+    const { life } = setup();
+    life.markStarting();
+    await life.pause();
+    expect(life.cancelStarting()).toBe(true);
+    expect(life.getPhase()).toBe(PHASE.IDLE);
+    expect(life.getStateForTests().pauseWhenReady).toBe(false);
+    await life.start();
+    expect(life.isRecording()).toBe(true);
+    await life.stop();
+  });
+
   it('queued pause after prepare still leaves a resumable session', async () => {
     const { recorder, life } = setup();
     let releasePrepare;

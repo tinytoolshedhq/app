@@ -46,6 +46,7 @@ export function createRecorderLifecycle(initial = {}) {
     pauseCount: 0,
     resumeCount: 0,
     stopRequested: false,
+    pauseWhenReady: false,
     lastPrepareOptions: null,
     chain: Promise.resolve(),
   };
@@ -72,6 +73,20 @@ export function createRecorderLifecycle(initial = {}) {
     return api;
   }
 
+  /** Mark STARTING immediately (before permission / prepare) so AppState can see it. */
+  function markStarting() {
+    if (state.phase === PHASE.RELEASED) return false;
+    if (state.phase === PHASE.IDLE) state.phase = PHASE.STARTING;
+    return state.phase === PHASE.STARTING;
+  }
+
+  function cancelStarting() {
+    if (state.phase !== PHASE.STARTING) return false;
+    state.pauseWhenReady = false;
+    state.phase = PHASE.IDLE;
+    return true;
+  }
+
   async function discardLeftover() {
     const rec = recorder();
     const leftover = rec?.uri;
@@ -82,11 +97,7 @@ export function createRecorderLifecycle(initial = {}) {
   async function startInternal() {
     if (state.phase === PHASE.RELEASED) throw releasedError('start');
     state.stopRequested = false;
-    if (
-      state.phase === PHASE.RECORDING
-      || state.phase === PHASE.STARTING
-      || state.phase === PHASE.PAUSED
-    ) {
+    if (state.phase === PHASE.RECORDING || state.phase === PHASE.PAUSED) {
       await stopInternal();
       state.stopRequested = false;
     }
@@ -111,6 +122,10 @@ export function createRecorderLifecycle(initial = {}) {
       rec.record();
       // Clock starts here — prepare time is not recording.
       state.phase = PHASE.RECORDING;
+      if (state.pauseWhenReady) {
+        state.pauseWhenReady = false;
+        await pauseInternal();
+      }
       if (typeof deps.enableMeasurementMode === 'function') {
         try {
           await deps.enableMeasurementMode();
@@ -165,6 +180,10 @@ export function createRecorderLifecycle(initial = {}) {
 
   async function pauseInternal() {
     if (isStopOrReleasePendingOrDone()) return false;
+    if (state.phase === PHASE.STARTING) {
+      state.pauseWhenReady = true;
+      return false;
+    }
     if (state.phase !== PHASE.RECORDING) return false;
     const rec = recorder();
     if (!rec || typeof rec.pause !== 'function') return false;
@@ -185,7 +204,9 @@ export function createRecorderLifecycle(initial = {}) {
   }
 
   async function resumeInternal() {
+    state.pauseWhenReady = false;
     if (isStopOrReleasePendingOrDone()) return false;
+    if (state.phase === PHASE.STARTING) return false;
     if (state.phase !== PHASE.PAUSED) return false;
     const rec = recorder();
     if (!rec || typeof rec.record !== 'function') return false;
@@ -215,6 +236,8 @@ export function createRecorderLifecycle(initial = {}) {
 
   const api = {
     bind,
+    markStarting,
+    cancelStarting,
     start: () => enqueue(() => startInternal()),
     stop: () => {
       state.stopRequested = true;
