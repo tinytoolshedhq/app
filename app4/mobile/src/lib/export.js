@@ -86,7 +86,7 @@ export function recordsToCsv(list) {
     t('export.csvAvg'),
     t('export.csvMin'),
     t('export.csvCalibration'),
-    t('settings.offset'),
+    `${t('settings.offset')} (${t('settings.unit')})`,
   ].map(csvEscape);
   const lines = [header.join(',')];
   for (const r of rows) {

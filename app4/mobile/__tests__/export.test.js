@@ -101,8 +101,12 @@ describe('RecordsSheet capture target', () => {
     const path = require('path');
     const src = fs.readFileSync(path.join(__dirname, '../src/components/RecordsSheet.js'), 'utf8');
     expect(src).toMatch(/from '\.\/ExportCard'/);
+    expect(src).toMatch(/recordsForExportImage/);
     expect(src).toMatch(/styles\.offscreen/);
-    expect(src).toMatch(/shareImage\(exportRef\.current\)/);
+    expect(src).toMatch(/captureExportImage/);
+    expect(src).toMatch(/shareImage\(node\)/);
+    expect(src).toMatch(/setCaptureOpen\(true\)/);
+    expect(src).toMatch(/captureOpen \?/);
     expect(src).toMatch(/Swipeable/);
     expect(src).not.toMatch(/updateRecordNote/);
     expect(src).not.toMatch(/notePlaceholder/);
@@ -114,7 +118,8 @@ describe('RecordsSheet capture target', () => {
     expect(src).toMatch(/styles\.exportCapture/);
     expect(src).toMatch(/EXPORT_CARD_BG/);
     expect(src).toMatch(/backgroundColor: EXPORT_CARD_BG/);
-    expect(src).toMatch(/top: -4000/);
+    expect(src).toMatch(/left: -10000/);
+    expect(src).not.toMatch(/top: -4000/);
     expect(src).not.toMatch(/left: -EXPORT_CARD_WIDTH/);
   });
 });

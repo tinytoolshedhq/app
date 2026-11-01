@@ -65,7 +65,7 @@ describe('records repository', () => {
       offset: 2,
     }]);
     expect(csv.charCodeAt(0)).toBe(0xFEFF);
-    expect(csv).toMatch(/Current \(dB\),Max \(dB\),Avg \(dB\),Min \(dB\),Calibration,Adjust/);
+    expect(csv).toMatch(/Current \(dB\),Max \(dB\),Avg \(dB\),Min \(dB\),Calibration,Adjust \(dB\)/);
     expect(csv).toMatch(/Duration \(s\)/);
     expect(csv).not.toMatch(/durationMs/);
     expect(csv).not.toMatch(/,note,/);
@@ -133,7 +133,7 @@ describe('records repository', () => {
     const en = recordsToCsv([row]);
     expect(en.startsWith('\uFEFF')).toBe(true);
     expect(en.replace(/^\uFEFF/, '').split('\n')[0]).toBe(
-      'Created,Duration (s),Current (dB),Max (dB),Avg (dB),Min (dB),Calibration,Adjust',
+      'Created,Duration (s),Current (dB),Max (dB),Avg (dB),Min (dB),Calibration,Adjust (dB)',
     );
     expect(en).toMatch(/,2,/);
     expect(en).not.toMatch(/,1\.5,/);
@@ -145,7 +145,7 @@ describe('records repository', () => {
     const zh = recordsToCsv([row]);
     expect(zh.startsWith('\uFEFF')).toBe(true);
     expect(zh.replace(/^\uFEFF/, '').split('\n')[0]).toBe(
-      '建立時間,時長（秒）,目前 (dB),最大 (dB),平均 (dB),最小 (dB),校準,調整',
+      '建立時間,時長（秒）,目前 (dB),最大 (dB),平均 (dB),最小 (dB),校準,調整 (dB)',
     );
     expect(zh).toMatch(/,2,/);
     expect(zh).not.toMatch(/偏移/);
@@ -161,6 +161,7 @@ describe('records repository', () => {
     expect(src).toMatch(/\]\.map\(csvEscape\)/);
     expect(src).toMatch(/CSV_UTF8_BOM/);
     expect(src).toMatch(/t\('settings\.offset'\)/);
+    expect(src).toMatch(/t\('settings\.unit'\)/);
     expect(src).toMatch(/Math\.round/);
   });
 });

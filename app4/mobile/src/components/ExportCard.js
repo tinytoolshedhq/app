@@ -8,9 +8,24 @@ export const EXPORT_CARD_WIDTH = 390;
 export const EXPORT_CARD_PADDING_H = 32;
 export const EXPORT_CARD_PADDING_V = 32;
 export const EXPORT_CARD_BG = '#F7F5F2';
+export const EXPORT_IMAGE_RECORD_LIMIT = 30;
 
-export default function ExportCard({ records, width = EXPORT_CARD_WIDTH }) {
+/** Newest-first list → at most 30 rows plus an overflow count for the rest. */
+export function recordsForExportImage(list) {
+  const rows = Array.isArray(list) ? list : [];
+  return {
+    records: rows.slice(0, EXPORT_IMAGE_RECORD_LIMIT),
+    overflowCount: Math.max(0, rows.length - EXPORT_IMAGE_RECORD_LIMIT),
+  };
+}
+
+export default function ExportCard({
+  records,
+  overflowCount = 0,
+  width = EXPORT_CARD_WIDTH,
+}) {
   const rows = Array.isArray(records) ? records : [];
+  const extra = Math.max(0, Number(overflowCount) || 0);
   return (
     <View collapsable={false} style={[styles.card, { width }]}>
       <Text style={styles.title}>{t('records.title')}</Text>
@@ -34,6 +49,9 @@ export default function ExportCard({ records, width = EXPORT_CARD_WIDTH }) {
           </View>
         ))
       )}
+      {extra > 0 ? (
+        <Text style={styles.overflow}>{t('export.imageOverflow', { count: extra })}</Text>
+      ) : null}
     </View>
   );
 }
@@ -81,5 +99,10 @@ const styles = StyleSheet.create({
     color: '#8A837C',
     marginTop: 4,
     fontVariant: ['tabular-nums'],
+  },
+  overflow: {
+    fontSize: 13,
+    color: '#8A837C',
+    marginTop: 16,
   },
 });

@@ -84,7 +84,7 @@
     "csvAvg": "平均 (dB)",
     "csvMin": "最小 (dB)",
     "csvCalibration": "校準",
-    "csvOffset": "調整",
+    "imageOverflow": "另有 {count} 筆，完整資料請用 CSV 匯出",
     "cancelled": "已取消匯出。",
     "permissionDenied": "沒有相簿權限，圖片沒有儲存。"
   },

@@ -84,7 +84,7 @@
     "csvAvg": "Avg (dB)",
     "csvMin": "Min (dB)",
     "csvCalibration": "Calibration",
-    "csvOffset": "Adjust",
+    "imageOverflow": "{count} more — export CSV for all records",
     "cancelled": "Export cancelled.",
     "permissionDenied": "Photo access was denied. The image was not saved."
   },

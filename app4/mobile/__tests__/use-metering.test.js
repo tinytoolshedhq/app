@@ -235,6 +235,38 @@ describe('useMetering start/stop cycles', () => {
     await probe.unmount();
   });
 
+  it('does not count the prepare wait in elapsed', async () => {
+    let releasePrepare;
+    const prepareGate = new Promise((resolve) => {
+      releasePrepare = resolve;
+    });
+    const innerPrepare = recorder.prepareToRecordAsync.getMockImplementation();
+    recorder.prepareToRecordAsync.mockImplementation(async (options) => {
+      await prepareGate;
+      if (innerPrepare) return innerPrepare(options);
+    });
+    const probe = await mount();
+    let startP;
+    await act(async () => {
+      startP = probe.get().start();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    });
+    expect(probe.get().running).toBe(false);
+    expect(probe.get().elapsedMs).toBe(0);
+    await act(async () => {
+      releasePrepare();
+      await startP;
+    });
+    expect(probe.get().running).toBe(true);
+    expect(probe.get().elapsedMs).toBeLessThan(120);
+    await act(async () => {
+      await probe.get().stop();
+    });
+    await probe.unmount();
+  });
+
   it('advances elapsed and still auto-stops after background during prepare', async () => {
     let releasePrepare;
     const prepareGate = new Promise((resolve) => {
@@ -261,13 +293,17 @@ describe('useMetering start/stop cycles', () => {
       await Promise.resolve();
       appStateHandler('background');
       await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 400));
     });
+    expect(probe.get().elapsedMs).toBe(0);
+    expect(probe.get().running).toBe(false);
 
     await act(async () => {
       releasePrepare();
       await startP;
     });
     expect(probe.get().running).toBe(true);
+    expect(probe.get().elapsedMs).toBeLessThan(120);
 
     await act(async () => {
       appStateHandler('active');
@@ -277,10 +313,12 @@ describe('useMetering start/stop cycles', () => {
     });
 
     const elapsedAtForeground = probe.get().elapsedMs;
+    expect(elapsedAtForeground).toBeLessThan(200);
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 400));
     });
     expect(probe.get().elapsedMs).toBeGreaterThan(elapsedAtForeground);
+    expect(probe.get().elapsedMs).toBeLessThan(800);
     expect(probe.get().running).toBe(true);
 
     spy.mockReturnValue(true);

@@ -109,6 +109,8 @@ export function createRecorderLifecycle(initial = {}) {
       state.prepareCount += 1;
       state.lastPrepareOptions = options;
       rec.record();
+      // Clock starts here — prepare time is not recording.
+      state.phase = PHASE.RECORDING;
       if (typeof deps.enableMeasurementMode === 'function') {
         try {
           await deps.enableMeasurementMode();
@@ -116,7 +118,6 @@ export function createRecorderLifecycle(initial = {}) {
           // Expo Go / missing native module
         }
       }
-      state.phase = PHASE.RECORDING;
     } catch (error) {
       state.phase = PHASE.IDLE;
       throw error;

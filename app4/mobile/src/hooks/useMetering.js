@@ -114,10 +114,10 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     }
   }, []);
 
-  /** Elapsed + free-session limit follow the queue, not the Start tap. */
+  /** Elapsed follows actual RECORDING, never the Start tap / prepare wait. */
   const readElapsedMs = useCallback(() => {
     const recording = lifeRef.current?.isRecording?.() === true;
-    if (recording) {
+    if (recording && !pausedByBackgroundRef.current) {
       if (!startedAtRef.current) {
         startedAtRef.current = Date.now();
         setStartedAt(startedAtRef.current);
