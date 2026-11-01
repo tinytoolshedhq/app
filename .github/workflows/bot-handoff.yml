@@ -1,0 +1,32 @@
+name: Bot file handoff
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'shared/tasks/*/inbox/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Route changed task files
+        env:
+          HANDOFF_BEFORE: ${{ github.event.before }}
+          HANDOFF_AFTER: ${{ github.sha }}
+          HANDOFF_ENABLED: ${{ vars.BOT_HANDOFF_ENABLED }}
+          HANDOFF_EVENT: ${{ github.event_name }}
+          GROK_BOT_WEBHOOKS: ${{ secrets.GROK_BOT_WEBHOOKS }}
+        run: python scripts/bot_handoff.py

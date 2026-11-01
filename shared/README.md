@@ -10,6 +10,6 @@
 - `calendar/` — 發文及發布排程。
 - `strategy/` — 按需建立的短期策略筆記。
 
-任務流程見 `tasks/README.md`。目前自動喚醒 bot 尚未接線；本目錄不是已啟用的訊息佇列。
+任務流程及 webhook 設定見 `tasks/README.md`。GitHub Actions 負責觸發；需完成 Grok routine 與 secret 設定，並開啟 `BOT_HANDOFF_ENABLED` 才會實際喚醒 bot。
 
 Do not commit secrets.

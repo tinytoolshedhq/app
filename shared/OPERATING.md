@@ -28,5 +28,5 @@
 
 ## 實作狀態
 本文件是協作約定，不能自行限制平台上的工具、權限或通訊方式。
-目前 repo 尚未接上任務檔到 Grok Bot 的自動觸發；新增文件不會自行喚醒 bot。
+Repo 由 `.github/workflows/bot-handoff.yml` 監聽任務變更；實際喚醒需完成 Grok routine、GitHub secret 設定，並將 `BOT_HANDOFF_ENABLED` 設為 `true`。停用或手動執行時只預演，不呼叫 bot。
 任務目錄使用方式及觸發範圍見 `shared/tasks/README.md`。
