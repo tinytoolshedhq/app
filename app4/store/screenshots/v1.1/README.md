@@ -16,7 +16,7 @@ Locales: `en-US`, `zh-Hant`.
 2. `02-levels.png` — everyday level reference on the meter
 3. `03-records.png` — history list
 4. `04-export.png` — CSV / image / PDF export UI
-5. `05-paywall.png` — Full Pack, US$2.99 one-time
+5. `05-paywall.png` — Full Pack paywall. Caption (no price): “Full Pack · One-time purchase” / 「完整包｜一次買斷」, subline “No subscription” / 「沒有訂閱」. In-app UI still shows US$2.99.
 
 `iap-review/<locale>-paywall.png` is the same paywall at iPhone size with no caption band.
 
