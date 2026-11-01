@@ -40,6 +40,7 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
 
   const runningRef = useRef(false);
   const liveRef = useRef(false);
+  const sessionIntentRef = useRef(false);
   const pausedByBackgroundRef = useRef(false);
   const meterRef = useRef(emptyMeter());
   const startedAtRef = useRef(null);
@@ -105,16 +106,48 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     setSession(next.session);
   }, [recorderState?.metering, running]);
 
+  const foldElapsedClock = useCallback(() => {
+    if (startedAtRef.current) {
+      elapsedPausedRef.current += Date.now() - startedAtRef.current;
+      startedAtRef.current = null;
+      setStartedAt(null);
+    }
+  }, []);
+
+  /** Elapsed follows actual RECORDING, never the Start tap / prepare wait. */
+  const readElapsedMs = useCallback(() => {
+    const recording = lifeRef.current?.isRecording?.() === true;
+    if (recording && !pausedByBackgroundRef.current) {
+      if (!startedAtRef.current) {
+        startedAtRef.current = Date.now();
+        setStartedAt(startedAtRef.current);
+      }
+      return elapsedPausedRef.current + (Date.now() - startedAtRef.current);
+    }
+    foldElapsedClock();
+    return elapsedPausedRef.current;
+  }, [foldElapsedClock]);
+
   const start = useCallback(async () => {
+    sessionIntentRef.current = true;
+    lifeRef.current.bind({ recorder });
+    // Visible to AppState before the permission prompt / prepare wait.
+    lifeRef.current.markStarting();
     let status;
     try {
       status = await requestRecordingPermissionsAsync();
     } catch {
+      sessionIntentRef.current = false;
+      lifeRef.current.cancelStarting();
+      pausedByBackgroundRef.current = false;
       setPermission('denied');
       setSettingsHint(true);
       return false;
     }
     if (!status.granted) {
+      sessionIntentRef.current = false;
+      lifeRef.current.cancelStarting();
+      pausedByBackgroundRef.current = false;
       setPermission(status.status || 'denied');
       setSettingsHint(shouldShowSettingsHint(status, { afterRequest: true }));
       return false;
@@ -122,77 +155,107 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     setPermission('granted');
     setSettingsHint(false);
     try {
-      lifeRef.current.bind({ recorder });
       await lifeRef.current.start();
       // expo-audio's setAudioModeAsync hardcodes AVAudioSession mode .default
       // (see AudioModule.setAudioMode). Lifecycle applies .measurement *after*
       // record() via enableMeasurementMode. Expo Go: feature-detects and no-ops.
-      pausedByBackgroundRef.current = false;
+      // Do not clear pausedByBackground here: a background during prepare
+      // must still resume or stay paused consistently after record() begins.
       autoStoppedRef.current = false;
       const fresh = emptyMeter();
       meterRef.current = fresh;
       liveRef.current = true;
-      const now = Date.now();
-      startedAtRef.current = now;
       elapsedPausedRef.current = 0;
-      setStartedAt(now);
+      startedAtRef.current = null;
       setElapsedMs(0);
       setSession(fresh.session);
       setSmoothed(null);
+      runningRef.current = true;
       setRunning(true);
+      const next = readElapsedMs();
+      setElapsedMs(next);
       return true;
     } catch {
+      sessionIntentRef.current = false;
+      lifeRef.current.cancelStarting();
+      runningRef.current = false;
+      setRunning(false);
       return false;
     }
-  }, [recorder]);
+  }, [readElapsedMs, recorder]);
 
   const stop = useCallback(async () => {
+    sessionIntentRef.current = false;
     liveRef.current = false;
     meterRef.current = freezeMeter(meterRef.current);
     setSmoothed(meterRef.current.smoothed);
     setSession(meterRef.current.session);
-    if (startedAtRef.current) {
-      const total = elapsedPausedRef.current + (Date.now() - startedAtRef.current);
-      setElapsedMs(total);
-    }
+    const total = readElapsedMs();
+    foldElapsedClock();
+    setElapsedMs(total);
     startedAtRef.current = null;
     setStartedAt(null);
+    runningRef.current = false;
     setRunning(false);
     pausedByBackgroundRef.current = false;
     lifeRef.current.bind({ recorder });
     await lifeRef.current.stop();
-  }, [recorder]);
+  }, [foldElapsedClock, readElapsedMs, recorder]);
 
   useEffect(() => {
+    const inFlightSession = () => (
+      sessionIntentRef.current
+      || runningRef.current
+      || lifeRef.current?.isSessionActive?.() === true
+    );
+
     const sub = AppState.addEventListener('change', (next) => {
       if (next !== 'active') {
-        if (!runningRef.current) return;
-        if (startedAtRef.current) {
-          elapsedPausedRef.current += Date.now() - startedAtRef.current;
-          startedAtRef.current = null;
-        }
+        if (!inFlightSession()) return;
+        foldElapsedClock();
         pausedByBackgroundRef.current = true;
         lifeRef.current.bind({ recorder });
-        // Same serialized queue as start/stop/release. No-ops if stop is pending.
+        // Same serialized queue as start/stop/release. If Start is still
+        // preparing, pause runs after record() and no-ops if stop is pending.
         lifeRef.current.pause().catch(() => {});
         return;
       }
-      if (!pausedByBackgroundRef.current || !runningRef.current) return;
+      if (!pausedByBackgroundRef.current && !inFlightSession()) return;
       lifeRef.current.bind({ recorder });
-      lifeRef.current.resume().then((did) => {
-        if (!did || !runningRef.current) {
+      const syncClockFromRecorder = (didResume) => {
+        const recording = didResume || lifeRef.current?.isRecording?.() === true;
+        if (recording) {
+          pausedByBackgroundRef.current = false;
+          if (!startedAtRef.current) {
+            startedAtRef.current = Date.now();
+            setStartedAt(startedAtRef.current);
+          }
+          return;
+        }
+        if (lifeRef.current?.isStarting?.() === true || (sessionIntentRef.current && !runningRef.current)) {
+          // Foreground during permission/prepare: let start() run the clock
+          // once record() begins. Background time is not held after this.
           pausedByBackgroundRef.current = false;
           return;
         }
         pausedByBackgroundRef.current = false;
-        startedAtRef.current = Date.now();
-        setStartedAt(startedAtRef.current);
+      };
+      if (!pausedByBackgroundRef.current) {
+        syncClockFromRecorder(false);
+        return;
+      }
+      lifeRef.current.resume().then((did) => {
+        if (!did && !runningRef.current && !sessionIntentRef.current) {
+          pausedByBackgroundRef.current = false;
+          return;
+        }
+        syncClockFromRecorder(did);
       }).catch(() => {
-        pausedByBackgroundRef.current = false;
+        syncClockFromRecorder(false);
       });
     });
     return () => sub.remove();
-  }, [recorder]);
+  }, [foldElapsedClock, recorder]);
 
   // Unmount only. Do not depend on the recorder identity — that would
   // stop+release the session whenever the SharedRef was recreated.
@@ -204,9 +267,7 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
   useEffect(() => {
     if (!running) return undefined;
     const tick = () => {
-      const base = elapsedPausedRef.current;
-      const live = startedAtRef.current ? Date.now() - startedAtRef.current : 0;
-      const next = base + live;
+      const next = readElapsedMs();
       setElapsedMs(next);
       if (
         !autoStoppedRef.current
@@ -221,7 +282,7 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
     tick();
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [running, stop]);
+  }, [readElapsedMs, running, stop]);
 
   const stats = sessionDisplayStats(session, offset);
   const displayDb = applyOffset(smoothed, offset);

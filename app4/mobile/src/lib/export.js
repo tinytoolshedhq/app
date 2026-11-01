@@ -66,11 +66,14 @@ export function formatCsvDate(value) {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
 
-/** durationMs → seconds string (trim trailing zeros). */
+/** UTF-8 BOM so Excel on Windows keeps CJK headers readable. */
+export const CSV_UTF8_BOM = '\uFEFF';
+
+/** durationMs → whole seconds (rounded). */
 export function formatCsvDurationSeconds(durationMs) {
   const ms = Number(durationMs);
   const s = Number.isFinite(ms) ? Math.max(0, ms) / 1000 : 0;
-  return String(Number(s.toFixed(3)));
+  return String(Math.round(s));
 }
 
 export function recordsToCsv(list) {
@@ -83,8 +86,8 @@ export function recordsToCsv(list) {
     t('export.csvAvg'),
     t('export.csvMin'),
     t('export.csvCalibration'),
-    t('export.csvOffset'),
-  ];
+    `${t('settings.offset')} (${t('settings.unit')})`,
+  ].map(csvEscape);
   const lines = [header.join(',')];
   for (const r of rows) {
     lines.push([
@@ -98,7 +101,7 @@ export function recordsToCsv(list) {
       csvEscape(r.offset),
     ].join(','));
   }
-  return `${lines.join('\n')}\n`;
+  return `${CSV_UTF8_BOM}${lines.join('\n')}\n`;
 }
 
 export function recordsToHtml(list) {

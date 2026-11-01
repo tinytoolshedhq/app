@@ -114,6 +114,21 @@ describe('copy', () => {
     expect(zh.paywall.unlimited).not.toMatch(/備註/);
     expect(en.records.note).toBeUndefined();
     expect(en.records.notePlaceholder).toBeUndefined();
+    expect(en.export.csvOffset).toBeUndefined();
+    expect(zh.export.csvOffset).toBeUndefined();
+    expect(en.settings.offset).toBe('Adjust');
+    expect(zh.settings.offset).toBe('調整');
+    expect(en.export.csvCurrent).toBe('Current (dB)');
+    expect(zh.export.csvCurrent).toBe('目前 (dB)');
+    expect(en.export.csvMax).toBe('Max (dB)');
+    expect(zh.export.csvMax).toBe('最大 (dB)');
+    expect(en.export.csvAvg).toBe('Avg (dB)');
+    expect(zh.export.csvAvg).toBe('平均 (dB)');
+    expect(en.export.csvMin).toBe('Min (dB)');
+    expect(zh.export.csvMin).toBe('最小 (dB)');
+    expect(en.export.imageOverflow).toBe('{count} more — export CSV for all records');
+    expect(zh.export.imageOverflow).toBe('另有 {count} 筆，完整資料請用 CSV 匯出');
+    expect(`${en.export.csvCurrent}${zh.export.csvCurrent}`).not.toMatch(/dB\(A\)/i);
   });
 
   it('keeps the system mic purpose string friendly, deleted right away, and not saved', () => {

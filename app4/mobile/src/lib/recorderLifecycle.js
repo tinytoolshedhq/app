@@ -46,6 +46,7 @@ export function createRecorderLifecycle(initial = {}) {
     pauseCount: 0,
     resumeCount: 0,
     stopRequested: false,
+    pauseWhenReady: false,
     lastPrepareOptions: null,
     chain: Promise.resolve(),
   };
@@ -72,6 +73,20 @@ export function createRecorderLifecycle(initial = {}) {
     return api;
   }
 
+  /** Mark STARTING immediately (before permission / prepare) so AppState can see it. */
+  function markStarting() {
+    if (state.phase === PHASE.RELEASED) return false;
+    if (state.phase === PHASE.IDLE) state.phase = PHASE.STARTING;
+    return state.phase === PHASE.STARTING;
+  }
+
+  function cancelStarting() {
+    if (state.phase !== PHASE.STARTING) return false;
+    state.pauseWhenReady = false;
+    state.phase = PHASE.IDLE;
+    return true;
+  }
+
   async function discardLeftover() {
     const rec = recorder();
     const leftover = rec?.uri;
@@ -82,11 +97,7 @@ export function createRecorderLifecycle(initial = {}) {
   async function startInternal() {
     if (state.phase === PHASE.RELEASED) throw releasedError('start');
     state.stopRequested = false;
-    if (
-      state.phase === PHASE.RECORDING
-      || state.phase === PHASE.STARTING
-      || state.phase === PHASE.PAUSED
-    ) {
+    if (state.phase === PHASE.RECORDING || state.phase === PHASE.PAUSED) {
       await stopInternal();
       state.stopRequested = false;
     }
@@ -109,6 +120,12 @@ export function createRecorderLifecycle(initial = {}) {
       state.prepareCount += 1;
       state.lastPrepareOptions = options;
       rec.record();
+      // Clock starts here — prepare time is not recording.
+      state.phase = PHASE.RECORDING;
+      if (state.pauseWhenReady) {
+        state.pauseWhenReady = false;
+        await pauseInternal();
+      }
       if (typeof deps.enableMeasurementMode === 'function') {
         try {
           await deps.enableMeasurementMode();
@@ -116,7 +133,6 @@ export function createRecorderLifecycle(initial = {}) {
           // Expo Go / missing native module
         }
       }
-      state.phase = PHASE.RECORDING;
     } catch (error) {
       state.phase = PHASE.IDLE;
       throw error;
@@ -164,6 +180,10 @@ export function createRecorderLifecycle(initial = {}) {
 
   async function pauseInternal() {
     if (isStopOrReleasePendingOrDone()) return false;
+    if (state.phase === PHASE.STARTING) {
+      state.pauseWhenReady = true;
+      return false;
+    }
     if (state.phase !== PHASE.RECORDING) return false;
     const rec = recorder();
     if (!rec || typeof rec.pause !== 'function') return false;
@@ -174,11 +194,19 @@ export function createRecorderLifecycle(initial = {}) {
     }
     state.pauseCount += 1;
     state.phase = PHASE.PAUSED;
+    // Do not setAudioModeAsync({ allowsRecording: false }) while paused.
+    // Changing the AVAudioSession category leaves the native AVAudioRecorder
+    // alive (cache file still bound). That is the same class of reuse that
+    // crashed TestFlight 1.1.0 after Stop deleted the file and the next
+    // prepare reused the dead recorder. Stop already turns recording off
+    // after stopAndDiscardCache. Restore-on-resume is therefore skipped too.
     return true;
   }
 
   async function resumeInternal() {
+    state.pauseWhenReady = false;
     if (isStopOrReleasePendingOrDone()) return false;
+    if (state.phase === PHASE.STARTING) return false;
     if (state.phase !== PHASE.PAUSED) return false;
     const rec = recorder();
     if (!rec || typeof rec.record !== 'function') return false;
@@ -208,6 +236,8 @@ export function createRecorderLifecycle(initial = {}) {
 
   const api = {
     bind,
+    markStarting,
+    cancelStarting,
     start: () => enqueue(() => startInternal()),
     stop: () => {
       state.stopRequested = true;
@@ -221,6 +251,13 @@ export function createRecorderLifecycle(initial = {}) {
     },
     getPhase: () => state.phase,
     isRecording: () => state.phase === PHASE.RECORDING,
+    isStarting: () => state.phase === PHASE.STARTING,
+    isPaused: () => state.phase === PHASE.PAUSED,
+    isSessionActive: () => (
+      state.phase === PHASE.STARTING
+      || state.phase === PHASE.RECORDING
+      || state.phase === PHASE.PAUSED
+    ),
     isReleased: () => state.phase === PHASE.RELEASED,
     getStopCount: () => state.stopCount,
     getPrepareCount: () => state.prepareCount,

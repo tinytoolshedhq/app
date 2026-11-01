@@ -101,8 +101,12 @@ describe('RecordsSheet capture target', () => {
     const path = require('path');
     const src = fs.readFileSync(path.join(__dirname, '../src/components/RecordsSheet.js'), 'utf8');
     expect(src).toMatch(/from '\.\/ExportCard'/);
+    expect(src).toMatch(/recordsForExportImage/);
     expect(src).toMatch(/styles\.offscreen/);
-    expect(src).toMatch(/shareImage\(exportRef\.current\)/);
+    expect(src).toMatch(/captureExportImage/);
+    expect(src).toMatch(/shareImage\(node\)/);
+    expect(src).toMatch(/setCaptureOpen\(true\)/);
+    expect(src).toMatch(/captureOpen \?/);
     expect(src).toMatch(/Swipeable/);
     expect(src).not.toMatch(/updateRecordNote/);
     expect(src).not.toMatch(/notePlaceholder/);
@@ -111,5 +115,26 @@ describe('RecordsSheet capture target', () => {
     expect(src).toMatch(/records\.swipeHint/);
     expect(src).toMatch(/export\.csvHint/);
     expect(src).toMatch(/Alert\.alert\(t\('export\.csv'\), t\('export\.csvHint'\)/);
+    expect(src).toMatch(/styles\.exportCapture/);
+    expect(src).toMatch(/EXPORT_CARD_BG/);
+    expect(src).toMatch(/backgroundColor: EXPORT_CARD_BG/);
+    expect(src).toMatch(/left: -10000/);
+    expect(src).not.toMatch(/top: -4000/);
+    expect(src).not.toMatch(/left: -EXPORT_CARD_WIDTH/);
+  });
+});
+
+describe('ExportCard padding', () => {
+  it('uses generous equal horizontal padding and an opaque capture background', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const card = fs.readFileSync(path.join(__dirname, '../src/components/ExportCard.js'), 'utf8');
+    expect(card).toMatch(/EXPORT_CARD_PADDING_H = 32/);
+    expect(card).toMatch(/EXPORT_CARD_PADDING_V = 32/);
+    expect(card).toMatch(/EXPORT_CARD_BG = '#F7F5F2'/);
+    expect(card).toMatch(/paddingHorizontal: EXPORT_CARD_PADDING_H/);
+    expect(card).toMatch(/paddingVertical: EXPORT_CARD_PADDING_V/);
+    expect(card).toMatch(/backgroundColor: EXPORT_CARD_BG/);
+    expect(card).not.toMatch(/dB\(A\)/i);
   });
 });

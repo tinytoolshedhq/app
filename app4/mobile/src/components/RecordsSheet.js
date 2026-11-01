@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Alert,
   Modal,
@@ -15,7 +15,11 @@ import { formatDb, formatDuration } from '../lib/meter';
 import { canExport } from '../lib/gating';
 import { mapExportError, mapExportSuccess, shareCsv, shareImage, sharePdf } from '../lib/export';
 import { deleteRecord } from '../data/records';
-import ExportCard, { EXPORT_CARD_WIDTH } from './ExportCard';
+import ExportCard, {
+  EXPORT_CARD_BG,
+  EXPORT_CARD_WIDTH,
+  recordsForExportImage,
+} from './ExportCard';
 
 export default function RecordsSheet({
   visible,
@@ -26,7 +30,51 @@ export default function RecordsSheet({
 }) {
   const insets = useSafeAreaInsets();
   const exportRef = useRef(null);
+  const exportNodeWaiters = useRef([]);
   const swipeRefs = useRef({});
+  const [captureOpen, setCaptureOpen] = useState(false);
+  const imageSlice = recordsForExportImage(records);
+
+  function bindExportNode(node) {
+    exportRef.current = node;
+    if (!node) return;
+    const waiters = exportNodeWaiters.current;
+    exportNodeWaiters.current = [];
+    waiters.forEach((fn) => fn(node));
+  }
+
+  function waitForExportNode() {
+    if (exportRef.current) return Promise.resolve(exportRef.current);
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject(Object.assign(new Error('EXPORT_UNAVAILABLE'), { code: 'EXPORT_UNAVAILABLE' }));
+      }, 2000);
+      exportNodeWaiters.current.push((node) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(node);
+      });
+    });
+  }
+
+  async function captureExportImage() {
+    setCaptureOpen(true);
+    try {
+      const node = await waitForExportNode();
+      await new Promise((resolve) => {
+        const raf = global.requestAnimationFrame || ((cb) => setTimeout(cb, 16));
+        raf(() => raf(resolve));
+      });
+      return await shareImage(node);
+    } finally {
+      setCaptureOpen(false);
+      exportRef.current = null;
+    }
+  }
 
   async function onExport(kind) {
     if (!canExport({ isPro })) {
@@ -43,7 +91,7 @@ export default function RecordsSheet({
         });
         result = await shareCsv(records);
       } else if (kind === 'pdf') result = await sharePdf(records);
-      else result = await shareImage(exportRef.current);
+      else result = await captureExportImage();
       if (!result?.outcome) return;
       Alert.alert(t('common.ok'), mapExportSuccess(result.outcome));
     } catch (e) {
@@ -122,15 +170,26 @@ export default function RecordsSheet({
               </Swipeable>
             ))}
           </ScrollView>
-          <View pointerEvents="none" style={styles.offscreen} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <View ref={exportRef} collapsable={false}>
-              <ExportCard records={records} width={EXPORT_CARD_WIDTH} />
-            </View>
-          </View>
           <Pressable onPress={onClose} style={styles.done} accessibilityRole="button">
             <Text style={styles.doneText}>{t('settings.done')}</Text>
           </Pressable>
         </View>
+        {captureOpen ? (
+          <View
+            pointerEvents="none"
+            style={styles.offscreen}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            <View ref={bindExportNode} collapsable={false} style={styles.exportCapture}>
+              <ExportCard
+                records={imageSlice.records}
+                overflowCount={imageSlice.overflowCount}
+                width={EXPORT_CARD_WIDTH}
+              />
+            </View>
+          </View>
+        ) : null}
       </View>
     </Modal>
   );
@@ -173,9 +232,15 @@ const styles = StyleSheet.create({
   swipeDeleteText: { color: '#fff', fontWeight: '600', fontSize: 15 },
   offscreen: {
     position: 'absolute',
-    left: -EXPORT_CARD_WIDTH - 80,
+    left: -10000,
     top: 0,
     width: EXPORT_CARD_WIDTH,
+    backgroundColor: EXPORT_CARD_BG,
+  },
+  exportCapture: {
+    backgroundColor: EXPORT_CARD_BG,
+    width: EXPORT_CARD_WIDTH,
+    overflow: 'visible',
   },
   done: {
     backgroundColor: '#1C1A17',
