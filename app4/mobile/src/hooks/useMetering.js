@@ -19,6 +19,7 @@ import {
   tickMeter,
 } from '../lib/meter';
 import { shouldShowSettingsHint } from '../lib/openSettings';
+import { shouldAutoStopSession } from '../lib/gating';
 
 const POLL_MS = 100;
 
@@ -32,7 +33,7 @@ function emptyMeter() {
   return { smoothed: null, session: createSession() };
 }
 
-export function useMetering(offset) {
+export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
   const recorder = useAudioRecorder(RECORDING_OPTIONS);
   const recorderState = useAudioRecorderState(recorder, POLL_MS);
 
@@ -41,11 +42,26 @@ export function useMetering(offset) {
   const [settingsHint, setSettingsHint] = useState(false);
   const [smoothed, setSmoothed] = useState(null);
   const [session, setSession] = useState(createSession);
+  const [startedAt, setStartedAt] = useState(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
 
   const runningRef = useRef(false);
   const liveRef = useRef(false);
   const pausedByBackgroundRef = useRef(false);
   const meterRef = useRef(emptyMeter());
+  const startedAtRef = useRef(null);
+  const elapsedPausedRef = useRef(0);
+  const onDurationLimitRef = useRef(onDurationLimit);
+  const isProRef = useRef(isPro);
+  const autoStoppedRef = useRef(false);
+
+  useEffect(() => {
+    onDurationLimitRef.current = onDurationLimit;
+  }, [onDurationLimit]);
+
+  useEffect(() => {
+    isProRef.current = isPro;
+  }, [isPro]);
 
   useEffect(() => {
     runningRef.current = running;
@@ -131,9 +147,15 @@ export function useMetering(offset) {
         // missing native module or session error: keep expo-audio's session
       }
       pausedByBackgroundRef.current = false;
+      autoStoppedRef.current = false;
       const fresh = emptyMeter();
       meterRef.current = fresh;
       liveRef.current = true;
+      const now = Date.now();
+      startedAtRef.current = now;
+      elapsedPausedRef.current = 0;
+      setStartedAt(now);
+      setElapsedMs(0);
       setSession(fresh.session);
       setSmoothed(null);
       setRunning(true);
@@ -148,6 +170,12 @@ export function useMetering(offset) {
     meterRef.current = freezeMeter(meterRef.current);
     setSmoothed(meterRef.current.smoothed);
     setSession(meterRef.current.session);
+    if (startedAtRef.current) {
+      const total = elapsedPausedRef.current + (Date.now() - startedAtRef.current);
+      setElapsedMs(total);
+    }
+    startedAtRef.current = null;
+    setStartedAt(null);
     setRunning(false);
     pausedByBackgroundRef.current = false;
     await stopRecorder();
@@ -160,6 +188,10 @@ export function useMetering(offset) {
           try {
             recorder.pause();
             pausedByBackgroundRef.current = true;
+            if (startedAtRef.current) {
+              elapsedPausedRef.current += Date.now() - startedAtRef.current;
+              startedAtRef.current = null;
+            }
           } catch {
             // pause may throw if already stopped
           }
@@ -170,6 +202,8 @@ export function useMetering(offset) {
         try {
           recorder.record();
           pausedByBackgroundRef.current = false;
+          startedAtRef.current = Date.now();
+          setStartedAt(startedAtRef.current);
           enableMeasurementMode().catch(() => {});
         } catch {
           pausedByBackgroundRef.current = false;
@@ -184,6 +218,28 @@ export function useMetering(offset) {
     stopRecorder().catch(() => {});
   }, [stopRecorder]);
 
+  useEffect(() => {
+    if (!running) return undefined;
+    const tick = () => {
+      const base = elapsedPausedRef.current;
+      const live = startedAtRef.current ? Date.now() - startedAtRef.current : 0;
+      const next = base + live;
+      setElapsedMs(next);
+      if (
+        !autoStoppedRef.current
+        && shouldAutoStopSession({ elapsedMs: next, isPro: isProRef.current })
+      ) {
+        autoStoppedRef.current = true;
+        stop().then(() => {
+          onDurationLimitRef.current?.();
+        }).catch(() => {});
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [running, stop]);
+
   const stats = sessionDisplayStats(session, offset);
   const displayDb = applyOffset(smoothed, offset);
 
@@ -193,7 +249,11 @@ export function useMetering(offset) {
     settingsHint,
     displayDb,
     max: stats.max,
+    min: stats.min,
     avg: stats.avg,
+    sampleCount: stats.count,
+    startedAt,
+    elapsedMs,
     start,
     stop,
   };

@@ -1,0 +1,18 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "strict": false,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src/**/*.js",
+    "index.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/__tests__/**"
+  ]
+}

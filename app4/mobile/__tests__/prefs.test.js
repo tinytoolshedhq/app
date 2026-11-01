@@ -17,7 +17,9 @@ describe('calibration offset prefs', () => {
     await setOffset(7);
     expect(getOffset()).toBe(7);
     const raw = await AsyncStorage.getItem('decibelmeter:prefs/v1');
-    expect(JSON.parse(raw)).toEqual({ offset: 7 });
+    const stored = JSON.parse(raw);
+    expect(stored.offset).toBe(7);
+    expect(stored.calibrations[0].offset).toBe(7);
   });
 
   it('clamps stored values to -20..+20', async () => {

@@ -46,7 +46,6 @@ export function resolveLocale(...inputs) {
 export function deviceLocaleTags() {
   const list = Localization?.getLocales?.();
   if (Array.isArray(list) && list.length) return list;
-  if (Localization?.locale) return [Localization.locale];
   return ['en'];
 }
 

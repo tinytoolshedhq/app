@@ -8,7 +8,22 @@
     "stop": "Stop",
     "max": "Max",
     "avg": "Avg",
-    "estimate": "Approximate reading. Not a professional or legal-grade instrument."
+    "min": "Min",
+    "estimate": "Approximate reading. For reference only.",
+    "save": "Save",
+    "saved": "Saved",
+    "duration": "Time"
+  },
+  "level": {
+    "quiet": "~30 dB ≈ quiet room (estimate)",
+    "conversation": "~60 dB ≈ normal conversation (estimate)",
+    "busy": "~80 dB ≈ busy street (estimate)",
+    "loud": "~90 dB ≈ loud (estimate)",
+    "veryLoud": "Very loud — estimate only"
+  },
+  "accuracy": {
+    "warning": "Above 95 or below 40 may be inaccurate. Estimate only.",
+    "tip": "Remove the phone case. Don’t use AirPods or an external mic."
   },
   "permission": {
     "denied": "Microphone is needed to measure sound level. Audio is not saved or sent.",
@@ -17,14 +32,87 @@
     "settingsHint": "If the prompt does not appear, allow the microphone in Settings."
   },
   "settings": {
-    "title": "Calibration",
+    "title": "Settings",
     "offset": "Adjust",
     "unit": "dB",
     "offsetHelp": "Add or subtract up to 20 dB after comparing with a known meter.",
-    "offsetRecalc": "Changing the adjustment recalculates the current, max, and average values.",
+    "offsetRecalc": "Changing the adjustment recalculates the current, max, min, and average values.",
     "minus": "Decrease adjustment",
     "plus": "Increase adjustment",
     "done": "Done",
-    "open": "Calibrate"
+    "open": "Settings",
+    "calibrate": "Calibrate",
+    "profiles": "Calibrations",
+    "addProfile": "Add calibration",
+    "profileName": "Name",
+    "defaultProfile": "Default",
+    "removeProfile": "Remove",
+    "vibration": "Vibration alert",
+    "vibrationHelp": "Vibrate when the estimate is at or above this level.",
+    "threshold": "Threshold",
+    "restore": "Restore Purchases",
+    "redeem": "Redeem Code",
+    "fullpack": "Full Pack"
+  },
+  "records": {
+    "title": "Records",
+    "empty": "No saved records.",
+    "open": "Records",
+    "note": "Note",
+    "notePlaceholder": "Note",
+    "viewOnly": "View only",
+    "delete": "Delete",
+    "latest": "Up to 10"
+  },
+  "export": {
+    "title": "Export",
+    "csv": "CSV",
+    "image": "Image",
+    "pdf": "PDF",
+    "pdfTitle": "Decibel Meter records (estimate)",
+    "estimateNote": "All values are estimates for reference only.",
+    "unavailable": "Export is not available here.",
+    "fail": "Could not export."
+  },
+  "paywall": {
+    "title": "Full Pack",
+    "once": "One-time unlock. No subscription.",
+    "buy": "Unlock",
+    "priceFail": "Price unavailable. Try again.",
+    "records": "Free keeps up to 10 records.",
+    "export": "Export is in Full Pack.",
+    "duration": "Free sessions stop at 5 minutes.",
+    "calibration": "Free includes one calibration.",
+    "unlimited": "Unlimited records and notes",
+    "exports": "Export CSV, image, PDF",
+    "time": "Unlimited measurement time",
+    "profiles": "Named calibrations",
+    "haptics": "Vibration alert"
+  },
+  "iap": {
+    "buyFail": "Purchase didn’t go through.",
+    "processing": "Working…",
+    "unavailable": "Purchases aren’t available here.",
+    "timeout": "That took too long. Try again.",
+    "cancel": "Cancel",
+    "cancelled": "Purchase cancelled.",
+    "pending": "Purchase is waiting for approval.",
+    "simTitle": "Simulate purchase (dev)",
+    "simBody": "Grant entitlement for {productId}?",
+    "simBuy": "Simulate purchase",
+    "devTitle": "Simulate restore",
+    "devRestoreBody": "Grant entitlement?",
+    "restore": "Restore",
+    "restored": "Purchases restored.",
+    "nothingToRestore": "No previous purchase found.",
+    "cannotRestore": "Can’t restore here.",
+    "restoreAgain": "Couldn’t confirm this purchase. Tap Restore Purchases and try again."
+  },
+  "common": {
+    "fail": "Couldn’t do that.",
+    "retry": "Retry",
+    "unlocked": "Unlocked",
+    "close": "Close",
+    "ok": "OK"
   }
 }

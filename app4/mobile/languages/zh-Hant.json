@@ -8,7 +8,22 @@
     "stop": "停止",
     "max": "最大",
     "avg": "平均",
-    "estimate": "此為估算值，非專業或法規級測量。"
+    "min": "最小",
+    "estimate": "此為估算值，僅供參考。",
+    "save": "儲存",
+    "saved": "已儲存",
+    "duration": "時間"
+  },
+  "level": {
+    "quiet": "約 30 dB ≈ 安靜房間（估算）",
+    "conversation": "約 60 dB ≈ 一般交談（估算）",
+    "busy": "約 80 dB ≈ 熱鬧街道（估算）",
+    "loud": "約 90 dB ≈ 偏大聲（估算）",
+    "veryLoud": "很大聲 — 僅供參考"
+  },
+  "accuracy": {
+    "warning": "高於 95 或低於 40 可能不準，僅供參考。",
+    "tip": "拿掉手機殼。不要用 AirPods 或外接麥克風。"
   },
   "permission": {
     "denied": "要用麥克風才能量聲音大小。聲音不會存下來，也不會傳出去。",
@@ -17,14 +32,87 @@
     "settingsHint": "若沒有出現詢問，請到設定開啟麥克風。"
   },
   "settings": {
-    "title": "校準",
+    "title": "設定",
     "offset": "調整",
     "unit": "dB",
     "offsetHelp": "對照已知分貝計後，可加減最多 20 分貝。",
-    "offsetRecalc": "更改調整後，會重新計算目前、最大與平均值。",
+    "offsetRecalc": "更改調整後，會重新計算目前、最大、最小與平均值。",
     "minus": "減少調整",
     "plus": "增加調整",
     "done": "完成",
-    "open": "校準"
+    "open": "設定",
+    "calibrate": "校準",
+    "profiles": "校準",
+    "addProfile": "新增校準",
+    "profileName": "名稱",
+    "defaultProfile": "預設",
+    "removeProfile": "刪除",
+    "vibration": "震動提醒",
+    "vibrationHelp": "估算值達到此數值時震動。",
+    "threshold": "門檻",
+    "restore": "恢復購買",
+    "redeem": "兌換代碼",
+    "fullpack": "完整包"
+  },
+  "records": {
+    "title": "紀錄",
+    "empty": "還沒有儲存的紀錄。",
+    "open": "紀錄",
+    "note": "備註",
+    "notePlaceholder": "備註",
+    "viewOnly": "僅供檢視",
+    "delete": "刪除",
+    "latest": "最多 10 筆"
+  },
+  "export": {
+    "title": "匯出",
+    "csv": "CSV",
+    "image": "圖片",
+    "pdf": "PDF",
+    "pdfTitle": "分貝計紀錄（估算）",
+    "estimateNote": "所有數值皆為估算，僅供參考。",
+    "unavailable": "這裡無法匯出。",
+    "fail": "無法匯出。"
+  },
+  "paywall": {
+    "title": "完整包",
+    "once": "一次解鎖，沒有訂閱。",
+    "buy": "解鎖",
+    "priceFail": "讀不到價格，請再試。",
+    "records": "免費版最多保留 10 筆紀錄。",
+    "export": "匯出屬於完整包。",
+    "duration": "免費版每次最多 5 分鐘。",
+    "calibration": "免費版有一組校準。",
+    "unlimited": "不限筆數與備註",
+    "exports": "匯出 CSV、圖片、PDF",
+    "time": "不限量測時間",
+    "profiles": "多組校準名稱",
+    "haptics": "震動提醒"
+  },
+  "iap": {
+    "buyFail": "這次沒買成。",
+    "processing": "處理中…",
+    "unavailable": "這裡無法購買。",
+    "timeout": "等太久了，請再試一次。",
+    "cancel": "取消",
+    "cancelled": "已取消購買。",
+    "pending": "購買還在等待核准。",
+    "simTitle": "模擬購買（開發）",
+    "simBody": "要授予 {productId} 權限嗎？",
+    "simBuy": "模擬購買",
+    "devTitle": "模擬恢復",
+    "devRestoreBody": "要授予權限嗎？",
+    "restore": "恢復",
+    "restored": "已恢復購買。",
+    "nothingToRestore": "找不到先前的購買。",
+    "cannotRestore": "這裡無法恢復。",
+    "restoreAgain": "還確認不到這筆購買，請再點一次「恢復購買」。"
+  },
+  "common": {
+    "fail": "沒做成。",
+    "retry": "再試",
+    "unlocked": "已解鎖",
+    "close": "關閉",
+    "ok": "好"
   }
 }

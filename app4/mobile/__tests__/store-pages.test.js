@@ -22,8 +22,36 @@ describe('app4 store pages', () => {
     expect(privacy.toLowerCase()).toMatch(/calibration adjustment/);
     expect(privacy.toLowerCase()).toMatch(/no account, network, analytics, or ads/);
     expect(privacy.toLowerCase()).toMatch(/estimate/);
+    expect(privacy).toMatch(/系統分享面板/);
+    expect(privacy).toMatch(/CSV、圖片或 PDF/);
+    expect(privacy).toMatch(/本 App 自己不會上傳/);
+    expect(privacy.toLowerCase()).toMatch(/system share sheet/);
+    expect(privacy.toLowerCase()).toMatch(/csv, image, pdf/);
+    expect(privacy.toLowerCase()).toMatch(/uploads nothing/);
     expect(privacy).toMatch(/tinytoolshedhq@gmail\.com/);
     expect(support).toMatch(/tinytoolshedhq@gmail\.com/);
+  });
+
+  it('explains Full Pack, restore, and estimate-only copy on the support page', () => {
+    expect(support).toMatch(/US\$2\.99/);
+    expect(support).toMatch(/一次性買斷/);
+    expect(support).toMatch(/沒有訂閱、廣告或試用/);
+    expect(support).toMatch(/最多 10 筆紀錄，僅供檢視/);
+    expect(support).not.toMatch(/最近 10 筆/);
+    expect(support).toMatch(/不限筆數與備註/);
+    expect(support).toMatch(/設定 &gt; 恢復購買/);
+    expect(support).toMatch(/讀數是估計值，僅供參考/);
+    expect(support).toMatch(/one-time App Store purchase/i);
+    expect(support).toMatch(/No subscription, ads, or trial/i);
+    expect(support).toMatch(/Up to 10 records, view-only/);
+    expect(support).not.toMatch(/Latest 10|recent 10/i);
+    expect(support).toMatch(/Unlimited records and notes/);
+    expect(support).toMatch(/Settings &gt; Restore Purchases/);
+    expect(support).toMatch(/estimates for reference only/i);
+    const blob = support.toLowerCase();
+    expect(blob).not.toMatch(/db\(a\)/);
+    expect(blob).not.toMatch(/professional|medical|hearing/);
+    expect(support).not.toMatch(/專業|醫療|聽力/);
   });
 
   it('is not the leftover CraftQ / 業問 pages', () => {

@@ -2,5 +2,5 @@
   "CFBundleDisplayName": "分貝計",
   "NSMicrophoneUsageDescription": "要用麥克風才能量聲音大小。暫存錄音會立刻刪除，不會存下來，也不會傳出去。",
   "NSPhotoLibraryUsageDescription": "這個 App 不會使用你的照片。這段文字是系統元件需要的。",
-  "NSPhotoLibraryAddUsageDescription": "這個 App 不會把照片加進相簿。這段文字是系統元件需要的。"
+  "NSPhotoLibraryAddUsageDescription": "只有在你選擇儲存匯出的圖片時，才會把圖片加入相簿。"
 }

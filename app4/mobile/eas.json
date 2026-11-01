@@ -13,13 +13,22 @@
       "ios": {
         "simulator": true,
         "image": "macos-tahoe-26.5-xcode-26.6"
+      },
+      "env": {
+        "EXPO_PUBLIC_IAP_PRODUCT_ID": "com.tinytoolshed.decibelmeter.fullpack",
+        "EXPO_PUBLIC_EAS_BUILD_PROFILE": "preview",
+        "EXPO_PUBLIC_IAP_SIMULATE": "1"
       }
     },
     "production": {
       "ios": {
         "image": "macos-tahoe-26.5-xcode-26.6"
       },
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_IAP_PRODUCT_ID": "com.tinytoolshed.decibelmeter.fullpack",
+        "EXPO_PUBLIC_EAS_BUILD_PROFILE": "production"
+      }
     }
   }
 }

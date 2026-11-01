@@ -2,5 +2,5 @@
   "CFBundleDisplayName": "Decibel Meter",
   "NSMicrophoneUsageDescription": "The microphone is needed to measure sound level on this device. A temporary recording is deleted right away. Nothing is saved or sent.",
   "NSPhotoLibraryUsageDescription": "This app does not access your photos. This text is required by a system component.",
-  "NSPhotoLibraryAddUsageDescription": "This app does not add photos to your library. This text is required by a system component."
+  "NSPhotoLibraryAddUsageDescription": "Only used when you choose to save an exported image to your photo library."
 }

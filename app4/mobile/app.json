@@ -2,14 +2,14 @@
   "expo": {
     "name": "Decibel Meter",
     "slug": "decibel-meter",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tinytoolshed.decibelmeter",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "infoPlist": {
         "CFBundleDevelopmentRegion": "en",
         "CFBundleLocalizations": [
@@ -20,7 +20,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSMicrophoneUsageDescription": "The microphone is needed to measure sound level on this device. A temporary recording is deleted right away. Nothing is saved or sent.",
         "NSPhotoLibraryUsageDescription": "This app does not access your photos. This text is required by a system component.",
-        "NSPhotoLibraryAddUsageDescription": "This app does not add photos to your library. This text is required by a system component."
+        "NSPhotoLibraryAddUsageDescription": "Only used when you choose to save an exported image to your photo library."
       }
     },
     "android": {
@@ -64,7 +64,8 @@
           }
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-iap"
     ],
     "locales": {
       "en": "./languages/ios/en.json",
