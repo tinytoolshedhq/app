@@ -8,11 +8,11 @@ Last uploaded TestFlight build: **3** (version `1.1.0`).
 
 Do not change the last uploaded build number above. These land in the next EAS production build (4):
 
-- **Crash:** start → stop → start no longer crashes. After Stop we delete the metering cache file; the next Start now always calls `prepareToRecordAsync(RECORDING_OPTIONS)` so expo-audio creates a new native `AVAudioRecorder` instead of reusing the one whose file was deleted. Start/stop/release are serialized; unmount releases once.
+- **Crash:** start → stop → start no longer crashes. After Stop we delete the metering cache file; the next Start now always calls `prepareToRecordAsync(RECORDING_OPTIONS)` so expo-audio creates a new native `AVAudioRecorder` instead of reusing the one whose file was deleted. Start/stop/pause/resume/release share one serialized queue; AppState background/foreground pause/resume no-op if stop/release is pending or done; unmount releases once.
 - **Image export:** capture a dedicated off-screen export card (full records, no sheet chrome / status bar / buttons). After save: 「已儲存到相簿」 / "Saved to Photos" when `expo-media-library` actually writes to Photos; otherwise an accurate share-sheet message. Cancel and photo-permission denial are not reported as success. `app.json` adds the `expo-media-library` config plugin (existing photo Info.plist strings reused; version / buildNumber unchanged).
-- **CSV export:** after the share sheet, tell the user to pick a place (e.g. Save to Files). The file is written to the app cache, then shared — we do not claim Files → On My iPhone.
+- **CSV export:** short “Save to Files” hint with OK *before* the share sheet; brief success after a completed share (cancel = no success). Human-readable localized headers; duration in seconds; local `YYYY-MM-DD HH:mm:ss` dates. The file is written to the app cache, then shared — we do not claim Files → On My iPhone.
+- **Records delete:** swipe left to delete, with a confirm dialog and a one-line swipe hint.
 - **Notes removed:** no memo UI or writes. Old records that still have a `note` field load without crashing; CSV drops the notes column.
-- **Records delete:** swipe left to delete, with a confirm dialog.
 
 Do not switch to `remote` appVersionSource here (that sync needs credentials). Do not run `eas build:version:*` from this tree.
 

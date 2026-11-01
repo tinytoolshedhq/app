@@ -20,6 +20,7 @@ export const PHASE = {
   IDLE: 'idle',
   STARTING: 'starting',
   RECORDING: 'recording',
+  PAUSED: 'paused',
   STOPPING: 'stopping',
   RELEASED: 'released',
 };
@@ -42,9 +43,19 @@ export function createRecorderLifecycle(initial = {}) {
     stopCount: 0,
     prepareCount: 0,
     releaseCount: 0,
+    pauseCount: 0,
+    resumeCount: 0,
+    stopRequested: false,
     lastPrepareOptions: null,
     chain: Promise.resolve(),
   };
+
+  function isStopOrReleasePendingOrDone() {
+    return state.stopRequested
+      || state.phase === PHASE.STOPPING
+      || state.phase === PHASE.RELEASED
+      || state.phase === PHASE.IDLE;
+  }
 
   function enqueue(fn) {
     const run = state.chain.then(fn, fn);
@@ -70,8 +81,14 @@ export function createRecorderLifecycle(initial = {}) {
 
   async function startInternal() {
     if (state.phase === PHASE.RELEASED) throw releasedError('start');
-    if (state.phase === PHASE.RECORDING || state.phase === PHASE.STARTING) {
+    state.stopRequested = false;
+    if (
+      state.phase === PHASE.RECORDING
+      || state.phase === PHASE.STARTING
+      || state.phase === PHASE.PAUSED
+    ) {
       await stopInternal();
+      state.stopRequested = false;
     }
     const rec = recorder();
     if (!rec || typeof rec.prepareToRecordAsync !== 'function') {
@@ -118,6 +135,14 @@ export function createRecorderLifecycle(initial = {}) {
     state.phase = PHASE.STOPPING;
     if (rec) {
       state.stopCount += 1;
+      // Pause leaves isRecording false; still stop before deleting the cache file.
+      if (!rec.isRecording && typeof rec.stop === 'function') {
+        try {
+          await rec.stop();
+        } catch {
+          // already stopped
+        }
+      }
       await stopAndDiscardCache(rec, deps.deleteAsync);
     }
     if (typeof deps.setAudioModeAsync === 'function') {
@@ -137,6 +162,43 @@ export function createRecorderLifecycle(initial = {}) {
     state.phase = PHASE.IDLE;
   }
 
+  async function pauseInternal() {
+    if (isStopOrReleasePendingOrDone()) return false;
+    if (state.phase !== PHASE.RECORDING) return false;
+    const rec = recorder();
+    if (!rec || typeof rec.pause !== 'function') return false;
+    try {
+      rec.pause();
+    } catch {
+      return false;
+    }
+    state.pauseCount += 1;
+    state.phase = PHASE.PAUSED;
+    return true;
+  }
+
+  async function resumeInternal() {
+    if (isStopOrReleasePendingOrDone()) return false;
+    if (state.phase !== PHASE.PAUSED) return false;
+    const rec = recorder();
+    if (!rec || typeof rec.record !== 'function') return false;
+    try {
+      rec.record();
+    } catch {
+      return false;
+    }
+    if (typeof deps.enableMeasurementMode === 'function') {
+      try {
+        await deps.enableMeasurementMode();
+      } catch {
+        // Expo Go / missing native module
+      }
+    }
+    state.resumeCount += 1;
+    state.phase = PHASE.RECORDING;
+    return true;
+  }
+
   async function releaseInternal() {
     if (state.phase === PHASE.RELEASED) return;
     await stopInternal();
@@ -147,14 +209,24 @@ export function createRecorderLifecycle(initial = {}) {
   const api = {
     bind,
     start: () => enqueue(() => startInternal()),
-    stop: () => enqueue(() => stopInternal()),
-    release: () => enqueue(() => releaseInternal()),
+    stop: () => {
+      state.stopRequested = true;
+      return enqueue(() => stopInternal());
+    },
+    pause: () => enqueue(() => pauseInternal()),
+    resume: () => enqueue(() => resumeInternal()),
+    release: () => {
+      state.stopRequested = true;
+      return enqueue(() => releaseInternal());
+    },
     getPhase: () => state.phase,
     isRecording: () => state.phase === PHASE.RECORDING,
     isReleased: () => state.phase === PHASE.RELEASED,
     getStopCount: () => state.stopCount,
     getPrepareCount: () => state.prepareCount,
     getReleaseCount: () => state.releaseCount,
+    getPauseCount: () => state.pauseCount,
+    getResumeCount: () => state.resumeCount,
     getLastPrepareOptions: () => state.lastPrepareOptions,
     getStateForTests: () => ({ ...state }),
   };

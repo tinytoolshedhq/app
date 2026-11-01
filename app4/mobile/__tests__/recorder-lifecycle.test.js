@@ -137,4 +137,63 @@ describe('recorder lifecycle', () => {
     expect(last).toBeTruthy();
     expect(last.isMeteringEnabled).toBe(true);
   });
+
+  it('serializes background pause/resume with a concurrent Stop so resume is a no-op', async () => {
+    const { recorder, life } = setup();
+    await life.start();
+    expect(life.getPhase()).toBe(PHASE.RECORDING);
+    const pauseP = life.pause();
+    const stopP = life.stop();
+    const resumeP = life.resume();
+    const [, , resumed] = await Promise.all([pauseP, stopP, resumeP]);
+    expect(resumed).toBe(false);
+    expect(life.getPhase()).toBe(PHASE.IDLE);
+    expect(life.isReleased()).toBe(false);
+    expect(recorder.getState().state).toBe('stopped');
+    expect(recorder.getState().released).toBe(false);
+    expect(life.getStateForTests().stopRequested).toBe(true);
+    await life.start();
+    expect(life.getPhase()).toBe(PHASE.RECORDING);
+    expect(recorder.prepareToRecordAsync).toHaveBeenLastCalledWith(RECORDING_OPTIONS);
+    expect(recorder.getState().state).toBe('recording');
+    await life.stop();
+  });
+
+  it('survives interruption (pause) then Stop then Start', async () => {
+    const { recorder, life, enableMeasurementMode } = setup();
+    await life.start();
+    const didPause = await life.pause();
+    expect(didPause).toBe(true);
+    expect(life.getPhase()).toBe(PHASE.PAUSED);
+    expect(recorder.getState().state).toBe('paused');
+    const resumeWhileStopping = life.resume();
+    await life.stop();
+    expect(await resumeWhileStopping).toBe(false);
+    expect(life.getPhase()).toBe(PHASE.IDLE);
+    expect(recorder.getState().state).toBe('stopped');
+    expect(recorder.getState().fileDeleted).toBe(true);
+    await life.start();
+    expect(life.getPhase()).toBe(PHASE.RECORDING);
+    expect(recorder.prepareToRecordAsync).toHaveBeenCalledTimes(2);
+    recorder.prepareToRecordAsync.mock.calls.forEach((args) => {
+      expect(args[0]).toEqual(RECORDING_OPTIONS);
+    });
+    expect(enableMeasurementMode).toHaveBeenCalledTimes(2);
+    expect(recorder.getState().released).toBe(false);
+    await life.stop();
+  });
+
+  it('pause and resume no-op after stop or release', async () => {
+    const { recorder, life } = setup();
+    await life.start();
+    await life.stop();
+    expect(await life.pause()).toBe(false);
+    expect(await life.resume()).toBe(false);
+    expect(recorder.pause).toHaveBeenCalledTimes(0);
+    await life.start();
+    await life.release();
+    expect(await life.pause()).toBe(false);
+    expect(await life.resume()).toBe(false);
+    expect(life.isReleased()).toBe(true);
+  });
 });

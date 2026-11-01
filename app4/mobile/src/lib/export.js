@@ -55,14 +55,41 @@ export function csvEscape(value) {
   return s;
 }
 
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+/** Local wall time as YYYY-MM-DD HH:mm:ss (readable, not UTC ISO). */
+export function formatCsvDate(value) {
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return value == null ? '' : String(value);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+
+/** durationMs → seconds string (trim trailing zeros). */
+export function formatCsvDurationSeconds(durationMs) {
+  const ms = Number(durationMs);
+  const s = Number.isFinite(ms) ? Math.max(0, ms) / 1000 : 0;
+  return String(Number(s.toFixed(3)));
+}
+
 export function recordsToCsv(list) {
   const rows = Array.isArray(list) ? list : [];
-  const header = ['createdAt', 'durationMs', 'current', 'max', 'avg', 'min', 'calibration', 'offset'];
+  const header = [
+    t('export.csvCreatedAt'),
+    t('export.csvDuration'),
+    t('export.csvCurrent'),
+    t('export.csvMax'),
+    t('export.csvAvg'),
+    t('export.csvMin'),
+    t('export.csvCalibration'),
+    t('export.csvOffset'),
+  ];
   const lines = [header.join(',')];
   for (const r of rows) {
     lines.push([
-      csvEscape(r.createdAt),
-      csvEscape(r.durationMs),
+      csvEscape(formatCsvDate(r.createdAt)),
+      csvEscape(formatCsvDurationSeconds(r.durationMs)),
       csvEscape(formatDb(r.current)),
       csvEscape(formatDb(r.max)),
       csvEscape(formatDb(r.avg)),

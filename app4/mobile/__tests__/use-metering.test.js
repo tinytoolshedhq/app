@@ -1,5 +1,6 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
+import { AppState } from 'react-native';
 import {
   requestRecordingPermissionsAsync,
   useAudioRecorder,
@@ -40,7 +41,9 @@ function createStableRecorder() {
       if (released) throw new Error('double release');
       if (state === 'recording' || state === 'paused') state = 'stopped';
     }),
-    pause: jest.fn(),
+    pause: jest.fn(() => {
+      if (state === 'recording') state = 'paused';
+    }),
     markDeleted() {
       fileDeleted = true;
     },
@@ -62,11 +65,17 @@ function HookProbe({ isPro = false, onDurationLimit, onReady }) {
 
 describe('useMetering start/stop cycles', () => {
   let recorder;
+  let appStateHandler;
 
   beforeEach(() => {
     recorder = createStableRecorder();
     useAudioRecorder.mockReturnValue(recorder);
     requestRecordingPermissionsAsync.mockResolvedValue({ granted: true, status: 'granted' });
+    appStateHandler = null;
+    jest.spyOn(AppState, 'addEventListener').mockImplementation((type, cb) => {
+      if (type === 'change') appStateHandler = cb;
+      return { remove: jest.fn() };
+    });
     const FS = require('expo-file-system');
     const legacy = require('expo-file-system/legacy');
     const del = jest.fn(async (uri) => {
@@ -74,6 +83,10 @@ describe('useMetering start/stop cycles', () => {
     });
     FS.deleteAsync = del;
     legacy.deleteAsync = del;
+  });
+
+  afterEach(() => {
+    AppState.addEventListener.mockRestore?.();
   });
 
   async function mount(props = {}) {
@@ -151,5 +164,74 @@ describe('useMetering start/stop cycles', () => {
     });
     await probe.unmount();
     spy.mockRestore();
+  });
+
+  it('routes background→foreground through the queue when Stop is tapped concurrently', async () => {
+    const probe = await mount();
+    await act(async () => {
+      await probe.get().start();
+    });
+    expect(probe.get().running).toBe(true);
+    await act(async () => {
+      appStateHandler('background');
+      await Promise.resolve();
+    });
+    expect(recorder.pause).toHaveBeenCalled();
+    await act(async () => {
+      const stopP = probe.get().stop();
+      appStateHandler('active');
+      await stopP;
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(probe.get().running).toBe(false);
+    expect(recorder.getMeta().state).toBe('stopped');
+    expect(recorder.getMeta().released).toBe(false);
+    let ok;
+    await act(async () => {
+      ok = await probe.get().start();
+    });
+    expect(ok).toBe(true);
+    expect(probe.get().running).toBe(true);
+    expect(recorder.prepareToRecordAsync).toHaveBeenLastCalledWith(RECORDING_OPTIONS);
+    await act(async () => {
+      await probe.get().stop();
+    });
+    await probe.unmount();
+  });
+
+  it('survives an interruption then Stop then Start', async () => {
+    const probe = await mount();
+    await act(async () => {
+      await probe.get().start();
+    });
+    await act(async () => {
+      appStateHandler('inactive');
+      await Promise.resolve();
+      appStateHandler('background');
+      await Promise.resolve();
+    });
+    expect(recorder.pause).toHaveBeenCalled();
+    expect(recorder.getMeta().state).toBe('paused');
+    await act(async () => {
+      await probe.get().stop();
+    });
+    expect(probe.get().running).toBe(false);
+    expect(recorder.getMeta().state).toBe('stopped');
+    expect(recorder.getMeta().released).toBe(false);
+    let ok;
+    await act(async () => {
+      ok = await probe.get().start();
+    });
+    expect(ok).toBe(true);
+    expect(probe.get().running).toBe(true);
+    expect(recorder.prepareToRecordAsync).toHaveBeenCalledTimes(2);
+    recorder.prepareToRecordAsync.mock.calls.forEach((args) => {
+      expect(args[0]).toEqual(RECORDING_OPTIONS);
+    });
+    await act(async () => {
+      await probe.get().stop();
+    });
+    await probe.unmount();
   });
 });

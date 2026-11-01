@@ -60,6 +60,7 @@ describe('EAS identifiers and Expo Go constraints', () => {
     expect(app.expo.android.blockedPermissions).toEqual([
       'android.permission.READ_MEDIA_IMAGES',
       'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.READ_MEDIA_VISUAL_USER_SELECTED',
     ]);
   });
 
@@ -106,7 +107,9 @@ describe('EAS identifiers and Expo Go constraints', () => {
     expect(hook).toMatch(/useAudioRecorder\(RECORDING_OPTIONS\)/);
     expect(hook).toMatch(/useAudioRecorderState/);
     expect(hook).toMatch(/AppState\.addEventListener/);
-    expect(hook).toMatch(/recorder\.pause\(/);
+    expect(hook).toMatch(/lifeRef\.current\.pause\(/);
+    expect(hook).toMatch(/lifeRef\.current\.resume\(/);
+    expect(hook).not.toMatch(/recorder\.pause\(/);
     expect(hook).toMatch(/isUsableMeteringSample/);
     expect(hook).toMatch(/requestRecordingPermissionsAsync/);
     expect(hook).toMatch(/tickMeter\(meterRef\.current, sample\)/);

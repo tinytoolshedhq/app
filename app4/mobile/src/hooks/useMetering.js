@@ -166,31 +166,30 @@ export function useMetering(offset, { isPro = false, onDurationLimit } = {}) {
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
       if (next !== 'active') {
-        if (runningRef.current && recorder.isRecording) {
-          try {
-            recorder.pause();
-            pausedByBackgroundRef.current = true;
-            if (startedAtRef.current) {
-              elapsedPausedRef.current += Date.now() - startedAtRef.current;
-              startedAtRef.current = null;
-            }
-          } catch {
-            // pause may throw if already stopped
-          }
+        if (!runningRef.current) return;
+        if (startedAtRef.current) {
+          elapsedPausedRef.current += Date.now() - startedAtRef.current;
+          startedAtRef.current = null;
         }
+        pausedByBackgroundRef.current = true;
+        lifeRef.current.bind({ recorder });
+        // Same serialized queue as start/stop/release. No-ops if stop is pending.
+        lifeRef.current.pause().catch(() => {});
         return;
       }
-      if (pausedByBackgroundRef.current && runningRef.current) {
-        try {
-          recorder.record();
+      if (!pausedByBackgroundRef.current || !runningRef.current) return;
+      lifeRef.current.bind({ recorder });
+      lifeRef.current.resume().then((did) => {
+        if (!did || !runningRef.current) {
           pausedByBackgroundRef.current = false;
-          startedAtRef.current = Date.now();
-          setStartedAt(startedAtRef.current);
-          enableMeasurementMode().catch(() => {});
-        } catch {
-          pausedByBackgroundRef.current = false;
+          return;
         }
-      }
+        pausedByBackgroundRef.current = false;
+        startedAtRef.current = Date.now();
+        setStartedAt(startedAtRef.current);
+      }).catch(() => {
+        pausedByBackgroundRef.current = false;
+      });
     });
     return () => sub.remove();
   }, [recorder]);

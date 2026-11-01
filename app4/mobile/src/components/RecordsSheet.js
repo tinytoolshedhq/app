@@ -35,8 +35,14 @@ export default function RecordsSheet({
     }
     try {
       let result;
-      if (kind === 'csv') result = await shareCsv(records);
-      else if (kind === 'pdf') result = await sharePdf(records);
+      if (kind === 'csv') {
+        await new Promise((resolve) => {
+          Alert.alert(t('export.csv'), t('export.csvHint'), [
+            { text: t('common.ok'), onPress: () => resolve() },
+          ]);
+        });
+        result = await shareCsv(records);
+      } else if (kind === 'pdf') result = await sharePdf(records);
       else result = await shareImage(exportRef.current);
       if (!result?.outcome) return;
       Alert.alert(t('common.ok'), mapExportSuccess(result.outcome));
@@ -91,6 +97,9 @@ export default function RecordsSheet({
               <Text style={styles.link}>{t('export.pdf')}</Text>
             </Pressable>
           </View>
+          {records.length > 0 ? (
+            <Text style={styles.swipeHint}>{t('records.swipeHint')}</Text>
+          ) : null}
           <ScrollView>
             {records.length === 0 ? (
               <Text style={styles.empty}>{t('records.empty')}</Text>
@@ -142,6 +151,7 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: '600', color: '#1C1A17', marginBottom: 4 },
   hint: { fontSize: 13, color: '#8A837C', marginBottom: 8 },
+  swipeHint: { fontSize: 12, color: '#8A837C', marginBottom: 8 },
   exportRow: { flexDirection: 'row', gap: 16, marginBottom: 12 },
   link: { color: '#3F8A57', fontSize: 16, fontWeight: '600' },
   empty: { fontSize: 15, color: '#6B6560', paddingVertical: 16 },

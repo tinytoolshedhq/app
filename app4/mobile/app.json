@@ -31,7 +31,8 @@
       ],
       "blockedPermissions": [
         "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_EXTERNAL_STORAGE"
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#163A3A",

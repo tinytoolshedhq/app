@@ -29,11 +29,15 @@ describe('export outcomes', () => {
   it('maps success copy to what actually happened', () => {
     expect(mapExportSuccess('saved_photos')).toBe(t('export.savedPhotos'));
     expect(mapExportSuccess('csv_shared')).toBe(t('export.csvShared'));
+    expect(mapExportSuccess('csv_shared')).toBe('CSV exported.');
     expect(mapExportSuccess('shared')).toBe(t('export.sharedImage'));
+    expect(t('export.csvHint')).toMatch(/Save to Files/);
     setLocale('zh-Hant');
     expect(mapExportSuccess('saved_photos')).toBe('已儲存到相簿');
-    expect(mapExportSuccess('csv_shared')).toMatch(/分享選單/);
-    expect(mapExportSuccess('csv_shared')).toMatch(/儲存到檔案/);
+    expect(mapExportSuccess('csv_shared')).toBe('已匯出 CSV。');
+    expect(mapExportSuccess('csv_shared')).not.toMatch(/分享選單/);
+    expect(t('export.csvHint')).toMatch(/分享選單/);
+    expect(t('export.csvHint')).toMatch(/儲存到檔案/);
   });
 
   it('treats only the real share-dismiss codes as cancel, not a /cancel/ message', () => {
@@ -104,5 +108,8 @@ describe('RecordsSheet capture target', () => {
     expect(src).not.toMatch(/notePlaceholder/);
     expect(src).not.toMatch(/TextInput/);
     expect(src).toMatch(/records\.deleteConfirm/);
+    expect(src).toMatch(/records\.swipeHint/);
+    expect(src).toMatch(/export\.csvHint/);
+    expect(src).toMatch(/Alert\.alert\(t\('export\.csv'\), t\('export\.csvHint'\)/);
   });
 });

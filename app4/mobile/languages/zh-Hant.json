@@ -61,7 +61,8 @@
     "delete": "刪除",
     "deleteTitle": "刪除紀錄",
     "deleteConfirm": "要刪除這筆紀錄嗎？",
-    "latest": "最多 10 筆"
+    "latest": "最多 10 筆",
+    "swipeHint": "左滑可刪除"
   },
   "export": {
     "title": "匯出",
@@ -74,7 +75,16 @@
     "fail": "無法匯出。",
     "savedPhotos": "已儲存到相簿",
     "sharedImage": "已開啟分享選單。請選擇「儲存到照片」或其他 App。若取消，不會儲存。",
-    "csvShared": "CSV 已準備好。請在分享選單選擇「儲存到檔案」或其他 App，檔案會存在你選的位置。若取消，不會儲存。",
+    "csvHint": "接下來請在分享選單選擇「儲存到檔案」或其他 App。",
+    "csvShared": "已匯出 CSV。",
+    "csvCreatedAt": "建立時間",
+    "csvDuration": "時長（秒）",
+    "csvCurrent": "目前",
+    "csvMax": "最大",
+    "csvAvg": "平均",
+    "csvMin": "最小",
+    "csvCalibration": "校準",
+    "csvOffset": "偏移",
     "cancelled": "已取消匯出。",
     "permissionDenied": "沒有相簿權限，圖片沒有儲存。"
   },

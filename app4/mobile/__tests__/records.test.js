@@ -2,7 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveRecord, getRecords, initRecords, resetRecordsForTests } from '../src/data/records';
 import { setProUnlocked, clearProUnlocked } from '../src/lib/entitlements';
 import { FREE_RECORD_LIMIT } from '../src/lib/gating';
-import { csvEscape, recordsToCsv, recordsToHtml } from '../src/lib/export';
+import { csvEscape, formatCsvDate, formatCsvDurationSeconds, recordsToCsv, recordsToHtml } from '../src/lib/export';
+import { setLocale } from '../src/i18n';
 
 describe('records repository', () => {
   beforeEach(async () => {
@@ -51,6 +52,7 @@ describe('records repository', () => {
   });
 
   it('builds a CSV without a notes column or dB(A)', () => {
+    setLocale('en');
     const csv = recordsToCsv([{
       createdAt: '2026-01-01T00:00:00.000Z',
       durationMs: 1000,
@@ -62,7 +64,9 @@ describe('records repository', () => {
       calibrationName: 'home',
       offset: 2,
     }]);
-    expect(csv).toMatch(/current,max,avg,min,calibration,offset/);
+    expect(csv).toMatch(/Current,Max,Avg,Min,Calibration,Offset/);
+    expect(csv).toMatch(/Duration \(s\)/);
+    expect(csv).not.toMatch(/durationMs/);
     expect(csv).not.toMatch(/,note,/);
     expect(csv).not.toMatch(/hi, there/);
     expect(csv).toMatch(/60/);
@@ -101,10 +105,38 @@ describe('records repository', () => {
       calibrationName: '-hello',
       offset: -2,
     }]);
-    expect(csv).toMatch(/,1000,/);
+    expect(csv).toMatch(/,1,/);
     expect(csv).toMatch(/,-2\n/);
     expect(csv).not.toMatch(/'-2/);
     expect(csv).not.toContain("'=SUM(A1)");
     expect(csv).toContain("'-hello");
+  });
+
+  it('uses localized human-readable headers, duration in seconds, and local dates', () => {
+    const row = {
+      createdAt: '2026-06-15T13:04:05.000Z',
+      durationMs: 1500,
+      current: 60,
+      max: 70,
+      avg: 62,
+      min: 40,
+      calibrationName: 'home',
+      offset: 0,
+    };
+    expect(formatCsvDurationSeconds(1500)).toBe('1.5');
+    expect(formatCsvDurationSeconds(1000)).toBe('1');
+    expect(formatCsvDate(row.createdAt)).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+    setLocale('en');
+    const en = recordsToCsv([row]);
+    expect(en.split('\n')[0]).toBe('Created,Duration (s),Current,Max,Avg,Min,Calibration,Offset');
+    expect(en).toMatch(/,1\.5,/);
+    expect(en).toMatch(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
+    expect(en).not.toMatch(/2026-06-15T13:04:05/);
+    expect(en).not.toMatch(/durationMs|duration_s|createdAt/);
+    setLocale('zh-Hant');
+    const zh = recordsToCsv([row]);
+    expect(zh.split('\n')[0]).toBe('建立時間,時長（秒）,目前,最大,平均,最小,校準,偏移');
+    expect(zh).toMatch(/,1\.5,/);
+    setLocale('en');
   });
 });

@@ -24,12 +24,14 @@ describe('app4 store pages', () => {
     expect(privacy.toLowerCase()).toMatch(/estimate/);
     expect(privacy).toMatch(/系統分享面板/);
     expect(privacy).toMatch(/存進相簿（只新增，不讀取）/);
-    expect(privacy).toMatch(/若無法存入相簿會改用系統分享面板/);
+    expect(privacy).toMatch(/若相簿功能無法使用，會改用系統分享面板/);
+    expect(privacy).toMatch(/若你拒絕權限，則不會儲存/);
     expect(privacy).toMatch(/CSV、PDF 透過系統分享面板匯出/);
     expect(privacy).toMatch(/本 App 自己不會上傳/);
     expect(privacy.toLowerCase()).toMatch(/saves it to photos after you agree \(add only/);
     expect(privacy.toLowerCase()).toMatch(/does not read your library/);
-    expect(privacy.toLowerCase()).toMatch(/if it cannot save to photos, it uses the system share sheet/);
+    expect(privacy.toLowerCase()).toMatch(/if the photos feature is unavailable, it uses the system share sheet/);
+    expect(privacy.toLowerCase()).toMatch(/if you deny permission, nothing is saved/);
     expect(privacy.toLowerCase()).toMatch(/csv and pdf are exported via the system share sheet/);
     expect(privacy.toLowerCase()).toMatch(/uploads nothing/);
     expect(privacy).not.toMatch(/備註/);
