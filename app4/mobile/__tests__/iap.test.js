@@ -181,7 +181,7 @@ describe('iap flows', () => {
     const purchase = { productId: FULLPACK, transactionId: 'tx-restore' };
     iap.getAvailablePurchases.mockResolvedValue([purchase]);
     const r = await restoreProUnlock();
-    expect(r).toEqual({ ok: true, restored: true });
+    expect(r).toMatchObject({ ok: true, restored: true, message: t('iap.restored') });
     expect(await isProUnlocked()).toBe(true);
     expect(iap.getAvailablePurchases).toHaveBeenCalled();
     expect(iap.finishTransaction).toHaveBeenCalledWith({
@@ -208,7 +208,82 @@ describe('iap flows', () => {
       purchase,
       isConsumable: false,
     });
-    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe('Purchases restored.');
+    expect(result.message).toBe(t('iap.restored'));
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/components/PaywallSheet.js'), 'utf8');
+    expect(paywall).toMatch(/if \(r\.ok && r\.restored\) \{[\s\S]*setPro\(true\)/);
+  });
+
+  it('already-owned + entitlement found on restore: ok, Pro unlocked, UI unlocks', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    const purchase = { productId: FULLPACK, transactionId: 'tx-owned-restore' };
+    let queries = 0;
+    iap.getAvailablePurchases.mockImplementation(async () => {
+      queries += 1;
+      if (queries === 1) {
+        const err = new Error('already owned');
+        err.code = 'E_ALREADY_OWNED';
+        throw err;
+      }
+      return [purchase];
+    });
+    const unlocked = [];
+    const unsub = subscribePro((v) => {
+      if (v) unlocked.push(true);
+    });
+    const r = await restoreProUnlock();
+    unsub();
+    expect(r.ok).toBe(true);
+    expect(r.restored).toBe(true);
+    expect(r.message).toBe(t('iap.restored'));
+    expect(r.error).toBeUndefined();
+    expect(await isProUnlocked()).toBe(true);
+    expect(unlocked.length).toBeGreaterThan(0);
+    expect(iap.finishTransaction).toHaveBeenCalledWith({
+      purchase,
+      isConsumable: false,
+    });
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/components/PaywallSheet.js'), 'utf8');
+    const settings = require('fs').readFileSync(require('path').join(__dirname, '../src/components/SettingsSheet.js'), 'utf8');
+    expect(paywall).toMatch(/if \(r\.ok && r\.restored !== false\) \{[\s\S]*setPro\(true\)/);
+    expect(settings).toMatch(/if \(r\.ok && r\.restored !== false\)/);
+  });
+
+  it('already-owned + entitlement not found: ok false, no unlock, restore-again message', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    process.env.EXPO_PUBLIC_EAS_BUILD_PROFILE = 'production';
+    iap.requestPurchase.mockRejectedValueOnce({
+      code: 'E_ALREADY_OWNED',
+      message: 'already owned',
+    });
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    const buy = await purchaseProUnlock();
+    expect(buy.ok).toBe(false);
+    expect(buy.restored).toBe(false);
+    expect(buy.error).toBe(t('iap.restoreAgain'));
+    expect(buy.error).not.toBe(t('iap.restored'));
+    expect(await isProUnlocked()).toBe(false);
+
+    iap.restorePurchases.mockRejectedValueOnce({
+      code: 'E_ALREADY_OWNED',
+      message: 'already owned',
+    });
+    iap.getAvailablePurchases.mockResolvedValue([]);
+    iap.currentEntitlementIOS.mockResolvedValue(null);
+    const restore = await restoreProUnlock();
+    expect(restore.ok).toBe(false);
+    expect(restore.restored).toBe(false);
+    expect(restore.error).toBe(t('iap.restoreAgain'));
+    expect(restore.error).toBe("Couldn’t confirm this purchase. Tap Restore Purchases and try again.");
+    expect(restore.error).not.toBe(t('iap.restored'));
+    expect(await isProUnlocked()).toBe(false);
+    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restoreAgain'));
+    expect(mapRestoreError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restoreAgain'));
+    setLocale('zh-Hant');
+    expect(t('iap.restoreAgain')).toBe('還確認不到這筆購買，請再點一次「恢復購買」。');
+    setLocale('en');
   });
 
   it('finishes unfinished Full Pack transactions found on launch', async () => {

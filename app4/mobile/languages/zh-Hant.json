@@ -105,7 +105,8 @@
     "restore": "恢復",
     "restored": "已恢復購買。",
     "nothingToRestore": "找不到先前的購買。",
-    "cannotRestore": "這裡無法恢復。"
+    "cannotRestore": "這裡無法恢復。",
+    "restoreAgain": "還確認不到這筆購買，請再點一次「恢復購買」。"
   },
   "common": {
     "fail": "沒做成。",

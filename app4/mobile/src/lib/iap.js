@@ -282,7 +282,8 @@ async function readCurrentEntitlements(iap) {
       }
     }
     return { ok: true, purchases: list };
-  } catch {
+  } catch (e) {
+    if (isAlreadyOwnedError(e)) throw e;
     return { ok: false, purchases: [] };
   }
 }
@@ -508,11 +509,12 @@ async function tryNativeRestore() {
   return withTimeout((async () => {
     await initConnection();
     try {
+      let sawAlreadyOwned = false;
       if (typeof iap.restorePurchases === 'function') {
         try {
           await iap.restorePurchases();
-        } catch {
-          // continue to query
+        } catch (e) {
+          if (isAlreadyOwnedError(e)) sawAlreadyOwned = true;
         }
       }
       const { purchases } = await readCurrentEntitlements(iap);
@@ -520,7 +522,15 @@ async function tryNativeRestore() {
       if (purchases.some((p) => isEntitledPurchase(p))) {
         await setProUnlocked(true);
         await setEmptyPurchaseStreak(0);
-        return { ok: true, restored: true };
+        return { ok: true, restored: true, message: t('iap.restored') };
+      }
+      if (sawAlreadyOwned) {
+        return {
+          ok: false,
+          restored: false,
+          alreadyOwned: true,
+          error: t('iap.restoreAgain'),
+        };
       }
       return { ok: true, restored: false };
     } finally {
@@ -529,20 +539,27 @@ async function tryNativeRestore() {
   })(), iapActionConfig.timeoutMs, timedOut);
 }
 
+/** Already-owned: refresh entitlements. Grant only if Full Pack is actually present. */
 async function restoreAlreadyOwned() {
-  const restored = await tryNativeRestore();
-  if (restored.ok && restored.restored) {
-    return { ok: true, restored: true };
+  try {
+    const restored = await tryNativeRestore();
+    if (restored.ok && restored.restored) {
+      return { ok: true, restored: true, message: t('iap.restored') };
+    }
+    if (restored.timedOut) return restored;
+    return {
+      ok: false,
+      restored: false,
+      error: restored.error || t('iap.restoreAgain'),
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      restored: false,
+      timedOut: e?.timedOut === true,
+      error: mapRestoreError(e),
+    };
   }
-  if (restored.timedOut) return restored;
-  if (await isProUnlocked()) {
-    return { ok: true, restored: true };
-  }
-  return {
-    ok: false,
-    restored: false,
-    error: restored.error || t('iap.nothingToRestore'),
-  };
 }
 
 async function tryNativePurchase() {
@@ -673,11 +690,25 @@ export async function restoreProUnlock() {
     const native = await tryNativeRestore();
     if (native.timedOut) return native;
     if (native.ok && native.restored) return native;
+    if (native.alreadyOwned) {
+      return {
+        ok: false,
+        restored: false,
+        error: native.error || t('iap.restoreAgain'),
+      };
+    }
     if (await isProUnlocked()) {
       return { ok: true, restored: true };
     }
     if (native.ok) return native;
   } catch (e) {
+    if (isAlreadyOwnedError(e)) {
+      try {
+        return await restoreAlreadyOwned();
+      } catch (restoreErr) {
+        return { ok: false, restored: false, error: mapRestoreError(restoreErr) };
+      }
+    }
     if (await isProUnlocked()) {
       return { ok: true, restored: true };
     }

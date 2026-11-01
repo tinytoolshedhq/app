@@ -105,7 +105,8 @@
     "restore": "Restore",
     "restored": "Purchases restored.",
     "nothingToRestore": "No previous purchase found.",
-    "cannotRestore": "Can’t restore here."
+    "cannotRestore": "Can’t restore here.",
+    "restoreAgain": "Couldn’t confirm this purchase. Tap Restore Purchases and try again."
   },
   "common": {
     "fail": "Couldn’t do that.",

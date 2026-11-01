@@ -29,7 +29,8 @@ describe('localized error mapping', () => {
     setLocale('en');
     expect(mapIapError({ code: 'IAP_UNAVAILABLE', message: 'IAP unavailable' })).toBe(t('iap.unavailable'));
     expect(mapIapError({ code: 'E_USER_CANCELLED' })).toBe(t('iap.cancelled'));
-    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restored'));
+    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restoreAgain'));
+    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).not.toBe(t('iap.restored'));
     expect(mapIapError({ code: 'E_DEFERRED' })).toBe(t('iap.pending'));
     expect(mapIapError({ timedOut: true })).toBe(t('iap.timeout'));
     expect(mapIapError({ message: 'boom' })).toBe(t('iap.buyFail'));
@@ -40,7 +41,7 @@ describe('localized error mapping', () => {
     setLocale('zh-Hant');
     expect(mapIapError({ code: 'IAP_UNAVAILABLE' })).toBe(t('iap.unavailable'));
     expect(mapIapError({ timedOut: true })).toBe(t('iap.timeout'));
-    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restored'));
+    expect(mapIapError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restoreAgain'));
     expect(mapIapError(new Error('IAP unavailable'))).not.toMatch(/IAP unavailable/i);
   });
 

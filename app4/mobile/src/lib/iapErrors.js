@@ -33,7 +33,7 @@ export function isTimeoutError(error) {
  */
 export function mapIapError(error) {
   if (isUserCancelledError(error)) return t('iap.cancelled');
-  if (isAlreadyOwnedError(error)) return t('iap.restored');
+  if (isAlreadyOwnedError(error)) return t('iap.restoreAgain');
   if (isDeferredError(error)) return t('iap.pending');
   if (isTimeoutError(error)) return t('iap.timeout');
   if (isUnavailableError(error)) return t('iap.unavailable');
@@ -43,7 +43,7 @@ export function mapIapError(error) {
 /** Restore failures use the restore-specific string, not “can’t purchase here”. */
 export function mapRestoreError(error) {
   if (isUserCancelledError(error)) return t('iap.cancelled');
-  if (isAlreadyOwnedError(error)) return t('iap.restored');
+  if (isAlreadyOwnedError(error)) return t('iap.restoreAgain');
   if (isDeferredError(error)) return t('iap.pending');
   if (isTimeoutError(error)) return t('iap.timeout');
   return t('iap.cannotRestore');
