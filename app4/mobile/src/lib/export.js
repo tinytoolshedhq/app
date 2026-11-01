@@ -103,15 +103,13 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+/** Share-sheet dismiss only. expo-sharing iOS/Android resolve on dismiss;
+ * web `navigator.share` rejects with DOM AbortError. Do not match /cancel/. */
 export function isShareCancelled(error) {
   if (!error) return false;
   const code = String(error.code || '');
-  const msg = String(error.message || '').toLowerCase();
-  return (
-    code === 'EXPORT_CANCELLED'
-    || code === 'ERR_SHARING_CANCELLED'
-    || /cancel/.test(msg)
-  );
+  if (code === 'EXPORT_CANCELLED' || code === 'ERR_SHARING_CANCELLED') return true;
+  return error.name === 'AbortError';
 }
 
 export function isPhotoPermissionDenied(error) {
@@ -154,7 +152,7 @@ export async function saveImageToPhotos(uri) {
   try {
     perm = await ML.requestPermissionsAsync(true);
   } catch (error) {
-    if (isShareCancelled(error) || isPhotoPermissionDenied(error)) {
+    if (isPhotoPermissionDenied(error)) {
       const err = new Error('PHOTO_PERMISSION');
       err.code = 'E_PHOTO_PERM';
       throw err;
@@ -213,17 +211,32 @@ export async function captureExportImage(viewRef) {
   return capture(viewRef, { format: 'png', quality: 1, result: 'tmpfile' });
 }
 
+async function discardTempExportUri(uri) {
+  const FS = loadFileSystem();
+  if (!uri || typeof FS?.deleteAsync !== 'function') return false;
+  try {
+    await FS.deleteAsync(uri, { idempotent: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function shareImage(viewRef) {
   const uri = await captureExportImage(viewRef);
   try {
-    const saved = await saveImageToPhotos(uri);
-    if (saved.outcome === 'saved_photos') return { uri, outcome: 'saved_photos' };
-  } catch (error) {
-    if (isPhotoPermissionDenied(error) || error?.code === 'E_PHOTO_PERM') throw error;
-    // Media library missing / failed: fall through to the share sheet.
+    try {
+      const saved = await saveImageToPhotos(uri);
+      if (saved.outcome === 'saved_photos') return { uri, outcome: 'saved_photos' };
+    } catch (error) {
+      if (isPhotoPermissionDenied(error) || error?.code === 'E_PHOTO_PERM') throw error;
+      // Media library missing / failed: fall through to the share sheet.
+    }
+    await shareFile(uri, 'image/png');
+    return { uri, outcome: 'shared' };
+  } finally {
+    await discardTempExportUri(uri);
   }
-  await shareFile(uri, 'image/png');
-  return { uri, outcome: 'shared' };
 }
 
 export function mapExportError(error) {

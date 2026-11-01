@@ -36,9 +36,12 @@ describe('export outcomes', () => {
     expect(mapExportSuccess('csv_shared')).toMatch(/儲存到檔案/);
   });
 
-  it('does not treat cancel or photo denial as a generic failure', () => {
+  it('treats only the real share-dismiss codes as cancel, not a /cancel/ message', () => {
     expect(isShareCancelled({ code: 'EXPORT_CANCELLED' })).toBe(true);
-    expect(isShareCancelled({ message: 'User cancelled share' })).toBe(true);
+    expect(isShareCancelled({ code: 'ERR_SHARING_CANCELLED' })).toBe(true);
+    expect(isShareCancelled({ name: 'AbortError', message: 'Share canceled' })).toBe(true);
+    expect(isShareCancelled({ message: 'User cancelled share' })).toBe(false);
+    expect(isShareCancelled({ code: 'EXPORT_UNAVAILABLE', message: 'cancelled' })).toBe(false);
     expect(isPhotoPermissionDenied({ code: 'E_PHOTO_PERM' })).toBe(true);
     expect(mapExportError({ code: 'EXPORT_CANCELLED' })).toBe(t('export.cancelled'));
     expect(mapExportError({ code: 'E_PHOTO_PERM' })).toBe(t('export.permissionDenied'));
@@ -62,6 +65,21 @@ describe('export outcomes', () => {
     const result = await shareImage({ current: true });
     expect(result.outcome).toBe('shared');
     expect(Sharing.shareAsync).toHaveBeenCalled();
+  });
+
+  it('deletes the capture tmpfile after a Photos save', async () => {
+    const FS = require('expo-file-system/legacy');
+    FS.deleteAsync.mockClear();
+    await shareImage({ current: true });
+    expect(FS.deleteAsync).toHaveBeenCalledWith('file:///tmp/card.png', { idempotent: true });
+  });
+
+  it('deletes the capture tmpfile after permission denial', async () => {
+    MediaLibrary.requestPermissionsAsync.mockResolvedValue({ granted: false, status: 'denied' });
+    const FS = require('expo-file-system/legacy');
+    FS.deleteAsync.mockClear();
+    await expect(shareImage({ current: true })).rejects.toMatchObject({ code: 'E_PHOTO_PERM' });
+    expect(FS.deleteAsync).toHaveBeenCalledWith('file:///tmp/card.png', { idempotent: true });
   });
 
   it('does not report CSV success when the share sheet is cancelled', async () => {

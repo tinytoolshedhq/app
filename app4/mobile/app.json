@@ -29,6 +29,10 @@
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS"
       ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#163A3A",
         "foregroundImage": "./assets/icon.png"
@@ -71,7 +75,8 @@
         {
           "photosPermission": "This app does not access your photos. This text is required by a system component.",
           "savePhotosPermission": "Only used when you choose to save an exported image to your photo library.",
-          "isAccessMediaLocationEnabled": false
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": []
         }
       ]
     ],

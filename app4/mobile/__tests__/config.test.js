@@ -55,6 +55,12 @@ describe('EAS identifiers and Expo Go constraints', () => {
     expect(plist.NSPhotoLibraryAddUsageDescription).toBe(
       'Only used when you choose to save an exported image to your photo library.',
     );
+    const media = app.expo.plugins.find((p) => Array.isArray(p) && p[0] === 'expo-media-library');
+    expect(media[1].granularPermissions).toEqual([]);
+    expect(app.expo.android.blockedPermissions).toEqual([
+      'android.permission.READ_MEDIA_IMAGES',
+      'android.permission.READ_EXTERNAL_STORAGE',
+    ]);
   });
 
   it('ignores credentials.json', () => {
