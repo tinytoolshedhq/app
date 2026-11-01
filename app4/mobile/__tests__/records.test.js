@@ -59,7 +59,8 @@ describe('records repository', () => {
   it('prefixes a quote on CSV cells that start with formula characters', () => {
     expect(csvEscape('=SUM(A1)')).toBe("'=SUM(A1)");
     expect(csvEscape('+1+1')).toBe("'+1+1");
-    expect(csvEscape('-2')).toBe("'-2");
+    expect(csvEscape('-2')).toBe('-2');
+    expect(csvEscape('-hello')).toBe("'-hello");
     expect(csvEscape('@cmd')).toBe("'@cmd");
     expect(csvEscape('\tHYPERLINK')).toBe("'\tHYPERLINK");
     expect(csvEscape('\rCMD')).toBe("'\rCMD");
@@ -72,11 +73,14 @@ describe('records repository', () => {
       max: 70,
       avg: 62,
       min: 40,
-      note: '=HYPERLINK("http://evil")',
-      calibrationName: '+home',
-      offset: 2,
+      note: '=SUM(A1)',
+      calibrationName: '-hello',
+      offset: -2,
     }]);
-    expect(csv).toContain("\"'=HYPERLINK(\"\"http://evil\"\")\"");
-    expect(csv).toContain("'+home");
+    expect(csv).toMatch(/,1000,/);
+    expect(csv).toMatch(/,-2\n/);
+    expect(csv).not.toMatch(/'-2/);
+    expect(csv).toContain("'=SUM(A1)");
+    expect(csv).toContain("'-hello");
   });
 });

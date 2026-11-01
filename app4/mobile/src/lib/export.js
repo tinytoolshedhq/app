@@ -37,10 +37,12 @@ function loadViewShot() {
   }
 }
 
-/** Neutralize spreadsheet formula injection (=, +, -, @, tab, CR). */
+const PLAIN_NUMBER = /^-?\d+(\.\d+)?$/;
+
+/** Neutralize spreadsheet formula injection (=, +, -, @, tab, CR). Pure numbers stay numeric. */
 export function csvEscape(value) {
   let s = value == null ? '' : String(value);
-  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  if (!PLAIN_NUMBER.test(s) && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
