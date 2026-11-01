@@ -54,3 +54,9 @@ export function unavailableError() {
   err.code = 'IAP_UNAVAILABLE';
   return err;
 }
+
+/** Gentle title for restore-again; other failures keep the generic fail title. */
+export function iapFailureAlertTitle(error) {
+  if (error === t('iap.restoreAgain')) return t('settings.restore');
+  return t('common.fail');
+}

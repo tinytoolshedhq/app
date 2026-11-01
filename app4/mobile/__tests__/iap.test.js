@@ -39,7 +39,7 @@ import {
   setProUnlocked,
   subscribePro,
 } from '../src/lib/entitlements';
-import { mapIapError, mapRestoreError } from '../src/lib/iapErrors';
+import { mapIapError, mapRestoreError, iapFailureAlertTitle } from '../src/lib/iapErrors';
 import { setLocale, t } from '../src/i18n';
 
 const realEntitlementSleep = entitlementGrantConfig.sleep.bind(entitlementGrantConfig);
@@ -283,7 +283,32 @@ describe('iap flows', () => {
     expect(mapRestoreError({ code: 'E_ALREADY_OWNED' })).toBe(t('iap.restoreAgain'));
     setLocale('zh-Hant');
     expect(t('iap.restoreAgain')).toBe('還確認不到這筆購買，請再點一次「恢復購買」。');
+    expect(iapFailureAlertTitle(t('iap.restoreAgain'))).toBe('恢復購買');
     setLocale('en');
+    expect(iapFailureAlertTitle(t('iap.restoreAgain'))).toBe('Restore Purchases');
+    expect(iapFailureAlertTitle(t('iap.buyFail'))).toBe(t('common.fail'));
+    const paywall = require('fs').readFileSync(require('path').join(__dirname, '../src/components/PaywallSheet.js'), 'utf8');
+    const settings = require('fs').readFileSync(require('path').join(__dirname, '../src/components/SettingsSheet.js'), 'utf8');
+    expect(paywall).toMatch(/iapFailureAlertTitle\(buyError\)/);
+    expect(paywall).toMatch(/iapFailureAlertTitle\(r\.error\)/);
+    expect(settings).toMatch(/iapFailureAlertTitle\(r\.error\)/);
+  });
+
+  it('already-owned from getAvailablePurchases during grant fails closed', async () => {
+    const iap = require('expo-iap');
+    process.env.EXPO_PUBLIC_IAP_SIMULATE = '0';
+    iap.getAvailablePurchases.mockRejectedValue({
+      code: 'E_ALREADY_OWNED',
+      message: 'already owned',
+    });
+    iap.isTransactionVerifiedIOS.mockResolvedValue(true);
+    const granted = await grantFullpackPurchase({
+      productId: FULLPACK,
+      transactionId: 'tx-owned-grant-miss',
+    });
+    expect(granted).toBe(false);
+    expect(await isProUnlocked()).toBe(false);
+    expect(iap.finishTransaction).not.toHaveBeenCalled();
   });
 
   it('finishes unfinished Full Pack transactions found on launch', async () => {
