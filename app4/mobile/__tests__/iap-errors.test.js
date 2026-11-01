@@ -7,6 +7,7 @@ import {
   isUserCancelledError,
   mapIapError,
   mapRestoreError,
+  iapFailureAlertTitle,
 } from '../src/lib/iapErrors';
 
 describe('iap error classification', () => {
@@ -54,5 +55,18 @@ describe('localized error mapping', () => {
     setLocale('zh-Hant');
     expect(mapRestoreError({ code: 'IAP_UNAVAILABLE' })).toBe('這裡無法恢復。');
     expect(mapRestoreError({ code: 'IAP_UNAVAILABLE' })).not.toBe('這裡無法購買。');
+  });
+
+  it('uses a gentle Restore Purchases title only for restoreAgain', () => {
+    setLocale('en');
+    expect(iapFailureAlertTitle(t('iap.restoreAgain'))).toBe('Restore Purchases');
+    expect(iapFailureAlertTitle(t('iap.restoreAgain'))).toBe(t('settings.restore'));
+    expect(iapFailureAlertTitle(t('iap.buyFail'))).toBe(t('common.fail'));
+    expect(iapFailureAlertTitle(t('iap.cannotRestore'))).toBe(t('common.fail'));
+    expect(iapFailureAlertTitle(t('iap.unavailable'))).toBe(t('common.fail'));
+    setLocale('zh-Hant');
+    expect(iapFailureAlertTitle(t('iap.restoreAgain'))).toBe('恢復購買');
+    expect(iapFailureAlertTitle(t('iap.buyFail'))).toBe('沒做成。');
+    setLocale('en');
   });
 });

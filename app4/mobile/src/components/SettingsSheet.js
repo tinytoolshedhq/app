@@ -29,6 +29,7 @@ import {
   restoreProUnlock,
   runIapBusy,
 } from '../lib/iap';
+import { iapFailureAlertTitle } from '../lib/iapErrors';
 
 export default function SettingsSheet({
   visible,
@@ -71,7 +72,7 @@ export default function SettingsSheet({
         return;
       }
       if (r.error) {
-        Alert.alert(t('common.fail'), r.error);
+        Alert.alert(iapFailureAlertTitle(r.error), r.error);
         return;
       }
       Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));

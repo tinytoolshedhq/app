@@ -18,6 +18,7 @@ import {
   restoreProUnlock,
   runIapBusy,
 } from '../lib/iap';
+import { iapFailureAlertTitle } from '../lib/iapErrors';
 import { isProUnlocked, subscribePro } from '../lib/entitlements';
 
 const REASON_KEYS = {
@@ -98,7 +99,8 @@ export default function PaywallSheet({ visible, reason, onClose }) {
         return;
       }
       if (r.pending || r.cancelled) return;
-      Alert.alert(t('common.fail'), r.error || t('iap.buyFail'));
+      const buyError = r.error || t('iap.buyFail');
+      Alert.alert(iapFailureAlertTitle(buyError), buyError);
     } finally {
       endBusy();
     }
@@ -114,7 +116,7 @@ export default function PaywallSheet({ visible, reason, onClose }) {
         return;
       }
       if (r.error) {
-        Alert.alert(t('common.fail'), r.error);
+        Alert.alert(iapFailureAlertTitle(r.error), r.error);
         return;
       }
       Alert.alert(t('settings.restore'), t('iap.nothingToRestore'));

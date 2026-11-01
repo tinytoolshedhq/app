@@ -289,13 +289,18 @@ async function readCurrentEntitlements(iap) {
 }
 
 async function unlockFromEntitlements(iap) {
-  const { purchases } = await readCurrentEntitlements(iap);
-  if (purchases.some((p) => isEntitledPurchase(p))) {
-    await setProUnlocked(true);
-    await setEmptyPurchaseStreak(0);
-    return true;
+  try {
+    const { purchases } = await readCurrentEntitlements(iap);
+    if (purchases.some((p) => isEntitledPurchase(p))) {
+      await setProUnlocked(true);
+      await setEmptyPurchaseStreak(0);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    if (isAlreadyOwnedError(e)) return false;
+    throw e;
   }
-  return false;
 }
 
 async function finishIfPossible(iap, purchase) {
@@ -322,17 +327,29 @@ async function grantFullpackPurchaseBody(purchase) {
   const iap = loadIap();
   const verified = await verifyTransactionBestEffort(iap, purchase);
 
-  let granted = false;
-  if (await unlockFromEntitlements(iap)) granted = true;
+  try {
+    await readCurrentEntitlements(iap);
+  } catch (e) {
+    if (isAlreadyOwnedError(e)) return false;
+    throw e;
+  }
 
-  if (!granted) {
-    for (const ms of entitlementGrantConfig.retryDelaysMs) {
-      await entitlementGrantConfig.sleep(ms);
-      if (await unlockFromEntitlements(iap)) {
-        granted = true;
-        break;
+  let granted = false;
+  try {
+    if (await unlockFromEntitlements(iap)) granted = true;
+
+    if (!granted) {
+      for (const ms of entitlementGrantConfig.retryDelaysMs) {
+        await entitlementGrantConfig.sleep(ms);
+        if (await unlockFromEntitlements(iap)) {
+          granted = true;
+          break;
+        }
       }
     }
+  } catch (e) {
+    if (isAlreadyOwnedError(e)) return false;
+    throw e;
   }
 
   if (!granted && verified === true) {
