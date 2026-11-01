@@ -60,7 +60,7 @@ Purchases use `expo-iap`. After a successful buy the app grants Pro and then `fi
 - `ios.bundleIdentifier` / `android.package`: `com.tinytoolshed.decibelmeter`
 - Full Pack product id: `com.tinytoolshed.decibelmeter.fullpack`
 - `owner`: `leowang1105`; `extra.eas.projectId`: `117e579d-6aec-40ea-8e97-19bc314debcb`
-- `ios.buildNumber`: `"3"`; `version`: `1.1.0`. Production `autoIncrement` is on.
+- `ios.buildNumber`: `"3"`; `version`: `1.1.0`. Production `autoIncrement` is on. See `RELEASE.md`: last uploaded build is 3; keep local `appVersionSource` and commit the bumped number back via PR after each production build.
 - `eas.json` profiles: `development` (dev client), `preview` (iOS simulator, `IAP_SIMULATE=1`), `production` (`autoIncrement: true`, no simulate)
 - Do not put Apple team IDs, ASC app IDs, or credential paths in the repo. Do not run `eas build` / `eas submit` from this tree unless asked.
 
