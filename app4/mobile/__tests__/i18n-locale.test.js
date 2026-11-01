@@ -147,9 +147,10 @@ describe('copy', () => {
     expect(app.expo.locales.en).toBe('./languages/ios/en.json');
     expect(enIos.NSPhotoLibraryUsageDescription).toBe(app.expo.ios.infoPlist.NSPhotoLibraryUsageDescription);
     expect(enIos.NSPhotoLibraryAddUsageDescription).toBe(app.expo.ios.infoPlist.NSPhotoLibraryAddUsageDescription);
-    expect(zhIos.NSPhotoLibraryUsageDescription).toMatch(/不會使用你的照片/);
-    expect(zhIos.NSPhotoLibraryUsageDescription).toMatch(/系統元件/);
-    expect(zhIos.NSPhotoLibraryAddUsageDescription).toBe('只有在你選擇儲存匯出的圖片時，才會把圖片加入相簿。');
+    expect(zhIos.NSPhotoLibraryUsageDescription).toBe(
+      '用來在你選擇儲存時，把測量結果圖片存到相簿。App 不會讀取你現有的照片。',
+    );
+    expect(zhIos.NSPhotoLibraryAddUsageDescription).toBe('用來在你選擇儲存時，把測量結果圖片存到相簿。');
   });
 
   it('does not hardcode CJK in app source', () => {

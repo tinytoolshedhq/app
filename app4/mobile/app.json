@@ -19,8 +19,8 @@
         "CFBundleAllowMixedLocalizations": true,
         "ITSAppUsesNonExemptEncryption": false,
         "NSMicrophoneUsageDescription": "The microphone is needed to measure sound level on this device. A temporary recording is deleted right away. Nothing is saved or sent.",
-        "NSPhotoLibraryUsageDescription": "This app does not access your photos. This text is required by a system component.",
-        "NSPhotoLibraryAddUsageDescription": "Only used when you choose to save an exported image to your photo library."
+        "NSPhotoLibraryUsageDescription": "Used to save your measurement result images to your photo library when you choose to save them. The app does not read your existing photos.",
+        "NSPhotoLibraryAddUsageDescription": "Used to save your measurement result images to your photo library when you choose to save them."
       }
     },
     "android": {
@@ -74,8 +74,8 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "This app does not access your photos. This text is required by a system component.",
-          "savePhotosPermission": "Only used when you choose to save an exported image to your photo library.",
+          "photosPermission": "Used to save your measurement result images to your photo library when you choose to save them. The app does not read your existing photos.",
+          "savePhotosPermission": "Used to save your measurement result images to your photo library when you choose to save them.",
           "isAccessMediaLocationEnabled": false,
           "granularPermissions": []
         }

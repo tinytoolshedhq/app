@@ -50,12 +50,16 @@ describe('EAS identifiers and Expo Go constraints', () => {
 
   it('declares photo-library purpose strings so ITMS-90683 is not flagged', () => {
     const plist = app.expo.ios.infoPlist;
-    expect(plist.NSPhotoLibraryUsageDescription.toLowerCase()).toMatch(/does not access your photos/);
-    expect(plist.NSPhotoLibraryUsageDescription.toLowerCase()).toMatch(/required by a system component/);
+    expect(plist.NSPhotoLibraryUsageDescription).toBe(
+      'Used to save your measurement result images to your photo library when you choose to save them. The app does not read your existing photos.',
+    );
     expect(plist.NSPhotoLibraryAddUsageDescription).toBe(
-      'Only used when you choose to save an exported image to your photo library.',
+      'Used to save your measurement result images to your photo library when you choose to save them.',
     );
     const media = app.expo.plugins.find((p) => Array.isArray(p) && p[0] === 'expo-media-library');
+    expect(media[1].photosPermission).toBe(plist.NSPhotoLibraryUsageDescription);
+    expect(media[1].savePhotosPermission).toBe(plist.NSPhotoLibraryAddUsageDescription);
+    expect(media[1].isAccessMediaLocationEnabled).toBe(false);
     expect(media[1].granularPermissions).toEqual([]);
     expect(app.expo.android.blockedPermissions).toEqual([
       'android.permission.READ_MEDIA_IMAGES',
