@@ -26,14 +26,17 @@
 
 ## 職責
 - 可憐的碼農：程式修改、PR、Expo/EAS builds。
-- 亞洲小編／美洲小編／歐洲小編：各自負責的發文、回覆及已登入帳號操作。
+- 亞洲小編（editor-asia）：日本、南韓、台灣、泰國、越南。
+- 美洲小編（editor-americas）：美國、巴西。
+- 歐洲小編（editor-europe）：英國、德國、法國、義大利。
+- 三區統一經營 X、Threads、Instagram，負責所屬市場的內容、發文與回覆；完整分工見 [社群分工表](https://github.com/tinytoolshedhqOrg/tinytoolshed-backup/blob/main/marketing/social/regions.md)。
 - 黑麻麻：確有跨 bot 協調需求時，透過上述任務檔流程協調。
 - 其他 bot：只處理各自職責內的任務。
 - 胖嘟嘟阿姨、漏洞大師：預定移除，不再建立新任務或審核依賴。此文件不會刪除平台上的 bot。
 
 ## 共享位置
 - 本 repo `shared/`：短期任務、草稿、排程與結果。
-- `tinytoolshedhq/tinytoolshed-backup/shared/`：長期策略及筆記。只在任務需要時讀取；本次未同步修改該 repo。
+- `tinytoolshedhqOrg/tinytoolshed-backup/`：長期策略及筆記；社群分工以 `marketing/social/regions.md` 為準，只在任務需要時讀取。
 
 ## 啟動設定
 每個 bot 的常駐指令與 routine 指令都應加入：
