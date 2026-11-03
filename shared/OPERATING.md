@@ -30,6 +30,7 @@
 - 美洲小編（editor-americas）：美國、巴西。
 - 歐洲小編（editor-europe）：英國、德國、法國、義大利。
 - 三區統一經營 X、Threads、Instagram，負責所屬市場的內容、發文與回覆；完整分工見 [社群分工表](https://github.com/tinytoolshedhqOrg/tinytoolshed-backup/blob/main/marketing/social/regions.md)。
+- 社群候選每天每國跨三平台合計最多 2 則，24 小時內發布、留言與按讚數皆 >100（暫定）。每次發文、留言或回覆前通知使用者並送審；非中文原文及草稿分別附繁中翻譯，明確核准該則後才發布。完整規則見[社群執行規則](https://github.com/tinytoolshedhqOrg/tinytoolshed-backup/blob/main/marketing/tiny-toolshed-launch.md)。
 - 黑麻麻：確有跨 bot 協調需求時，透過上述任務檔流程協調。
 - 其他 bot：只處理各自職責內的任務。
 - 胖嘟嘟阿姨、漏洞大師：預定移除，不再建立新任務或審核依賴。此文件不會刪除平台上的 bot。
