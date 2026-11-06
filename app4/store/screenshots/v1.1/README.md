@@ -16,7 +16,7 @@ Locales: `en-US`, `zh-Hant`.
 2. `02-levels.png` — everyday level reference on the meter
 3. `03-records.png` — history list
 4. `04-export.png` — CSV / image / PDF export UI
-5. `05-paywall.png` — Full Pack paywall. Caption (no price): “Full Pack · One-time purchase” / 「完整包｜一次買斷」, subline “No subscription” / 「沒有訂閱」. In-app UI still shows US$2.99.
+5. `05-paywall.png` — Full Pack paywall. Caption (no price): “Full Pack · One-time purchase” / 「完整包｜一次買斷」, subline “No subscription” / 「沒有訂閱」.
 
 `iap-review/<locale>-paywall.png` is the same paywall at iPhone size with no caption band.
 
@@ -26,10 +26,10 @@ On-screen and caption copy says estimate / for reference only where relevant. No
 
 ## Capture notes
 
-- UI is the real v1.1 screens (`MeterScreen`, `RecordsSheet`, `PaywallSheet`) from commit `93b85cf`.
+- UI is the real current screens (`MeterScreen`, `RecordsSheet`, `PaywallSheet`) from commit `0345eb4` (notes / 備註 removed).
 - This environment has no Xcode / iOS Simulator. Frames were captured from Expo web at the store CSS sizes, with a 9:41 status bar drawn in the safe-area inset.
 - Demo meter values and five history rows were local uncommitted tweaks (not in this PR).
-- StoreKit cannot return a price on web. `US$2.99` was injected only for these shots (the app has no hardcoded store fallback).
+- StoreKit cannot return a price on web. No price was injected. The in-app price row was hidden with a local-only capture tweak so the shots stay clean (no empty/loading price, no `US$2.99`). The shipping app is unchanged.
 - Redeem Code is hidden on web (`canPresentRedeemCode()` is false), so it does not appear.
 
 ## Files
