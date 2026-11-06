@@ -63,8 +63,14 @@ export default function PaywallScreen() {
         setPro(true);
         return;
       }
-      if (r.pending || r.cancelled) return;
+      if (r.pending) {
+        Alert.alert(t('paywall.buy'), t('iap.pending'));
+        return;
+      }
+      if (r.cancelled) return;
       Alert.alert(t('common.fail'), r.error || t('iap.buyFail'));
+    } catch {
+      Alert.alert(t('common.fail'), t('iap.buyFail'));
     } finally {
       endBusy();
     }

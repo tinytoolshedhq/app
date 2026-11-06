@@ -23,7 +23,7 @@
     "buyFail": "購買失敗",
     "processing": "等待中…",
     "unavailable": "無法使用內購",
-    "timeout": "等待購買逾時",
+    "timeout": "商店回應逾時，請再試一次。如果已完成付款，請使用「恢復購買」。",
     "cancel": "取消",
     "simTitle": "模擬購買（開發）",
     "simBody": "要為 {productId} 授予權限嗎？",
@@ -33,7 +33,9 @@
     "restore": "恢復",
     "restored": "已恢復購買",
     "nothingToRestore": "找不到已購買紀錄",
-    "cannotRestore": "此平台無法恢復"
+    "cannotRestore": "此平台無法恢復",
+    "productUnavailable": "商店無法載入完整版商品，請檢查網路連線後再試一次。",
+    "pending": "這筆購買正在等待核准，商店確認交易後會自動解鎖完整版。"
   },
   "common": {
     "back": "返回",

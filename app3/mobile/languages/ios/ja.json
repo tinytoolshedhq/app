@@ -7,6 +7,6 @@
   "NSCalendarsWriteOnlyAccessUsageDescription": "項目の次の予定日をカレンダーに追加します。",
   "NSRemindersUsageDescription": "「久しぶり」は「リマインダー」アプリを使いません。通知は端末内のみです。",
   "NSRemindersFullAccessUsageDescription": "「久しぶり」は「リマインダー」アプリを使いません。通知は端末内のみです。",
-  "NSMicrophoneUsageDescription": "端末内の音声入力のためにマイクを使います。",
-  "NSSpeechRecognitionUsageDescription": "話した内容をこのiPhone上で文字にして、項目の追加や検索に使います。音声はネットワークに送りません。"
+  "NSMicrophoneUsageDescription": "マイクで話した内容を端末上で文字に変換し、記録する項目の追加や検索に使います。例えば「最後に歯ブラシを交換したのはいつ？」と話して記録を検索できます。",
+  "NSSpeechRecognitionUsageDescription": "マイクで話した内容を端末上で文字に変換し、記録する項目の追加や検索に使います。例えば「最後に歯ブラシを交換したのはいつ？」と話して記録を検索できます。"
 }

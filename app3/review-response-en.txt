@@ -1,0 +1,17 @@
+Hello App Review Team,
+
+Thank you for reviewing Been Ages and identifying these issues. We have made the following changes in the new build submitted for review.
+
+Guideline 5.1.1(ii) – Microphone purpose string
+We updated the microphone and speech recognition purpose strings in all five supported languages: English, Traditional Chinese, Japanese, German, and French. The strings now explain that speech is transcribed on the device to add or look up tracked activities, with a specific example of asking when the user last changed their toothbrush.
+
+Guideline 2.1(b) – In-App Purchase responsiveness
+We revised the Full Pack purchase flow to confirm that the requested product is available before initiating a purchase. We added timeout and error handling for store connection and product loading, and improved transaction event handling so the app can process purchase results even if the native purchase request has not yet returned. Pending purchases now display an explanatory message. Failed or cancelled attempts release the purchase button's processing state so the user can try again. The app also retains its purchase update listener to handle transactions that complete after a timeout.
+
+To review the purchase flow:
+1. Open Been Ages and go to Settings.
+2. Tap Pro to open the purchase screen.
+3. Tap Buy to purchase Full Pack, a one-time non-consumable purchase with product ID com.beenages.app.fullpack.
+4. Restore purchases is available both on the purchase screen and in Settings.
+
+Thank you for your time and consideration.

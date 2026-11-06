@@ -26,7 +26,7 @@
     "buyFail": "購入に失敗",
     "processing": "待機中…",
     "unavailable": "購入できません",
-    "timeout": "購入の待ち時間が切れました",
+    "timeout": "ストアの応答がタイムアウトしました。再試行してください。支払い済みの場合は「購入を復元」をお試しください。",
     "cancel": "キャンセル",
     "simTitle": "購入をシミュレート（開発）",
     "simBody": "{productId} の権限を付与しますか？",
@@ -36,7 +36,9 @@
     "restore": "復元",
     "restored": "購入を復元しました",
     "nothingToRestore": "購入履歴がありません",
-    "cannotRestore": "この環境では復元できません"
+    "cannotRestore": "この環境では復元できません",
+    "productUnavailable": "ストアから完全版の商品を読み込めませんでした。接続を確認して再試行してください。",
+    "pending": "購入は承認待ちです。ストアが購入を確認すると完全版が解除されます。"
   },
   "common": {
     "back": "戻る",

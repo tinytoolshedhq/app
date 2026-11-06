@@ -27,7 +27,7 @@
     "buyFail": "Achat échoué",
     "processing": "Traitement…",
     "unavailable": "Achats indisponibles",
-    "timeout": "Achat trop long",
+    "timeout": "La boutique n’a pas répondu à temps. Réessayez. Si vous avez déjà payé, utilisez « Restaurer les achats ».",
     "cancel": "Annuler",
     "simTitle": "Simuler l’achat (dev)",
     "simBody": "Accorder {productId} ?",
@@ -37,7 +37,9 @@
     "restore": "Restaurer",
     "restored": "Achats restaurés",
     "nothingToRestore": "Aucun achat trouvé",
-    "cannotRestore": "Impossible ici"
+    "cannotRestore": "Impossible ici",
+    "productUnavailable": "La boutique n’a pas pu charger la version complète. Vérifiez votre connexion et réessayez.",
+    "pending": "Cet achat est en attente d’approbation. La version complète sera disponible après confirmation par la boutique."
   },
   "common": {
     "back": "Retour",

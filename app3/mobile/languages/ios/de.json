@@ -7,6 +7,6 @@
   "NSCalendarsWriteOnlyAccessUsageDescription": "Legt das nächste Fälligkeitsdatum in deinen Kalender.",
   "NSRemindersUsageDescription": "Been Ages nutzt nicht die App „Erinnerungen“. Die Hinweise sind lokale Mitteilungen.",
   "NSRemindersFullAccessUsageDescription": "Been Ages nutzt nicht die App „Erinnerungen“. Die Hinweise sind lokale Mitteilungen.",
-  "NSMicrophoneUsageDescription": "Been Ages nutzt das Mikrofon für Spracheingabe nur auf diesem Gerät.",
-  "NSSpeechRecognitionUsageDescription": "Been Ages wandelt deine Stimme auf diesem iPhone in Text um, um Einträge zu merken oder nachzuschlagen. Die Sprache bleibt auf dem Gerät und wird nicht übers Netz gesendet."
+  "NSMicrophoneUsageDescription": "Been Ages nutzt das Mikrofon, um deine Sprache auf diesem Gerät in Text umzuwandeln und Aktivitäten hinzuzufügen oder nachzuschlagen, etwa mit der Frage „Wann habe ich zuletzt meine Zahnbürste gewechselt?“.",
+  "NSSpeechRecognitionUsageDescription": "Been Ages nutzt das Mikrofon, um deine Sprache auf diesem Gerät in Text umzuwandeln und Aktivitäten hinzuzufügen oder nachzuschlagen, etwa mit der Frage „Wann habe ich zuletzt meine Zahnbürste gewechselt?“."
 }

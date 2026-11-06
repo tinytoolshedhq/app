@@ -3,6 +3,7 @@ jest.mock('expo-iap', () => {
   let purchased = false;
   const listeners = new Set();
   const errorListeners = new Set();
+  const purchaseTimers = new Set();
   const sku = process.env.EXPO_PUBLIC_IAP_PRODUCT_ID || 'com.beenages.app.fullpack';
   const emitUpdate = (purchase) => {
     purchased = true;
@@ -25,9 +26,11 @@ jest.mock('expo-iap', () => {
       type: 'in-app',
     }]),
     requestPurchase: jest.fn(async () => {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        purchaseTimers.delete(timer);
         emitUpdate({ productId: sku });
       }, 5);
+      purchaseTimers.add(timer);
     }),
     finishTransaction: jest.fn(async () => {}),
     purchaseUpdatedListener: jest.fn((cb) => {
@@ -40,17 +43,16 @@ jest.mock('expo-iap', () => {
     }),
     getAvailablePurchases: jest.fn(async () => (purchased ? [{ productId: sku }] : [])),
     currentEntitlementIOS: jest.fn(async () => (purchased ? { productId: sku } : null)),
-    restorePurchases: jest.fn(async () => {
-      setTimeout(() => {
-        emitUpdate({ productId: sku });
-      }, 5);
-    }),
+    // Restoring reads existing ownership; it must not create a new purchase.
+    restorePurchases: jest.fn(async () => {}),
     presentCodeRedemptionSheet: jest.fn(async () => null),
     presentCodeRedemptionSheetIOS: jest.fn(async () => null),
     isTransactionVerifiedIOS: jest.fn(async () => true),
     __emitPurchaseUpdated: emitUpdate,
     __emitPurchaseError: emitError,
     __resetIapMock: () => {
+      for (const timer of purchaseTimers) clearTimeout(timer);
+      purchaseTimers.clear();
       purchased = false;
       listeners.clear();
       errorListeners.clear();

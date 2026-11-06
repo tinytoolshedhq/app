@@ -7,6 +7,6 @@
   "NSCalendarsWriteOnlyAccessUsageDescription": "Adds an item's next due date to your calendar.",
   "NSRemindersUsageDescription": "Been Ages does not use the Reminders app. Its reminders are local notifications.",
   "NSRemindersFullAccessUsageDescription": "Been Ages does not use the Reminders app. Its reminders are local notifications.",
-  "NSMicrophoneUsageDescription": "Been Ages uses the microphone for on-device voice input.",
-  "NSSpeechRecognitionUsageDescription": "Been Ages transcribes your voice on this iPhone to add or look up items. Speech stays on the device and is not sent over the network."
+  "NSMicrophoneUsageDescription": "Been Ages uses the microphone to transcribe your speech on your device so you can add or look up tracked activities, for example by asking when you last changed your toothbrush.",
+  "NSSpeechRecognitionUsageDescription": "Been Ages uses the microphone to transcribe your speech on your device so you can add or look up tracked activities, for example by asking when you last changed your toothbrush."
 }

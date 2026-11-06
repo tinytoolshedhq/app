@@ -7,6 +7,6 @@
   "NSCalendarsWriteOnlyAccessUsageDescription": "Ajoute la prochaine échéance d’un élément à votre Calendrier.",
   "NSRemindersUsageDescription": "Been Ages n’utilise pas l’app Rappels. Ses rappels sont des notifications locales.",
   "NSRemindersFullAccessUsageDescription": "Been Ages n’utilise pas l’app Rappels. Ses rappels sont des notifications locales.",
-  "NSMicrophoneUsageDescription": "Been Ages utilise le micro pour la saisie vocale sur cet appareil.",
-  "NSSpeechRecognitionUsageDescription": "Been Ages transcrit votre voix sur cet iPhone pour ajouter ou retrouver des éléments. La parole reste sur l’appareil et n’est pas envoyée sur le réseau."
+  "NSMicrophoneUsageDescription": "Been Ages utilise le micro pour transcrire votre voix sur cet appareil afin d’ajouter ou de rechercher des activités, par exemple en demandant « Quand ai-je changé ma brosse à dents pour la dernière fois ? ».",
+  "NSSpeechRecognitionUsageDescription": "Been Ages utilise le micro pour transcrire votre voix sur cet appareil afin d’ajouter ou de rechercher des activités, par exemple en demandant « Quand ai-je changé ma brosse à dents pour la dernière fois ? »."
 }
