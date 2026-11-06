@@ -23,7 +23,7 @@
     "buyFail": "Purchase failed",
     "processing": "Processing…",
     "unavailable": "Purchases unavailable",
-    "timeout": "Timed out waiting for purchase",
+    "timeout": "The store did not respond in time. Please try again. If you completed payment, use Restore purchases.",
     "cancel": "Cancel",
     "simTitle": "Simulate purchase (dev)",
     "simBody": "Grant entitlement for {productId}?",
@@ -33,7 +33,9 @@
     "restore": "Restore",
     "restored": "Purchases restored",
     "nothingToRestore": "No previous purchase found",
-    "cannotRestore": "Cannot restore on this platform"
+    "cannotRestore": "Cannot restore on this platform",
+    "productUnavailable": "The store could not load Full Pack. Check your connection and try again.",
+    "pending": "This purchase is awaiting approval. Full Pack will unlock when the store confirms the purchase."
   },
   "common": {
     "back": "Back",

@@ -10,7 +10,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.beenages.app",
-      "buildNumber": "12",
+      "buildNumber": "14",
       "infoPlist": {
         "CFBundleDevelopmentRegion": "en",
         "CFBundleLocalizations": [
@@ -29,8 +29,8 @@
         "NSCalendarsWriteOnlyAccessUsageDescription": "Adds an item's next due date to your calendar.",
         "NSRemindersUsageDescription": "Been Ages does not use the Reminders app. Its reminders are local notifications.",
         "NSRemindersFullAccessUsageDescription": "Been Ages does not use the Reminders app. Its reminders are local notifications.",
-        "NSMicrophoneUsageDescription": "Been Ages uses the microphone for on-device voice input.",
-        "NSSpeechRecognitionUsageDescription": "Been Ages transcribes your voice on this iPhone to add or look up items. Speech stays on the device and is not sent over the network."
+        "NSMicrophoneUsageDescription": "Been Ages uses the microphone to transcribe your speech on your device so you can add or look up tracked activities, for example by asking when you last changed your toothbrush.",
+        "NSSpeechRecognitionUsageDescription": "Been Ages uses the microphone to transcribe your speech on your device so you can add or look up tracked activities, for example by asking when you last changed your toothbrush."
       },
       "runtimeVersion": {
         "policy": "sdkVersion"
@@ -44,8 +44,8 @@
       [
         "expo-speech-recognition",
         {
-          "microphonePermission": "Been Ages uses the microphone for on-device voice input.",
-          "speechRecognitionPermission": "Been Ages transcribes your voice on this iPhone to add or look up items. Speech stays on the device and is not sent over the network."
+          "microphonePermission": "Been Ages uses the microphone to transcribe your speech on your device so you can add or look up tracked activities, for example by asking when you last changed your toothbrush.",
+          "speechRecognitionPermission": "Been Ages uses the microphone to transcribe your speech on your device so you can add or look up tracked activities, for example by asking when you last changed your toothbrush."
         }
       ],
       [

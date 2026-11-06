@@ -7,6 +7,6 @@
   "NSCalendarsWriteOnlyAccessUsageDescription": "把項目的下次該做日子加到行事曆。",
   "NSRemindersUsageDescription": "「好久沒了」不使用「提醒事項」App，提醒是本機通知。",
   "NSRemindersFullAccessUsageDescription": "「好久沒了」不使用「提醒事項」App，提醒是本機通知。",
-  "NSMicrophoneUsageDescription": "用麥克風在這支 iPhone 上語音輸入。辨識在裝置上完成。",
-  "NSSpeechRecognitionUsageDescription": "把你說的話在這支 iPhone 上轉成文字，用來新增或查項目。語音留在裝置上，不會送到網路上。"
+  "NSMicrophoneUsageDescription": "「好久沒了」使用麥克風，將你說的話在裝置上轉成文字，讓你新增或查詢追蹤項目，例如說「我上次什麼時候換牙刷？」來查詢紀錄。",
+  "NSSpeechRecognitionUsageDescription": "「好久沒了」使用麥克風，將你說的話在裝置上轉成文字，讓你新增或查詢追蹤項目，例如說「我上次什麼時候換牙刷？」來查詢紀錄。"
 }

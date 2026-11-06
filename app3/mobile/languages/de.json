@@ -27,7 +27,7 @@
     "buyFail": "Kauf fehlgeschlagen",
     "processing": "Wird verarbeitet…",
     "unavailable": "Käufe nicht verfügbar",
-    "timeout": "Kauf hat zu lange gedauert",
+    "timeout": "Der Store hat nicht rechtzeitig geantwortet. Versuche es erneut. Falls du bereits bezahlt hast, nutze „Käufe wiederherstellen“.",
     "cancel": "Abbrechen",
     "simTitle": "Kauf simulieren (Dev)",
     "simBody": "Berechtigung für {productId} geben?",
@@ -37,7 +37,9 @@
     "restore": "Wiederherstellen",
     "restored": "Käufe wiederhergestellt",
     "nothingToRestore": "Kein früherer Kauf gefunden",
-    "cannotRestore": "Hier nicht wiederherstellbar"
+    "cannotRestore": "Hier nicht wiederherstellbar",
+    "productUnavailable": "Der Store konnte das Komplettpaket nicht laden. Prüfe deine Verbindung und versuche es erneut.",
+    "pending": "Dieser Kauf wartet auf Genehmigung. Das Komplettpaket ist nach Bestätigung durch den Store verfügbar."
   },
   "common": {
     "back": "Zurück",

@@ -11,6 +11,27 @@ export const CANONICAL_PRO_PRODUCT_ID = 'com.beenages.app.fullpack';
 
 export const EMPTY_LIST_REVOKE_AFTER = 3;
 
+const STORE_TIMEOUT_MS = 15000;
+
+async function withStoreTimeout(operation, timeoutMs = STORE_TIMEOUT_MS) {
+  let timer;
+  try {
+    return await Promise.race([
+      Promise.resolve().then(operation),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(t('iap.timeout'))), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function connectToStore(iap) {
+  const connected = await withStoreTimeout(() => iap.initConnection());
+  if (connected === false) throw new Error(t('iap.unavailable'));
+}
+
 /** Backoff before re-reading entitlements after a purchase-updated event. */
 export const entitlementGrantConfig = {
   retryDelaysMs: [1000, 3000],
@@ -199,7 +220,7 @@ export function canPresentRedeemCode(os = Platform.OS) {
 async function endIapIfEphemeral(iap) {
   if (keepIapConnection) return;
   try {
-    await iap.endConnection?.();
+    await withStoreTimeout(() => iap.endConnection?.());
   } catch {}
 }
 
@@ -211,7 +232,7 @@ async function endIapIfEphemeral(iap) {
 async function verifyTransactionBestEffort(iap, purchase) {
   if (typeof iap?.isTransactionVerifiedIOS !== 'function') return null;
   try {
-    const ok = await iap.isTransactionVerifiedIOS(productSku(purchase));
+    const ok = await withStoreTimeout(() => iap.isTransactionVerifiedIOS(productSku(purchase)));
     return ok === true;
   } catch {
     return false;
@@ -223,12 +244,12 @@ async function readCurrentEntitlements(iap) {
     return { ok: false, purchases: [] };
   }
   try {
-    const purchases = await iap.getAvailablePurchases();
+    const purchases = await withStoreTimeout(() => iap.getAvailablePurchases());
     if (!Array.isArray(purchases)) return { ok: false, purchases: [] };
     const list = [...purchases];
     if (!list.some((p) => isEntitledPurchase(p)) && typeof iap?.currentEntitlementIOS === 'function') {
       try {
-        const one = await iap.currentEntitlementIOS(PRO_PRODUCT_ID);
+        const one = await withStoreTimeout(() => iap.currentEntitlementIOS(PRO_PRODUCT_ID));
         if (one) list.push(one);
       } catch {}
     }
@@ -251,7 +272,7 @@ async function unlockFromEntitlements(iap) {
 async function finishIfPossible(iap, purchase) {
   if (typeof iap?.finishTransaction !== 'function') return;
   try {
-    await iap.finishTransaction({ purchase, isConsumable: false });
+    await withStoreTimeout(() => iap.finishTransaction({ purchase, isConsumable: false }));
   } catch {}
 }
 
@@ -306,7 +327,7 @@ export async function startPurchaseUpdates() {
   try {
     const iap = require('expo-iap');
     if (!iap?.initConnection || typeof iap.purchaseUpdatedListener !== 'function') return;
-    await iap.initConnection();
+    await connectToStore(iap);
     keepIapConnection = true;
     try {
       purchaseSub?.remove?.();
@@ -339,7 +360,7 @@ export async function presentRedeemCodeSheet() {
     const present = (typeof iap.presentCodeRedemptionSheet === 'function' && iap.presentCodeRedemptionSheet)
       || (typeof iap.presentCodeRedemptionSheetIOS === 'function' && iap.presentCodeRedemptionSheetIOS);
     if (typeof present !== 'function') return { ok: false, unavailable: true };
-    if (typeof iap.initConnection === 'function') await iap.initConnection();
+    if (typeof iap.initConnection === 'function') await connectToStore(iap);
     await present();
     return { ok: true };
   } catch {
@@ -371,11 +392,11 @@ function waitForPurchaseEvent(iap, timeoutMs = 120000) {
   };
 
   subUpdate = iap.purchaseUpdatedListener((purchase) => {
+    if (!purchaseMatches(purchase)) return;
     if (isPendingPurchase(purchase)) {
       finish({ ok: false, pending: true, purchase });
       return;
     }
-    if (!purchaseMatches(purchase)) return;
     if (isRevoked(purchase)) return;
     finish({ ok: true, purchase });
   });
@@ -413,18 +434,25 @@ async function tryNativeRestore() {
     throw new Error('IAP unavailable');
   }
 
-  await iap.initConnection();
+  await connectToStore(iap);
   try {
+    let restoreError;
     if (typeof iap.restorePurchases === 'function') {
       try {
-        await iap.restorePurchases();
-      } catch {
-        // continue to query
+        await withStoreTimeout(() => iap.restorePurchases());
+      } catch (error) {
+        // Current entitlements may still be available if store sync failed.
+        restoreError = error;
       }
     }
-    if (await unlockFromEntitlements(iap)) {
+    const { ok, purchases } = await readCurrentEntitlements(iap);
+    if (purchases.some((p) => isEntitledPurchase(p))) {
+      await setProUnlocked(true);
+      await setEmptyPurchaseStreak(0);
       return { ok: true, restored: true };
     }
+    if (restoreError) throw restoreError;
+    if (!ok) throw new Error(t('iap.unavailable'));
     return { ok: true, restored: false };
   } finally {
     await endIapIfEphemeral(iap);
@@ -433,62 +461,55 @@ async function tryNativeRestore() {
 
 async function tryNativePurchase() {
   const iap = require('expo-iap');
-  if (!iap?.initConnection || !iap?.requestPurchase) {
-    throw new Error('IAP unavailable');
+  if (!iap?.initConnection || !iap?.requestPurchase || !iap?.fetchProducts) {
+    throw new Error(t('iap.unavailable'));
   }
 
-  await iap.initConnection();
-  const waiter = waitForPurchaseEvent(iap);
+  await connectToStore(iap);
+  let waiter;
   try {
-    if (typeof iap.fetchProducts === 'function') {
-      await iap.fetchProducts({ skus: [PRO_PRODUCT_ID], type: 'in-app' });
+    const products = await withStoreTimeout(() => iap.fetchProducts({
+      skus: [PRO_PRODUCT_ID], type: 'in-app',
+    }));
+    if (!Array.isArray(products) || !products.some((product) => purchaseMatches(product))) {
+      throw new Error(t('iap.productUnavailable'));
     }
 
-    let returned;
-    try {
-      returned = await iap.requestPurchase({
-        request: {
-          apple: { sku: PRO_PRODUCT_ID },
-          google: { skus: [PRO_PRODUCT_ID] }
-        },
-        type: 'in-app'
-      });
-    } catch (e) {
-      waiter.cancel();
-      if (isUserCancelledError(e)) return { ok: false, cancelled: true };
-      if (isDeferredError(e)) return { ok: false, pending: true };
-      if (isAlreadyOwnedError(e)) return await tryNativeRestore();
-      throw e;
-    }
-
-    if (isPendingPurchase(returned)) {
-      waiter.cancel();
-      return { ok: false, pending: true };
-    }
-
-    let result;
-    if (looksLikePurchase(returned) && purchaseMatches(returned) && !isRevoked(returned)) {
-      waiter.cancel();
-      result = { ok: true, purchase: returned };
-    } else {
-      result = await waiter.promise;
-    }
-
-    if (result.cancelled) return result;
-    if (result.pending) return { ok: false, pending: true };
-    if (result.alreadyOwned) return await tryNativeRestore();
-
-    if (result.ok && result.purchase) {
-      const granted = await grantFullpackPurchase(result.purchase);
-      if (granted) return { ok: true };
-    }
-
-    const restored = await tryNativeRestore();
-    if (restored.ok && restored.restored) return { ok: true };
-    if (!result.ok && !result.skipped) return result;
-    return { ok: false };
-  } finally {
+    // Subscribe before dispatch. A native request may still be unresolved when
+    // StoreKit emits its result, so either path must be able to finish the UI.
+    waiter = waitForPurchaseEvent(iap);
+    const requestResult = Promise.resolve().then(() => iap.requestPurchase({
+      request: {
+        apple: { sku: PRO_PRODUCT_ID },
+        google: { skus: [PRO_PRODUCT_ID] },
+      },
+      type: 'in-app',
+    })).then((returned) => {
+      const purchases = Array.isArray(returned) ? returned : [returned];
+      const purchase = purchases.find((p) => looksLikePurchase(p) && purchaseMatches(p) && !isRevoked(p));
+      if (purchase) {
+        return isPendingPurchase(purchase)
+          ? { ok: false, pending: true }
+          : { ok: true, purchase };
+      }
+      return waiter.promise;
+    });
+    const result = await Promise.race([waiter.promise, requestResult]);
     waiter.cancel();
+
+    if (result.cancelled || result.pending) return result;
+    if (result.alreadyOwned) return await tryNativeRestore();
+    if (!result.ok) return result;
+
+    const granted = await withStoreTimeout(() => grantFullpackPurchase(result.purchase));
+    return granted ? { ok: true } : { ok: false, error: t('iap.buyFail') };
+  } catch (e) {
+    if (isUserCancelledError(e)) return { ok: false, cancelled: true };
+    if (isDeferredError(e)) return { ok: false, pending: true };
+    if (isAlreadyOwnedError(e)) return await tryNativeRestore();
+    throw e;
+  } finally {
+    waiter?.cancel();
     await endIapIfEphemeral(iap);
   }
 }
@@ -588,27 +609,20 @@ function pickDisplayPrice(product) {
  * Returns null when the store is unreachable — never a hardcoded fallback.
  */
 export async function getProDisplayPrice() {
-  let timer;
   try {
     const iap = require('expo-iap');
     if (!iap?.initConnection || typeof iap.fetchProducts !== 'function') return null;
-    await iap.initConnection();
     try {
-      const products = await Promise.race([
-        iap.fetchProducts({ skus: [PRO_PRODUCT_ID], type: 'in-app' }),
-        new Promise((_, reject) => {
-          timer = setTimeout(() => reject(new Error('timeout')), 8000);
-        }),
-      ]);
+      await connectToStore(iap);
+      const products = await withStoreTimeout(() => iap.fetchProducts({
+        skus: [PRO_PRODUCT_ID], type: 'in-app',
+      }), 8000);
       const list = Array.isArray(products) ? products : [];
-      const match = list.find((p) => purchaseMatches(p) || p?.id === PRO_PRODUCT_ID) || list[0];
-      return pickDisplayPrice(match);
+      return pickDisplayPrice(list.find((p) => purchaseMatches(p)));
     } finally {
-      if (timer) clearTimeout(timer);
       await endIapIfEphemeral(iap);
     }
   } catch {
-    if (timer) clearTimeout(timer);
     return null;
   }
 }
@@ -627,7 +641,7 @@ export async function verifyProOnLaunch() {
   try {
     const iap = require('expo-iap');
     if (!iap?.initConnection || !iap?.getAvailablePurchases) return;
-    await iap.initConnection();
+    await connectToStore(iap);
     try {
       const { ok, purchases } = await readCurrentEntitlements(iap);
       if (!ok) return;
