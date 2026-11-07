@@ -1,0 +1,107 @@
+{
+  "id": "stand_wrist_flex",
+  "name": "站姿手腕活動",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "standing",
+  "body_regions": [
+    "wrists"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [],
+  "setup": "站穩，雙肘貼近身側，前臂朝前，手掌朝下。",
+  "description": "雙肘彎曲靠身旁，手腕小幅向上、向下活動。",
+  "instructions": [
+    "手腕輕抬與下放，慢慢重複",
+    "前臂保持穩定，繼續活動",
+    "繼續小幅上下活動",
+    "回到自然位置，雙手垂下"
+  ],
+  "cautions": [
+    "不強壓手腕，不聳肩或用全手臂甩動。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "手腕輕抬與下放，慢慢重複"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "前臂保持穩定，繼續活動"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "繼續小幅上下活動"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "回到自然位置，雙手垂下"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "stand_wrist_flex_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "雙肘靠身旁，手腕輕輕往上，再往下。",
+      "audio_path": "audio/stand_wrist_flex_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_wrist_flex_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "小幅度就好。",
+      "audio_path": "audio/stand_wrist_flex_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_wrist_flex_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "繼續慢慢活動，別用力彎到底。",
+      "audio_path": "audio/stand_wrist_flex_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_wrist_flex_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "放鬆手腕，雙手放下。",
+      "audio_path": "audio/stand_wrist_flex_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：站穩，雙肘貼近身側，前臂朝前，手掌朝下。採用 wrist 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "office"
+  ],
+  "library": {
+    "body_part": "手",
+    "muscle": "前臂屈伸肌群",
+    "pose": "wrist",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

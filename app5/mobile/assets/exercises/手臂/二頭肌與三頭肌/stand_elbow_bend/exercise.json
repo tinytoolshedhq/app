@@ -1,0 +1,107 @@
+{
+  "id": "stand_elbow_bend",
+  "name": "站姿手肘彎伸",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "standing",
+  "body_regions": [
+    "arms"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [],
+  "setup": "站穩，雙臂垂在身旁，手掌朝前，不持重物。",
+  "description": "上臂留在身旁，雙肘緩慢彎曲、伸回。",
+  "instructions": [
+    "緩慢彎肘再伸回",
+    "繼續彎伸，上臂留在原位",
+    "依舒服幅度重複",
+    "放下雙手，回到自然站姿"
+  ],
+  "cautions": [
+    "不鎖肘、不擺腰借力，不拿啞鈴。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "緩慢彎肘再伸回"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "繼續彎伸，上臂留在原位"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "依舒服幅度重複"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "放下雙手，回到自然站姿"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "stand_elbow_bend_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "彎曲手肘，雙手慢慢靠近肩膀，再放下。",
+      "audio_path": "audio/stand_elbow_bend_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_elbow_bend_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "上臂留在身旁。",
+      "audio_path": "audio/stand_elbow_bend_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_elbow_bend_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "繼續慢慢彎伸，不用伸得很直。",
+      "audio_path": "audio/stand_elbow_bend_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_elbow_bend_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "雙手放下，放鬆手臂。",
+      "audio_path": "audio/stand_elbow_bend_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：站穩，雙臂垂在身旁，手掌朝前，不持重物。採用 elbow 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "office"
+  ],
+  "library": {
+    "body_part": "手臂",
+    "muscle": "二頭肌與三頭肌",
+    "pose": "elbow",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

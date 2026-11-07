@@ -220,6 +220,7 @@ export class PlayerController {
       this.lastUnitIndex = snap.unitIndex;
       this.firedCues.clear();
     }
+    if (snap.phase === 'gap') void this.audio.stopAll();
     if (snap.phase === 'unit' && snap.current && !this.paused) {
       const elapsedInUnit = UNIT_SECONDS - snap.unitRemaining;
       this.fireCues(snap.current.voice_cues, elapsedInUnit);
@@ -232,7 +233,7 @@ export class PlayerController {
       if (this.firedCues.has(cue.id)) continue;
       if (elapsedInUnit + 0.05 >= cue.at_seconds) {
         this.firedCues.add(cue.id);
-        void this.audio.playAt(cue.id);
+        if (elapsedInUnit < cue.at_seconds + cue.max_duration_seconds) void this.audio.playAt(cue.id);
       }
     }
   }

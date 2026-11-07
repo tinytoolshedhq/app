@@ -1,0 +1,107 @@
+{
+  "id": "stand_shoulder_circles",
+  "name": "站姿肩膀繞圈",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "standing",
+  "body_regions": [
+    "shoulders"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [],
+  "setup": "雙腳與髖同寬站穩，膝蓋不鎖死，身旁留空。",
+  "description": "站穩後肩膀小幅向前、向後繞圈，雙臂自然垂放。",
+  "instructions": [
+    "肩膀小幅向前繞圈",
+    "保持慢速向前繞圈",
+    "肩膀改向後繞圈",
+    "停止繞圈，自然垂肩"
+  ],
+  "cautions": [
+    "不扭腰、踮腳或讓頭部跟著繞圈。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "肩膀小幅向前繞圈"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "保持慢速向前繞圈"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "肩膀改向後繞圈"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "停止繞圈，自然垂肩"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "stand_shoulder_circles_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "雙腳站穩，肩膀慢慢向前繞小圈。",
+      "audio_path": "audio/stand_shoulder_circles_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_shoulder_circles_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "輕輕繞，別憋氣。",
+      "audio_path": "audio/stand_shoulder_circles_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_shoulder_circles_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "換方向，肩膀慢慢向後繞圈。",
+      "audio_path": "audio/stand_shoulder_circles_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_shoulder_circles_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢停下，放鬆肩膀。",
+      "audio_path": "audio/stand_shoulder_circles_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：雙腳與髖同寬站穩，膝蓋不鎖死，身旁留空。採用 shoulder 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "office"
+  ],
+  "library": {
+    "body_part": "肩",
+    "muscle": "肩帶肌群",
+    "pose": "shoulder",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

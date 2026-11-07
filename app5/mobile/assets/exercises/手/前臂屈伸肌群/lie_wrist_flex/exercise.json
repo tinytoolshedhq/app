@@ -1,0 +1,109 @@
+{
+  "id": "lie_wrist_flex",
+  "name": "仰躺手腕勾放",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "lying",
+  "body_regions": [
+    "wrists"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "mat"
+  ],
+  "setup": "仰躺，上臂貼在身旁平面，手肘彎曲，前臂朝上，雙手放鬆。",
+  "description": "上臂支撐在身旁、前臂朝上，手腕小幅前後活動。",
+  "instructions": [
+    "上臂固定，手腕緩慢勾放",
+    "持續小幅活動，不碰臉",
+    "繼續慢速勾放手腕",
+    "手腕回正，前臂慢慢放下"
+  ],
+  "cautions": [
+    "不向臉部擺手、不持重物；肩膀難以放鬆時略過。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "上臂固定，手腕緩慢勾放"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "持續小幅活動，不碰臉"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "繼續慢速勾放手腕"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "手腕回正，前臂慢慢放下"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "lie_wrist_flex_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "上臂放穩，前臂朝上，手腕輕輕勾放。",
+      "audio_path": "audio/lie_wrist_flex_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_wrist_flex_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "只動手腕就好。",
+      "audio_path": "audio/lie_wrist_flex_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_wrist_flex_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "繼續小幅度活動，雙手不要靠近臉。",
+      "audio_path": "audio/lie_wrist_flex_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_wrist_flex_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "放鬆手腕，慢慢放下。",
+      "audio_path": "audio/lie_wrist_flex_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：仰躺，上臂貼在身旁平面，手肘彎曲，前臂朝上，雙手放鬆。採用 wrist 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "office"
+  ],
+  "library": {
+    "body_part": "手",
+    "muscle": "前臂屈伸肌群",
+    "pose": "wrist",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

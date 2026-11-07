@@ -1,0 +1,110 @@
+{
+  "id": "stand_calf_wall",
+  "name": "扶牆小腿伸展",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "standing",
+  "body_regions": [
+    "calves",
+    "ankles"
+  ],
+  "movement_type": "stretch",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "wall"
+  ],
+  "setup": "面向穩固牆面，雙手輕扶牆，地面止滑，預留後方空間。",
+  "description": "雙手扶牆，前後站立，後腳跟留地，兩側依序輕伸展。",
+  "instructions": [
+    "左腳小步後退，前膝微彎，左腳跟留地",
+    "收回左腳，站穩並準備換側",
+    "右腳小步後退，前膝微彎，右腳跟留地",
+    "收回右腳，站穩"
+  ],
+  "cautions": [
+    "雙腳朝前，後腳跟不強壓；換腳可暫停，不急著跨步。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "左腳小步後退，前膝微彎，左腳跟留地"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "收回左腳，站穩並準備換側"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "右腳小步後退，前膝微彎，右腳跟留地"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "收回右腳，站穩"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "stand_calf_wall_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "左腳退一小步，腳跟留地，前膝微彎。",
+      "audio_path": "audio/stand_calf_wall_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_calf_wall_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "慢慢收回，站穩。",
+      "audio_path": "audio/stand_calf_wall_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_calf_wall_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "換右腳後退，腳跟留地，輕輕伸展。",
+      "audio_path": "audio/stand_calf_wall_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_calf_wall_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "收回右腳，站穩放鬆。",
+      "audio_path": "audio/stand_calf_wall_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：面向穩固牆面，雙手輕扶牆，地面止滑，預留後方空間。採用 calf 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "flexibility"
+  ],
+  "library": {
+    "body_part": "腿",
+    "muscle": "小腿肌群",
+    "pose": "calf",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

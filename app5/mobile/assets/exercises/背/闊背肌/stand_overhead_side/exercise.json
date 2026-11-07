@@ -1,0 +1,107 @@
+{
+  "id": "stand_overhead_side",
+  "name": "舉臂側身伸展",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "standing",
+  "body_regions": [
+    "upper_back",
+    "waist"
+  ],
+  "movement_type": "stretch",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [],
+  "setup": "站穩，雙腳約肩寬。",
+  "description": "雙臂上舉，輕握手腕，身體向右傾。；回正後向左，保持骨盆穩定。",
+  "instructions": [
+    "雙臂上舉，輕握手腕，身體向右傾。",
+    "回正後向左，保持骨盆穩定。"
+  ],
+  "cautions": [
+    "只到輕微牽拉感，不彈震、不憋氣；疼痛或麻木時停止。",
+    "肩、頸、腰或膝已有傷勢時，先確認這個姿勢是否適合。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "雙手舉高輕握，身體慢慢向右。"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "下半身穩定，自然呼吸。"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "回正，再慢慢向左側傾。"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "慢慢回正，雙手放下。"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "stand_overhead_side_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "雙手舉高輕握，身體慢慢向右。",
+      "audio_path": "audio/stand_overhead_side_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_overhead_side_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "下半身穩定，自然呼吸。",
+      "audio_path": "audio/stand_overhead_side_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_overhead_side_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "回正，再慢慢向左側傾。",
+      "audio_path": "audio/stand_overhead_side_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_overhead_side_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢回正，雙手放下。",
+      "audio_path": "audio/stand_overhead_side_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：站穩，雙腳約肩寬。採用 overhead-side 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "stretches"
+  ],
+  "library": {
+    "body_part": "背",
+    "muscle": "闊背肌",
+    "pose": "overhead-side",
+    "source_note": "依英文來源改寫；每側約 10 秒加換側的 30 秒安排為產品草稿，與來源維持時間不同。",
+    "checked_on": "2026-11-07"
+  }
+}

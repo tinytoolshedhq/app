@@ -1,0 +1,109 @@
+{
+  "id": "lie_finger_open",
+  "name": "仰躺手指開合",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "lying",
+  "body_regions": [
+    "hands"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "mat"
+  ],
+  "setup": "仰躺，雙膝可彎、腳掌踩穩，雙臂放在身旁。",
+  "description": "雙臂放在身旁，雙手輕握拳再張開手指。",
+  "instructions": [
+    "雙手輕握再張開",
+    "維持輕柔開合",
+    "繼續緩慢開合",
+    "停止，雙手自然放鬆"
+  ],
+  "cautions": [
+    "不強扳手指，不將拳頭壓向地面。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "雙手輕握再張開"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "維持輕柔開合"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "繼續緩慢開合"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "停止，雙手自然放鬆"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "lie_finger_open_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "雙手放身旁，輕輕握拳，再張開手指。",
+      "audio_path": "audio/lie_finger_open_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_finger_open_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "慢慢來，不用握緊。",
+      "audio_path": "audio/lie_finger_open_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_finger_open_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "繼續輕輕開合，肩膀保持放鬆。",
+      "audio_path": "audio/lie_finger_open_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_finger_open_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "停下，放鬆雙手。",
+      "audio_path": "audio/lie_finger_open_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：仰躺，雙膝可彎、腳掌踩穩，雙臂放在身旁。採用 hands 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "office"
+  ],
+  "library": {
+    "body_part": "手",
+    "muscle": "手指屈伸肌群",
+    "pose": "hands",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

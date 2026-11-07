@@ -1,0 +1,108 @@
+{
+  "id": "sit_neck_side",
+  "name": "坐姿頸側輕伸展",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "neck"
+  ],
+  "movement_type": "stretch",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "穩坐無輪椅，雙腳踩地。",
+  "description": "坐直，右手輕扶左肩，頭慢慢向右側傾。；回正後，換另一側。",
+  "instructions": [
+    "坐直，右手輕扶左肩，頭慢慢向右側傾。",
+    "回正後，換另一側。"
+  ],
+  "cautions": [
+    "只到輕微牽拉感，不彈震、不憋氣；疼痛或麻木時停止。",
+    "肩、頸、腰或膝已有傷勢時，先確認這個姿勢是否適合。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "右手輕扶左肩，頭慢慢向右傾。"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "保持輕鬆，不要拉頭。"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "回正，左手扶右肩，頭慢慢向左傾。"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "慢慢回正，放鬆。"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_neck_side_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "右手輕扶左肩，頭慢慢向右傾。",
+      "audio_path": "audio/sit_neck_side_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_neck_side_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "保持輕鬆，不要拉頭。",
+      "audio_path": "audio/sit_neck_side_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_neck_side_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "回正，左手扶右肩，頭慢慢向左傾。",
+      "audio_path": "audio/sit_neck_side_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_neck_side_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢回正，放鬆。",
+      "audio_path": "audio/sit_neck_side_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：穩坐無輪椅，雙腳踩地。採用 neck-side 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "flexibility"
+  ],
+  "library": {
+    "body_part": "頸",
+    "muscle": "頸側肌群",
+    "pose": "neck-side",
+    "source_note": "依英文來源改寫；每側約 10 秒加換側的 30 秒安排為產品草稿，與來源維持時間不同。",
+    "checked_on": "2026-11-07"
+  }
+}

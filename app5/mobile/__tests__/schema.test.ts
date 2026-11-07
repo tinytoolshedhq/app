@@ -76,9 +76,9 @@ describe('content schema', () => {
     expect(safeParseContentPack(raw2).success).toBe(false);
   });
 
-  it('rejects the wrong exercise count', () => {
+  it('accepts variable catalog sizes instead of requiring exactly 30 exercises', () => {
     const raw = clone() as { exercises: unknown[] };
     raw.exercises = raw.exercises.slice(0, 29);
-    expect(safeParseContentPack(raw).success).toBe(false);
+    expect(safeParseContentPack(raw).success).toBe(true);
   });
 });

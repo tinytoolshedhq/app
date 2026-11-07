@@ -178,3 +178,13 @@ describe('player timeline', () => {
     expect(audio.plays).toEqual([]);
   });
 });
+
+describe('voice timing after a delayed ticker',()=>{
+ it('skips expired prompts instead of speaking old instructions together',()=>{
+  let now=0;const audio=mockAudio();
+  const p=new PlayerController([unit('a',[cue('old',0),cue('current',10)])],audio,()=>now);
+  p.start();now=10500;p.tick();
+  expect(audio.plays).toEqual(['current']);
+  now=30500;p.tick();expect(audio.stopAll).toHaveBeenCalled();
+ });
+});

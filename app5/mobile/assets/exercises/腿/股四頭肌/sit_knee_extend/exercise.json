@@ -1,0 +1,107 @@
+{
+  "id": "sit_knee_extend",
+  "name": "坐姿膝部輕伸",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "knees"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "坐穩，雙腳踩地，雙手扶椅面，膝前留空。",
+  "description": "大腿保持在椅面，單腳緩慢伸膝再放回，左右依序活動。",
+  "instructions": [
+    "左膝緩慢伸展再彎回，重複小幅活動",
+    "左腳放回地面",
+    "右膝緩慢伸展再彎回，重複小幅活動",
+    "右腳放回地面"
+  ],
+  "cautions": [
+    "大腿不離開椅面，不踢腿或強求鎖直膝蓋。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "左膝緩慢伸展再彎回，重複小幅活動"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "左腳放回地面"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "右膝緩慢伸展再彎回，重複小幅活動"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "右腳放回地面"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_knee_extend_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "左腳慢慢往前抬，膝蓋伸一點，再放回。",
+      "audio_path": "audio/sit_knee_extend_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_knee_extend_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "左腳踩穩，準備換腳。",
+      "audio_path": "audio/sit_knee_extend_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_knee_extend_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "右腳慢慢往前抬，再輕輕放回。",
+      "audio_path": "audio/sit_knee_extend_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_knee_extend_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "雙腳踩地，放鬆腿部。",
+      "audio_path": "audio/sit_knee_extend_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：坐穩，雙腳踩地，雙手扶椅面，膝前留空。採用 knee 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [],
+  "library": {
+    "body_part": "腿",
+    "muscle": "股四頭肌",
+    "pose": "knee",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

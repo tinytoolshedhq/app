@@ -62,7 +62,17 @@
           }
         }
       ],
-      "expo-iap"
+      "expo-iap",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      "expo-font"
     ],
     "locales": {
       "en": "./languages/ios/en.json",

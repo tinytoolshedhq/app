@@ -25,6 +25,7 @@ const voiceCueSchema = z.object({
   max_duration_seconds: z.number().positive(),
   text: z.string().min(1).max(400),
   audio_path: z.string().min(1).nullable(),
+  audio_status: z.enum(['pending', 'ready']).optional(),
   measured_duration_seconds: z.number().nonnegative().nullable(),
 }).strict();
 
@@ -60,6 +61,13 @@ export const exerciseSchema = z.object({
   animation_brief: z.string().min(1).max(800),
   media: mediaSchema,
   source_ids: z.array(idSchema),
+  library: z.object({
+    body_part: z.string().min(1),
+    muscle: z.string().min(1),
+    pose: z.string().min(1),
+    source_note: z.string().min(1),
+    checked_on: z.string().min(1),
+  }).strict().optional(),
 }).strict();
 
 const conversionLimitSchema = z.object({
@@ -222,7 +230,7 @@ export const contentPackSchema = z.object({
   playback: z.record(z.unknown()),
   global_safety: z.record(z.unknown()),
   sources: z.array(sourceSchema),
-  exercises: z.array(exerciseSchema).length(EXPECTED_EXERCISE_COUNT),
+  exercises: z.array(exerciseSchema).min(1),
 }).strict().superRefine((pack, ctx) => {
   const positionIds = new Set(pack.categories.positions.map((p) => p.id));
   const regionIds = new Set(pack.categories.body_regions.map((p) => p.id));
@@ -282,20 +290,6 @@ export const contentPackSchema = z.object({
     ex.voice_cues.forEach((c) => cueIds.push(c.id));
   });
   assertUniqueIds(cueIds, ctx, ['exercises'], 'voice_cue');
-
-  const byPosition: Record<string, number> = {};
-  for (const ex of pack.exercises) {
-    byPosition[ex.position] = (byPosition[ex.position] || 0) + 1;
-  }
-  for (const pos of pack.categories.positions) {
-    if (byPosition[pos.id] !== EXPECTED_PER_POSITION) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `${pos.id} must have exactly ${EXPECTED_PER_POSITION} exercises`,
-        path: ['exercises'],
-      });
-    }
-  }
 
   const wholeBody = pack.categories.selection_options.find((o) => o.id === WHOLE_BODY_ID);
   if (!wholeBody?.matches_all_body_regions) {

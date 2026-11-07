@@ -1,4 +1,6 @@
 import bundledRaw from '../../assets/content/exercises.zh-Hant.json';
+import sources from '../../assets/exercises/sources.json';
+import { exerciseLibrary } from './exercise-index';
 import {
   parseContentPack,
   WHOLE_BODY_ID,
@@ -11,7 +13,7 @@ let cached: ContentPack | null = null;
 
 export function loadBundledContent(): ContentPack {
   if (!cached) {
-    cached = parseContentPack(bundledRaw);
+    cached = parseContentPack({ ...bundledRaw, sources, exercises: exerciseLibrary });
   }
   return cached;
 }

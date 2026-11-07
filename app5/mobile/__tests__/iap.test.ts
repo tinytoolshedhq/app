@@ -183,10 +183,10 @@ describe('iap', () => {
     expect(paywall).toMatch(/displayPrice|getProDisplayPrice/);
   });
 
-  it('registers a persistent purchase listener at app start', async () => {
+  it('keeps purchase listeners available for legacy callers without starting IAP in the new flow', async () => {
     const iap = require('expo-iap');
     const app = require('fs').readFileSync(require('path').join(__dirname, '../src/App.tsx'), 'utf8');
-    expect(app).toMatch(/startPurchaseUpdates/);
+    expect(app).not.toMatch(/startPurchaseUpdates/);
     await startPurchaseUpdates();
     expect(iap.initConnection).toHaveBeenCalled();
     expect(iap.purchaseUpdatedListener).toHaveBeenCalled();

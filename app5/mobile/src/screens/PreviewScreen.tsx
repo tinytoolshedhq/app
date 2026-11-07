@@ -1,140 +1,200 @@
-import { useMemo, useState, useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { buildRoutine } from '../builder';
-import { labelFor, loadBundledContent } from '../content';
-import { t } from '../i18n';
-import { isProUnlocked, subscribePro } from '../iap';
-import { formatActiveDurationLabel } from '../player';
-import { getPrefs, setCurrentRoutine } from '../storage';
-import { colors } from '../theme/colors';
-import type { RootStackParamList } from '../navigation/types';
+import { useRef, useState } from "react";
+import {
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { resolveSelection } from "../content/catalog";
+import type { Exercise } from "../content";
+import {
+  getSelection,
+  rememberStarted,
+  setSelection,
+} from "../storage/selection";
+import { setCurrentRoutine } from "../storage";
+import { font, palette, ui } from "../theme/studio";
+import type { RootStackParamList } from "../navigation/types";
+import { ExerciseDetails } from "../components/ExerciseDetails";
+import ActionButton from "../components/ActionButton";
+import Icon from "../components/Icon";
+import ReorderableExerciseList, {
+  type SortScrollMetrics,
+} from "../components/ReorderableExerciseList";
 
 export default function PreviewScreen() {
   const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
-  const pack = useMemo(() => loadBundledContent(), []);
-  const [pro, setPro] = useState(false);
-  const prefs = getPrefs();
-
-  useEffect(() => {
-    isProUnlocked().then(setPro);
-    return subscribePro(setPro);
-  }, []);
-
-  const routine = useMemo(() => {
-    const built = buildRoutine({
-      exercises: pack.exercises,
-      position: prefs.position,
-      bodyRegion: prefs.bodyRegion,
-      durationSeconds: prefs.durationSeconds,
-      unlocked: pro,
-    });
-    setCurrentRoutine(built);
-    return built;
-  }, [pack, prefs.bodyRegion, prefs.durationSeconds, prefs.position, pro]);
-
-  const { n, unit } = formatActiveDurationLabel(prefs.durationSeconds);
-  const active = unit === 'min' ? t('duration.min', { n }) : t('duration.sec', { n });
-  const gapNote = t('preview.gapNote', { active });
-
-  const equipmentLabels = useMemo(() => {
-    const ids = new Set<string>();
-    for (const ex of routine.units) {
-      for (const e of ex.equipment) ids.add(e);
+  const selection = getSelection();
+  const [units, setUnits] = useState(() =>
+    selection ? resolveSelection(selection) : [],
+  );
+  const [dragging, setDragging] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const viewportRef = useRef<View>(null);
+  const scrollMetrics = useRef<SortScrollMetrics>({
+    offset: 0,
+    contentHeight: 0,
+    viewportHeight: 0,
+    top: 0,
+  });
+  const [detail, setDetail] = useState<Exercise | null>(null),
+    [starting, setStarting] = useState(false);
+  async function start() {
+    if (!selection || !units.length || starting) return;
+    setStarting(true);
+    try {
+      const orderedSelection = {
+        ...selection,
+        exerciseIds: units.map((ex) => ex.id),
+      };
+      await rememberStarted(orderedSelection);
+      setSelection(orderedSelection);
+      setCurrentRoutine({ units, repeatsSomeMoves: false, empty: false });
+      nav.navigate("Player");
+    } catch {
+      Alert.alert("尚未儲存", "無法記住這次的組合，請再試一次。");
+    } finally {
+      setStarting(false);
     }
-    return [...ids].map((id) => labelFor(pack.categories.equipment, id));
-  }, [pack.categories.equipment, routine.units]);
-
+  }
+  const seconds = units.length * 30;
+  const time = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 16 }]}>
-      <Pressable onPress={() => nav.goBack()} accessibilityLabel={t('common.back')}>
-        <Text style={styles.back}>{t('common.back')}</Text>
-      </Pressable>
-      <Text style={styles.title}>{t('preview.title')}</Text>
-      <Text style={styles.note}>{gapNote}</Text>
-      {routine.repeatsSomeMoves ? <Text style={styles.warn}>{t('preview.repeats')}</Text> : null}
-
-      <ScrollView style={styles.list} contentContainerStyle={{ paddingBottom: 16 }}>
-        {routine.empty ? (
-          <View>
-            <Text style={styles.empty}>{t('preview.empty')}</Text>
-            <Text style={styles.reason}>{t(`reason.${routine.reason || 'no_matching_content'}`)}</Text>
-            <Text style={styles.change}>{t('preview.change')}</Text>
-            {routine.reason === 'needs_unlock' ? (
-              <Pressable style={styles.secondary} onPress={() => nav.navigate('Paywall')}>
-                <Text style={styles.secondaryText}>{t('preview.unlock')}</Text>
-              </Pressable>
-            ) : null}
-          </View>
-        ) : (
-          routine.units.map((ex, i) => (
-            <View key={`${ex.id}-${i}`} style={styles.card}>
-              <Text style={styles.n}>{i + 1}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.name}>{ex.name}</Text>
-                <Text style={styles.setup}>{ex.setup}</Text>
-                {ex.cautions.map((c) => (
-                  <Text key={c} style={styles.caution}>{c}</Text>
-                ))}
-              </View>
-            </View>
-          ))
-        )}
-        {equipmentLabels.length ? (
-          <Text style={styles.equip}>{t('preview.equipment')}：{equipmentLabels.join('、')}</Text>
-        ) : null}
-        <Text style={styles.consult}>{t('home.consult')}</Text>
-        <Text style={styles.safety}>{t('home.safety')}</Text>
-      </ScrollView>
-
-      {!routine.empty ? (
+    <View style={[ui.root, { paddingTop: insets.top + 8 }]}>
+      <View style={[ui.content, s.nav]}>
         <Pressable
-          style={styles.cta}
-          onPress={() => nav.navigate('Player')}
           accessibilityRole="button"
+          accessibilityLabel="返回首頁"
+          onPress={() => nav.goBack()}
+          style={s.back}
         >
-          <Text style={styles.ctaText}>{t('preview.start')}</Text>
+          <Icon name="back" />
+          <Text style={s.navTitle}>組合預覽</Text>
         </Pressable>
-      ) : null}
+      </View>
+      <View
+        ref={viewportRef}
+        style={{ flex: 1 }}
+        onLayout={(event) => {
+          scrollMetrics.current.viewportHeight =
+            event.nativeEvent.layout.height;
+        }}
+      >
+        <ScrollView
+          ref={scrollRef}
+          scrollEnabled={!dragging}
+          removeClippedSubviews={false}
+          scrollEventThrottle={16}
+          onScroll={(event) => {
+            scrollMetrics.current.offset = event.nativeEvent.contentOffset.y;
+          }}
+          onContentSizeChange={(_width, height) => {
+            scrollMetrics.current.contentHeight = height;
+          }}
+          contentContainerStyle={[ui.content, { paddingBottom: 24 }]}
+        >
+          <Text style={[ui.heading, { marginTop: 22 }]}>
+            {selection?.name ?? "請先選擇組合"}
+          </Text>
+          <Text style={ui.subtitle}>{selection?.subtitle}</Text>
+          <View style={s.summary}>
+            <Text style={s.time}>{time}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.summaryTitle}>{units.length} 個動作 × 30 秒</Text>
+              <Text style={s.meta}>另有每段 3 秒準備時間</Text>
+            </View>
+          </View>
+          <View style={s.listHeading}>
+            <Text style={ui.section}>動作順序</Text>
+            <Text style={s.meta}>固定 30 秒 / 動作</Text>
+          </View>
+          <Text style={[s.meta, { marginBottom: 8 }]}>
+            長按右側把手，上下拖曳調整
+          </Text>
+          <ReorderableExerciseList
+            items={units}
+            onChange={setUnits}
+            onOpen={setDetail}
+            onDragStateChange={setDragging}
+            scrollRef={scrollRef}
+            viewportRef={viewportRef}
+            scrollMetrics={scrollMetrics}
+          />
+        </ScrollView>
+      </View>
+      <View
+        style={[
+          ui.content,
+          { paddingTop: 12, paddingBottom: insets.bottom + 16 },
+        ]}
+      >
+        <ActionButton
+          label={starting ? "正在準備…" : "開始跟練"}
+          onPress={() => void start()}
+          disabled={!units.length || starting || dragging}
+        />
+      </View>
+      <Modal
+        visible={!!detail}
+        animationType="slide"
+        onRequestClose={() => setDetail(null)}
+      >
+        <ExerciseDetails exercise={detail} onClose={() => setDetail(null)} />
+      </Modal>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20 },
-  back: { color: colors.brand, fontSize: 16, marginBottom: 12 },
-  title: { fontSize: 24, fontWeight: '700', color: colors.label },
-  note: { marginTop: 8, color: colors.l2, fontSize: 14 },
-  warn: { marginTop: 8, color: colors.red, fontSize: 14 },
-  list: { flex: 1, marginTop: 16 },
-  card: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.sep,
+const s = StyleSheet.create({
+  nav: { minHeight: 44, justifyContent: "center" },
+  back: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    alignSelf: "flex-start",
+    minHeight: 44,
   },
-  n: { width: 24, color: colors.l3, fontSize: 16 },
-  name: { fontSize: 16, fontWeight: '600', color: colors.label },
-  setup: { marginTop: 2, fontSize: 13, color: colors.l2 },
-  caution: { marginTop: 4, fontSize: 13, color: colors.red, lineHeight: 18 },
-  consult: { marginTop: 16, color: colors.l2, fontSize: 13, lineHeight: 20 },
-  empty: { fontSize: 18, fontWeight: '600', color: colors.label, marginTop: 24 },
-  reason: { marginTop: 8, color: colors.l2, fontSize: 15 },
-  change: { marginTop: 8, color: colors.l2, fontSize: 15 },
-  secondary: { marginTop: 16, alignSelf: 'flex-start' },
-  secondaryText: { color: colors.brand, fontSize: 16 },
-  equip: { marginTop: 16, color: colors.l2, fontSize: 14 },
-  safety: { marginTop: 16, color: colors.l2, fontSize: 13, lineHeight: 20 },
-  cta: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: colors.brand,
-    alignItems: 'center',
-    justifyContent: 'center',
+  navTitle: { color: palette.ink, fontSize: 15, fontFamily: font.medium },
+  summary: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 22,
+    padding: 16,
+    minHeight: 72,
+    borderRadius: 12,
+    backgroundColor: palette.wash,
+    marginTop: 18,
   },
-  ctaText: { color: colors.onbrand, fontSize: 17, fontWeight: '600' },
+  time: {
+    color: palette.blue,
+    fontFamily: font.bold,
+    fontSize: 29,
+    fontVariant: ["tabular-nums"],
+  },
+  summaryTitle: {
+    fontFamily: font.medium,
+    fontSize: 13,
+    lineHeight: 22,
+    color: palette.ink,
+  },
+  meta: {
+    fontFamily: font.regular,
+    fontSize: 11,
+    lineHeight: 18,
+    color: palette.muted,
+  },
+  listHeading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    marginTop: 22,
+    marginBottom: 8,
+  },
 });

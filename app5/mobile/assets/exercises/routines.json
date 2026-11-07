@@ -1,0 +1,8 @@
+[
+ {"id":"standing","name":"原地伸展","subtitle":"站起來，留一點空間給自己","color":"#E8CEB9","tag":"站著就能做","exercise_ids":["stand_neck_turn","stand_shoulder_circles","stand_chest_open","stand_elbow_bend","stand_wrist_flex","stand_finger_open","stand_side_slide","stand_shoulder_blades"]},
+ {"id":"office","name":"辦公室伸展","subtitle":"不用離開座位，也能鬆一下","color":"#CEDDD7","tag":"一張穩固椅子","exercise_ids":["sit_neck_turn","sit_neck_side","sit_shoulder_circles","sit_chest_open","sit_upper_back_turn","sit_wrist_flex","sit_finger_open","sit_side_reach"]},
+ {"id":"morning","name":"晨起喚醒","subtitle":"從小小的活動，慢慢醒過來","color":"#EDDFC1","tag":"輕柔開始","exercise_ids":["stand_shoulder_circles","stand_arm_raise","stand_chest_open","stand_elbow_bend","stand_side_slide","stand_shoulder_blades"]},
+ {"id":"bedtime","name":"睡前放鬆","subtitle":"躺下來，把今天慢慢放下","color":"#DDD7EA","tag":"仰躺・準備地墊","exercise_ids":["lie_ankle_pump","lie_heel_slide","lie_knee_roll","lie_pelvic_tilt","lie_single_knee_hug","lie_arm_slide","lie_finger_open","lie_wrist_flex"]},
+ {"id":"hands","name":"手腕與手臂","subtitle":"打字之間，給雙手一個空檔","color":"#E6D7D0","tag":"坐姿活動","exercise_ids":["sit_finger_open","sit_wrist_flex","sit_elbow_bend","sit_triceps"]},
+ {"id":"floor","name":"躺著舒展","subtitle":"在地墊上，舒服地活動身體","color":"#D5DFCA","tag":"仰躺・準備地墊","exercise_ids":["lie_heel_slide","lie_single_knee_hug","lie_hamstring","lie_glute","lie_knee_roll","lie_pelvic_tilt"]}
+]

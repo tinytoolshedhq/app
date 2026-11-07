@@ -1,0 +1,109 @@
+{
+  "id": "sit_shoulder_circles",
+  "name": "肩膀輕繞圈",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "shoulders"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "坐在穩固無輪椅子上，雙腳踩地，雙手垂在身旁。",
+  "description": "雙手自然垂放，肩膀小幅向前、向後繞圈。",
+  "instructions": [
+    "肩膀向前緩慢繞小圈",
+    "維持小幅度向前繞圈",
+    "改為向後緩慢繞小圈",
+    "停止繞圈，肩膀回到自然位置"
+  ],
+  "cautions": [
+    "不要用力聳肩或讓頭部跟著繞圈。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "肩膀向前緩慢繞小圈"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "維持小幅度向前繞圈"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "改為向後緩慢繞小圈"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "停止繞圈，肩膀回到自然位置"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_shoulder_circles_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "雙手放鬆，肩膀慢慢向前繞小圈。",
+      "audio_path": "audio/sit_shoulder_circles_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_shoulder_circles_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "輕輕繞就好，保持呼吸。",
+      "audio_path": "audio/sit_shoulder_circles_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_shoulder_circles_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "現在換方向，肩膀慢慢向後繞圈。",
+      "audio_path": "audio/sit_shoulder_circles_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_shoulder_circles_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢停下，放鬆肩膀。",
+      "audio_path": "audio/sit_shoulder_circles_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：坐在穩固無輪椅子上，雙腳踩地，雙手垂在身旁。採用 shoulder 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "office"
+  ],
+  "library": {
+    "body_part": "肩",
+    "muscle": "肩帶肌群",
+    "pose": "shoulder",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

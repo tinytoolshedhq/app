@@ -1,0 +1,109 @@
+{
+  "id": "sit_triceps",
+  "name": "坐姿手臂後側伸展",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "arms",
+    "shoulders"
+  ],
+  "movement_type": "stretch",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "坐在穩固無輪椅上，雙腳踩地。",
+  "description": "坐直，左肘向上彎，右手輕扶。；回正放下後換另一手。",
+  "instructions": [
+    "坐直，左肘向上彎，右手輕扶。",
+    "回正放下後換另一手。"
+  ],
+  "cautions": [
+    "只到輕微牽拉感，不彈震、不憋氣；疼痛或麻木時停止。",
+    "肩、頸、腰或膝已有傷勢時，先確認這個姿勢是否適合。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "坐直，左肘向上，右手輕扶。"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "肩膀放鬆，不用力壓。"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "雙手放下，再換右肘向上。"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "雙手放回腿上。"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_triceps_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "坐直，左肘向上，右手輕扶。",
+      "audio_path": "audio/sit_triceps_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_triceps_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "肩膀放鬆，不用力壓。",
+      "audio_path": "audio/sit_triceps_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_triceps_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "雙手放下，再換右肘向上。",
+      "audio_path": "audio/sit_triceps_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_triceps_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "雙手放回腿上。",
+      "audio_path": "audio/sit_triceps_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：坐在穩固無輪椅上，雙腳踩地。採用 triceps 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "stretches"
+  ],
+  "library": {
+    "body_part": "手臂",
+    "muscle": "三頭肌",
+    "pose": "triceps",
+    "source_note": "依英文來源改寫；每側約 10 秒加換側的 30 秒安排為產品草稿，與來源維持時間不同。",
+    "checked_on": "2026-11-07"
+  }
+}

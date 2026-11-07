@@ -1,0 +1,110 @@
+{
+  "id": "sit_ankle_pump",
+  "name": "坐姿腳踝勾放",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "ankles",
+    "calves"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "坐穩，雙腳踩地，預留腳前方活動空間。",
+  "description": "一腳略向前、腳跟輕放地，腳尖緩慢勾起再放下，兩側依序進行。",
+  "instructions": [
+    "左腳略向前，腳跟留地，腳尖勾放",
+    "左腳收回，準備右腳",
+    "右腳略向前，腳跟留地，腳尖勾放",
+    "右腳收回，雙腳踩穩"
+  ],
+  "cautions": [
+    "不要強行繃腳或勾腳；膝蓋不必完全伸直。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "左腳略向前，腳跟留地，腳尖勾放"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "左腳收回，準備右腳"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "右腳略向前，腳跟留地，腳尖勾放"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "右腳收回，雙腳踩穩"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_ankle_pump_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "左腳往前一點，腳跟留地，腳尖勾起再放下。",
+      "audio_path": "audio/sit_ankle_pump_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_ankle_pump_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "左腳收回，換右腳。",
+      "audio_path": "audio/sit_ankle_pump_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_ankle_pump_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "右腳跟留地，腳尖慢慢勾起再放下。",
+      "audio_path": "audio/sit_ankle_pump_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_ankle_pump_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "右腳收回，雙腳踩穩。",
+      "audio_path": "audio/sit_ankle_pump_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：坐穩，雙腳踩地，預留腳前方活動空間。採用 ankle 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "seated"
+  ],
+  "library": {
+    "body_part": "腿",
+    "muscle": "足踝周圍肌群",
+    "pose": "ankle",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

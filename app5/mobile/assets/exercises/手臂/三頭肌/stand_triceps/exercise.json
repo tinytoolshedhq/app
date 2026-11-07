@@ -1,0 +1,107 @@
+{
+  "id": "stand_triceps",
+  "name": "頭上手臂後側伸展",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "standing",
+  "body_regions": [
+    "arms",
+    "shoulders"
+  ],
+  "movement_type": "stretch",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [],
+  "setup": "雙腳站穩，確認頭上空間。",
+  "description": "左肘朝上彎曲，右手輕扶左肘。；輕靠近頭部，回正後換手。",
+  "instructions": [
+    "左肘朝上彎曲，右手輕扶左肘。",
+    "輕靠近頭部，回正後換手。"
+  ],
+  "cautions": [
+    "只到輕微牽拉感，不彈震、不憋氣；疼痛或麻木時停止。",
+    "肩、頸、腰或膝已有傷勢時，先確認這個姿勢是否適合。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "左手抬高彎肘，右手輕扶左肘。"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "保持呼吸，不要壓頸部。"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "放下換手，左手輕扶右肘。"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "慢慢放下雙手。"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "stand_triceps_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "左手抬高彎肘，右手輕扶左肘。",
+      "audio_path": "audio/stand_triceps_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_triceps_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "保持呼吸，不要壓頸部。",
+      "audio_path": "audio/stand_triceps_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_triceps_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "放下換手，左手輕扶右肘。",
+      "audio_path": "audio/stand_triceps_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "stand_triceps_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢放下雙手。",
+      "audio_path": "audio/stand_triceps_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：雙腳站穩，確認頭上空間。採用 triceps 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "stretches"
+  ],
+  "library": {
+    "body_part": "手臂",
+    "muscle": "三頭肌",
+    "pose": "triceps",
+    "source_note": "依英文來源改寫；每側約 10 秒加換側的 30 秒安排為產品草稿，與來源維持時間不同。",
+    "checked_on": "2026-11-07"
+  }
+}

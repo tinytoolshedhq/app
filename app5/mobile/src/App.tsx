@@ -1,19 +1,29 @@
-import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { initializeI18n, t } from './i18n';
-import { installWebAlert } from './lib/webAlert';
-import { loadBundledContent } from './content';
-import { startPurchaseUpdates, verifyProOnLaunch } from './iap';
-import { initPrefs } from './storage';
-import AppNavigator from './navigation/AppNavigator';
-import { colors } from './theme/colors';
+import {
+  useFonts,
+  NotoSansTC_400Regular,
+  NotoSansTC_500Medium,
+  NotoSansTC_700Bold,
+} from "@expo-google-fonts/noto-sans-tc";
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { initializeI18n, t } from "./i18n";
+import { installWebAlert } from "./lib/webAlert";
+import { loadBundledContent } from "./content";
+import { initPrefs } from "./storage";
+import AppNavigator from "./navigation/AppNavigator";
+import { colors } from "./theme/colors";
 
 installWebAlert();
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    NotoSansTC_400Regular,
+    NotoSansTC_500Medium,
+    NotoSansTC_700Bold,
+  });
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +34,6 @@ export default function App() {
         initializeI18n();
         loadBundledContent();
         await initPrefs();
-        try { await startPurchaseUpdates(); } catch { /* IAP optional in Expo Go */ }
-        await verifyProOnLaunch();
         if (!cancelled) setReady(true);
       } catch (e) {
         if (!cancelled) setError(String((e as Error)?.message || e));
@@ -36,18 +44,34 @@ export default function App() {
     };
   }, []);
 
-  if (error) {
+  if (error || fontError) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: colors.label, fontSize: 16 }}>{error}</Text>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.bg,
+          justifyContent: "center",
+          padding: 24,
+        }}
+      >
+        <Text style={{ color: colors.label, fontSize: 16 }}>
+          {error || fontError?.message}
+        </Text>
       </View>
     );
   }
 
-  if (!ready) {
+  if (!ready || !fontsLoaded) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: colors.l2 }}>{t('app.loading')}</Text>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.bg,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: colors.l2 }}>{t("app.loading")}</Text>
       </View>
     );
   }

@@ -1,0 +1,108 @@
+{
+  "id": "lie_heel_slide",
+  "name": "腳跟輕滑動",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "lying",
+  "body_regions": [
+    "knees",
+    "hips"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "mat"
+  ],
+  "setup": "仰躺在平穩表面，雙腿舒服伸展，腳跟有足夠滑動空間。",
+  "description": "仰躺，腳跟貼著平面慢慢滑近臀部再滑回，兩側依序進行。",
+  "instructions": [
+    "左腳跟貼面滑近臀部，再緩慢滑回",
+    "左腿放鬆，準備右腳",
+    "右腳跟貼面滑近臀部，再緩慢滑回",
+    "回到自然位置"
+  ],
+  "cautions": [
+    "不用力拖曳腳跟，不強求膝蓋完全彎曲或伸直。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "左腳跟貼面滑近臀部，再緩慢滑回"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "左腿放鬆，準備右腳"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "右腳跟貼面滑近臀部，再緩慢滑回"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "回到自然位置"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "lie_heel_slide_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "左腳跟慢慢滑近臀部，再輕輕滑回。",
+      "audio_path": "audio/lie_heel_slide_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_heel_slide_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "放鬆左腿，準備換腳。",
+      "audio_path": "audio/lie_heel_slide_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_heel_slide_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "換右腳跟慢慢滑近，再輕輕滑回。",
+      "audio_path": "audio/lie_heel_slide_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_heel_slide_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "雙腿放鬆，休息一下。",
+      "audio_path": "audio/lie_heel_slide_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：仰躺在平穩表面，雙腿舒服伸展，腳跟有足夠滑動空間。採用 heel 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [],
+  "library": {
+    "body_part": "腿",
+    "muscle": "股四頭肌",
+    "pose": "heel",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

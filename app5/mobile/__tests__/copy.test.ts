@@ -37,13 +37,12 @@ describe('copy', () => {
     expect(JSON.stringify(zh)).not.toMatch(/審核通過/);
     const preview = fs.readFileSync(path.join(__dirname, '../src/screens/PreviewScreen.tsx'), 'utf8');
     const player = fs.readFileSync(path.join(__dirname, '../src/screens/PlayerScreen.tsx'), 'utf8');
-    expect(preview).toMatch(/ex\.cautions/);
-    expect(preview).toMatch(/home\.consult/);
-    expect(preview).toMatch(/home\.safety/);
-    expect(player).toMatch(/cautions/);
-    expect(player).toMatch(/home\.consult/);
-    expect(player).toMatch(/home\.safety/);
-    expect(player.match(/shown\?\.name/g)?.length).toBe(1);
+    const details = fs.readFileSync(path.join(__dirname, '../src/components/ExerciseDetails.tsx'), 'utf8');
+    expect(details).not.toMatch(/注意事項|動作參考|ex\.cautions|Linking/);
+    expect(preview).not.toMatch(/home\.consult|home\.safety/);
+    expect(player).toMatch(/ExerciseDetails/);
+    expect(player).not.toMatch(/home\.safety/);
+    expect(player).toMatch(/shown\.name/);
   });
 
   it('declares App Store photo usage strings like app4 (ITMS-90683)', () => {

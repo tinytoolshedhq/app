@@ -1,0 +1,110 @@
+{
+  "id": "lie_pelvic_tilt",
+  "name": "骨盆輕輕回擺",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "lying",
+  "body_regions": [
+    "waist",
+    "hips"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "mat"
+  ],
+  "setup": "仰躺，雙膝彎曲，雙腳與髖同寬踩穩，雙手放在身旁。",
+  "description": "仰躺屈膝，骨盆輕微後傾，讓腰部靠近平面，再放鬆。",
+  "instructions": [
+    "輕輕後傾骨盆，腰部靠近平面，再放鬆",
+    "保持自然呼吸，緩慢重複",
+    "繼續小幅後傾與放鬆",
+    "回到腰背自然位置"
+  ],
+  "cautions": [
+    "不抬臀成橋式，不強壓腰部或用力收腹憋氣。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "輕輕後傾骨盆，腰部靠近平面，再放鬆"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "保持自然呼吸，緩慢重複"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "繼續小幅後傾與放鬆"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "回到腰背自然位置"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "lie_pelvic_tilt_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "骨盆輕輕後傾，腰靠近地面，再放鬆。",
+      "audio_path": "audio/lie_pelvic_tilt_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_pelvic_tilt_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "臀部留地，別憋氣。",
+      "audio_path": "audio/lie_pelvic_tilt_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_pelvic_tilt_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "繼續小小後傾，再慢慢放鬆。",
+      "audio_path": "audio/lie_pelvic_tilt_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_pelvic_tilt_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "回到自然位置，休息一下。",
+      "audio_path": "audio/lie_pelvic_tilt_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：仰躺，雙膝彎曲，雙腳與髖同寬踩穩，雙手放在身旁。採用 pelvis 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "back"
+  ],
+  "library": {
+    "body_part": "背",
+    "muscle": "腰背肌群",
+    "pose": "pelvis",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

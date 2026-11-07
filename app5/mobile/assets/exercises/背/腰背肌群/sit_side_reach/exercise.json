@@ -1,0 +1,110 @@
+{
+  "id": "sit_side_reach",
+  "name": "坐姿側身輕移",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "waist",
+    "upper_back"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "坐在無扶手穩固椅子上，雙腳踩穩，雙手垂放。",
+  "description": "雙腳踩穩，單手沿身側向下滑，軀幹小幅側彎再回正。",
+  "instructions": [
+    "左手沿身側向下滑，軀幹小幅向左",
+    "慢慢回到中間",
+    "右手沿身側向下滑，軀幹小幅向右",
+    "慢慢回正"
+  ],
+  "cautions": [
+    "雙側臀部留在椅面；不向前彎或用力伸手碰地。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "左手沿身側向下滑，軀幹小幅向左"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "慢慢回到中間"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "右手沿身側向下滑，軀幹小幅向右"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "慢慢回正"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_side_reach_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "左手沿身側往下，身體輕輕向左。",
+      "audio_path": "audio/sit_side_reach_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_side_reach_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "慢慢回到中間。",
+      "audio_path": "audio/sit_side_reach_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_side_reach_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "換右手往下滑，身體輕輕向右。",
+      "audio_path": "audio/sit_side_reach_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_side_reach_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "回到中間，坐穩放鬆。",
+      "audio_path": "audio/sit_side_reach_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：坐在無扶手穩固椅子上，雙腳踩穩，雙手垂放。採用 side 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "flexibility"
+  ],
+  "library": {
+    "body_part": "背",
+    "muscle": "腰背肌群",
+    "pose": "side",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

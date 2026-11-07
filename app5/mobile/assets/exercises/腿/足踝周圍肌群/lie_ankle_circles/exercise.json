@@ -1,0 +1,108 @@
+{
+  "id": "lie_ankle_circles",
+  "name": "仰躺腳踝小圈",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "lying",
+  "body_regions": [
+    "ankles"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "mat",
+    "cushion"
+  ],
+  "setup": "仰躺，小腿下墊薄墊，腳跟略超出墊緣，腳踝能自由活動。",
+  "description": "小腿用薄墊托住，兩腳踝小幅畫圈後反方向。",
+  "instructions": [
+    "雙腳踝各自小幅繞圈",
+    "維持小幅慢速繞圈",
+    "兩腳踝各自反方向繞圈",
+    "停止，腳踝回到自然位置"
+  ],
+  "cautions": [
+    "只有腳踝活動，不以整條腿旋轉；不強求圓圈完整。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "雙腳踝各自小幅繞圈"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "維持小幅慢速繞圈"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "兩腳踝各自反方向繞圈"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "停止，腳踝回到自然位置"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "lie_ankle_circles_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "小腿墊穩，兩隻腳踝各自慢慢畫小圈。",
+      "audio_path": "audio/lie_ankle_circles_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_ankle_circles_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "輕輕畫圈就好。",
+      "audio_path": "audio/lie_ankle_circles_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_ankle_circles_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "現在各自換方向，繼續慢慢畫圈。",
+      "audio_path": "audio/lie_ankle_circles_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "lie_ankle_circles_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢停下，放鬆雙腳。",
+      "audio_path": "audio/lie_ankle_circles_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：仰躺，小腿下墊薄墊，腳跟略超出墊緣，腳踝能自由活動。採用 ankle-circle 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [],
+  "library": {
+    "body_part": "腿",
+    "muscle": "足踝周圍肌群",
+    "pose": "ankle-circle",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}

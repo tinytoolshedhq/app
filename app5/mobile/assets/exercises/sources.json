@@ -1,0 +1,38 @@
+[
+  {
+    "id": "seated",
+    "title": "NHS — Sitting exercises",
+    "url": "https://www.nhs.uk/live-well/exercise/sitting-exercises/",
+    "scope": "部分坐姿活動的方向參考；本檔的時間、講稿與姿勢變體另行編排。"
+  },
+  {
+    "id": "flexibility",
+    "title": "NHS — Flexibility exercises",
+    "url": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/",
+    "scope": "側彎及扶牆小腿活動參考；坐姿變體與 30 秒安排須另行審核。"
+  },
+  {
+    "id": "office",
+    "title": "Newcastle Hospitals — 1 minute body check",
+    "url": "https://www.newcastle-hospitals.nhs.uk/services/newcastle-occupational-health-service/information-for-staff/physiotherapy/self-help-leaflets/1-minute-body-check/",
+    "scope": "肩部、手部與手肘活動參考；仰躺變體屬本產品草稿。"
+  },
+  {
+    "id": "back",
+    "title": "Cambridge University Hospitals — Back mobility exercises",
+    "url": "https://www.cuh.nhs.uk/patient-information/back-mobility-exercises/",
+    "scope": "屈膝移動、骨盆活動與膝部靠近身體的方向參考；不沿用為個人復健處方。"
+  },
+  {
+    "id": "stretches",
+    "title": "ColumbiaDoctors / WebMD Ignite — Stretches",
+    "url": "https://www.columbiadoctors.org/health-library/multimedia/stretches/",
+    "scope": "三頭肌與闊背肌伸展方向參考，30 秒編排另行設計。"
+  },
+  {
+    "id": "cooldown",
+    "title": "NHS — How to stretch after exercising",
+    "url": "https://www.nhs.uk/live-well/exercise/how-to-stretch-after-exercising/",
+    "scope": "腿後與臀部伸展方向參考，30 秒編排另行設計。"
+  }
+]

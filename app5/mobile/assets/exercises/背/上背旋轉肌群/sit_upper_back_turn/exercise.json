@@ -1,0 +1,110 @@
+{
+  "id": "sit_upper_back_turn",
+  "name": "上半身輕轉",
+  "content_version": "0.2.0",
+  "status": "draft",
+  "review_status": "source_referenced",
+  "position": "sitting",
+  "body_regions": [
+    "upper_back"
+  ],
+  "movement_type": "mobility",
+  "access_tier": "free",
+  "duration_seconds": 30,
+  "gap_after_seconds": 3,
+  "equipment": [
+    "chair"
+  ],
+  "setup": "坐直，雙腳踩地，雙手交叉輕放胸前。",
+  "description": "雙手交叉放胸前，骨盆朝前，上半身向兩側小幅轉動。",
+  "instructions": [
+    "骨盆朝前，上半身輕向左轉並短停",
+    "上半身慢慢回正",
+    "上半身輕向右轉並短停",
+    "回正，雙手放下"
+  ],
+  "cautions": [
+    "不要用椅背或手臂拉扯增加轉動幅度。"
+  ],
+  "movement_timeline": [
+    {
+      "start_seconds": 0,
+      "end_seconds": 10,
+      "instruction": "骨盆朝前，上半身輕向左轉並短停"
+    },
+    {
+      "start_seconds": 10,
+      "end_seconds": 15,
+      "instruction": "上半身慢慢回正"
+    },
+    {
+      "start_seconds": 15,
+      "end_seconds": 25,
+      "instruction": "上半身輕向右轉並短停"
+    },
+    {
+      "start_seconds": 25,
+      "end_seconds": 30,
+      "instruction": "回正，雙手放下"
+    }
+  ],
+  "voice_cues": [
+    {
+      "id": "sit_upper_back_turn_cue_01",
+      "at_seconds": 0,
+      "max_duration_seconds": 9,
+      "text": "雙手放胸前，上半身慢慢向左轉。",
+      "audio_path": "audio/sit_upper_back_turn_cue_01.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_upper_back_turn_cue_02",
+      "at_seconds": 10,
+      "max_duration_seconds": 4,
+      "text": "慢慢回到中間。",
+      "audio_path": "audio/sit_upper_back_turn_cue_02.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_upper_back_turn_cue_03",
+      "at_seconds": 15,
+      "max_duration_seconds": 9,
+      "text": "現在向右轉，轉到舒服的位置就好。",
+      "audio_path": "audio/sit_upper_back_turn_cue_03.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    },
+    {
+      "id": "sit_upper_back_turn_cue_04",
+      "at_seconds": 25,
+      "max_duration_seconds": 4,
+      "text": "慢慢回正，放鬆雙手。",
+      "audio_path": "audio/sit_upper_back_turn_cue_04.mp3",
+      "measured_duration_seconds": null,
+      "audio_status": "pending"
+    }
+  ],
+  "animation_brief": "靜態示意圖：坐直，雙腳踩地，雙手交叉輕放胸前。採用 twist 人物模板與方向箭頭。對照步驟與換側方向，不使用動畫。",
+  "media": {
+    "status": "static_diagram",
+    "image_path": null,
+    "animation_path": null,
+    "animation_format": null,
+    "animation_playback": null,
+    "animation_duration_seconds": null,
+    "figma_url": null
+  },
+  "source_ids": [
+    "seated",
+    "office"
+  ],
+  "library": {
+    "body_part": "背",
+    "muscle": "上背旋轉肌群",
+    "pose": "twist",
+    "source_note": "沿用既有中文內容；姿勢變體及 30 秒編排為產品草稿，不等同來源建議的完整訓練。",
+    "checked_on": "2026-11-07"
+  }
+}
